@@ -8,3 +8,8 @@ class Entity(ABC):
     @abstractmethod
     def id(self) -> ID:
         pass
+
+    def __eq__(self, other):
+        if not isinstance(other, Entity):
+            return False
+        return self.id == other.id
