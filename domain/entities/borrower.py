@@ -7,7 +7,7 @@ from domain.entities.libraries import Library, LibraryFee
 from domain.value_items import BorrowerVerificationFlags
 
 
-class BaseBorrower(Entity):
+class Borrower(Entity):
     library: Library  # library this borrower is a member of
     verification_flags: list[BorrowerVerificationFlags]  # what flags the borrower has done
 
@@ -17,5 +17,5 @@ class BaseBorrower(Entity):
         pass
 
     @abstractmethod
-    def apply_fee(self, fee: LibraryFee) -> BaseBorrower:
+    def apply_fee(self, fee: LibraryFee) -> Borrower:
         raise NotImplementedError()
