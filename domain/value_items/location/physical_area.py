@@ -11,4 +11,4 @@ class PhysicalArea(Location):
     model_config = {"frozen": True}
 
     def contains(self, other: Location) -> bool:
-        pass
+        raise NotImplementedError()

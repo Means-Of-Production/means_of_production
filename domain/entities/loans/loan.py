@@ -17,7 +17,7 @@ class Loan(Entity):
     location: Location
     _status: LoanStatus
     return_location: Location
-    _date_returned: date | None = PrivateAttr(default=None)
+    date_returned: date | None
 
     @classmethod
     @field_validator("_date_returned", mode="after")
@@ -39,15 +39,6 @@ class Loan(Entity):
     @property
     def active(self) -> bool:
         return self._status == LoanStatus.BORROWED
-
-    @computed_field
-    @property
-    def date_returned(self) -> date | None:
-        return self._date_returned
-
-    @date_returned.setter
-    def date_returned(self, value: date):
-        self._date_returned = value
 
     @property
     def status(self) -> LoanStatus:

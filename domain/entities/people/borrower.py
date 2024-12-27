@@ -10,8 +10,8 @@ class Borrower(Entity):
     library: Library  # the library this borrower is a member of
     verification_flags: list[BorrowerVerificationFlags]
 
-    @abstractmethod
     @property
+    @abstractmethod
     def fees(self) -> Sequence[LibraryFee]:
         raise NotImplementedError
 

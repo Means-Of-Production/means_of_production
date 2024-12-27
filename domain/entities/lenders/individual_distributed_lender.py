@@ -13,8 +13,11 @@ from domain.value_items.exceptions import ReturnNotStartedError
 
 class IndividualDistributedLender(Person, Lender):
     _items: list[Thing] = PrivateAttr(default_factory=list)
-    id: ID
     return_location_override : Location | None = None
+
+    @property
+    def entity_id(self) -> ID:
+        return self.person_id
 
     @property
     def items(self) -> Iterable[Thing]:
@@ -27,7 +30,7 @@ class IndividualDistributedLender(Person, Lender):
     def start_return(self, loan: Loan) -> Loan:
         if loan.item.status != ThingStatus.BORROWED:
             raise ReturnNotStartedError()
-        loan.date_returned = datetime.now(tz=timezone.utc).date
+        loan.date_returned = datetime.now(tz=timezone.utc).date()
         loan.status = LoanStatus.RETURN_STARTED
         return loan
 

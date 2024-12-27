@@ -6,10 +6,10 @@ from domain.value_items import ID
 class Entity(ABC):
     @property
     @abstractmethod
-    def id(self) -> ID:
+    def entity_id(self) -> ID:
         pass
 
     def __eq__(self, other):
         if not isinstance(other, Entity):
             return False
-        return self.id == other.id
+        return self.entity_id == other.entity_id

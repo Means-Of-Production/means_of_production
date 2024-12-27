@@ -9,7 +9,7 @@ class VirtualLocation(Location):
 
     model_config = {"frozen": True}
 
-    def contains(self, other: VirtualLocation) -> bool:
+    def contains(self, other: Location) -> bool:
         if not isinstance(other, VirtualLocation):
             return False
         return self.url == other.url

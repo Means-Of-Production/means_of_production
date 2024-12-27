@@ -8,8 +8,8 @@ from domain.value_items import Location
 
 
 class Lender(Entity):
-    @abstractmethod
     @property
+    @abstractmethod
     def items(self) -> Iterable[Thing]:
         raise NotImplementedError()
 

@@ -15,28 +15,28 @@ class Library(Entity):
     location: Location
     name: str
 
-    @abstractmethod
     @property
+    @abstractmethod
     def all_things(self) -> Iterable[Thing]:
         raise NotImplementedError()
 
-    @abstractmethod
     @property
+    @abstractmethod
     def available_things(self) -> Iterable[Thing]:
         raise NotImplementedError()
 
-    @abstractmethod
     @property
+    @abstractmethod
     def all_titles(self) -> Iterable[ThingTitle]:
         raise NotImplementedError()
 
-    @abstractmethod
     @property
+    @abstractmethod
     def available_titles(self) -> Iterable[ThingTitle]:
         raise NotImplementedError()
 
-    @abstractmethod
     @property
+    @abstractmethod
     def borrowers(self) -> Iterable[Borrower]:
         raise NotImplementedError()
 

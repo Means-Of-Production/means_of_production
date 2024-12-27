@@ -3,3 +3,4 @@ from domain.value_items import Money
 
 
 class LibraryFee(Entity):
+    pass
