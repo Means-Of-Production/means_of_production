@@ -12,3 +12,6 @@ class InvalidThingStateTransitionError(Exception):
 
         message = f"Invalid thing state transition. Current status: {current_status}, New status: {new_status}"
         super().__init__(message)
+
+class ReturnNotStartedError(Exception):
+    pass
