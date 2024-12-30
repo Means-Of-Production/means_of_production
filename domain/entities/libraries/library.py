@@ -1,12 +1,12 @@
 from abc import abstractmethod
 from typing import Iterable
 
-from domain.entities.entity import Entity
 from domain.entities.borrower import Borrower
-from domain.entities.thing import Thing
-from domain.entities.people import Person
-from domain.value_items import ID, DueDate, Location, ThingTitle
+from domain.entities.entity import Entity
 from domain.entities.loans import Loan
+from domain.entities.people import Person
+from domain.entities.thing import Thing
+from domain.value_items import ID, DueDate, Location, ThingTitle
 
 
 class Library(Entity):

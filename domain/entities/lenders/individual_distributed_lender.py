@@ -1,5 +1,5 @@
-from typing import Iterable, Self
 from datetime import datetime, timezone
+from typing import Iterable, Self
 
 from pydantic import PrivateAttr
 
@@ -7,13 +7,13 @@ from domain.entities.lenders.lender import Lender
 from domain.entities.loans import Loan
 from domain.entities.people import Person
 from domain.entities.thing import Thing
-from domain.value_items import ID, Location, ThingStatus, LoanStatus
+from domain.value_items import ID, LoanStatus, Location, ThingStatus
 from domain.value_items.exceptions import ReturnNotStartedError
 
 
 class IndividualDistributedLender(Person, Lender):
     _items: list[Thing] = PrivateAttr(default_factory=list)
-    return_location_override : Location | None = None
+    return_location_override: Location | None = None
 
     @property
     def entity_id(self) -> ID:
@@ -35,7 +35,10 @@ class IndividualDistributedLender(Person, Lender):
         return loan
 
     def finish_return(self, loan: Loan) -> Loan:
-        if loan.status != LoanStatus.WAITING_ON_LENDER_ACCEPTANCE and loan.status != LoanStatus.RETURN_STARTED:
+        if (
+            loan.status != LoanStatus.WAITING_ON_LENDER_ACCEPTANCE
+            and loan.status != LoanStatus.RETURN_STARTED
+        ):
             raise ReturnNotStartedError()
         loan.status = LoanStatus.RETURNED
         return loan

@@ -1,4 +1,4 @@
-from typing import Sequence, Self
+from typing import Self, Sequence
 
 from pydantic import PrivateAttr
 

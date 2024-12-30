@@ -1,13 +1,13 @@
 from datetime import date, timezone
 
-from pydantic import PrivateAttr, field_validator, computed_field
+from pydantic import field_validator
 
-from domain.entities.entity import Entity
-from domain.entities.thing import Thing
 from domain.entities.borrower import Borrower
+from domain.entities.entity import Entity
 from domain.entities.lenders import Lender
+from domain.entities.thing import Thing
+from domain.value_items import ID, DueDate, LoanStatus, Location
 
-from domain.value_items import Location, DueDate, ID, LoanStatus
 
 class Loan(Entity):
     loan_id: ID
@@ -24,7 +24,9 @@ class Loan(Entity):
     def validate_utc(cls, value):
         if value is not None:
             if value.tzinfo is None or value.tzinfo != timezone.utc:
-                raise ValueError("The 'date' field must be in UTC timezone if populated.")
+                raise ValueError(
+                    "The 'date' field must be in UTC timezone if populated."
+                )
 
         return value
 
@@ -56,19 +58,21 @@ class Loan(Entity):
                 valid_new_statuses = [
                     LoanStatus.WAITING_ON_LENDER_ACCEPTANCE,
                     LoanStatus.RETURNED,
-                    LoanStatus.RETURNED_DAMAGED
+                    LoanStatus.RETURNED_DAMAGED,
                 ]
             case LoanStatus.WAITING_ON_LENDER_ACCEPTANCE:
                 valid_new_statuses = [
                     LoanStatus.RETURNED,
                     LoanStatus.RETURNED_DAMAGED,
-                    LoanStatus.OVERDUE
+                    LoanStatus.OVERDUE,
                 ]
             case LoanStatus.RETURNED_DAMAGED | LoanStatus.RETURNED:
                 valid_new_statuses = []
 
         if value not in valid_new_statuses:
-            raise ValueError(f"Cannot change loan status from '{self._status}' to '{value}'.")
+            raise ValueError(
+                f"Cannot change loan status from '{self._status}' to '{value}'."
+            )
         self._status = value
 
     @property

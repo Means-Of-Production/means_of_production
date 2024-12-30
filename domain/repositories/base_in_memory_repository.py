@@ -1,9 +1,10 @@
-from typing import TypeVar, Generic, Iterable
+from typing import Generic, Iterable, TypeVar
 
 from domain.entities import Entity
 from domain.value_items import ID
 
-T = TypeVar('T', bound=Entity)
+T = TypeVar("T", bound=Entity)
+
 
 class BaseInMemoryRepository(Generic[T]):
     def __init__(self) -> None:
