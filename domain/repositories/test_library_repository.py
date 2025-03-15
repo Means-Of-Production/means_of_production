@@ -1,34 +1,27 @@
-import unittest
 from unittest.mock import MagicMock
-from domain.entities import Person, ILibrary, IBorrower, PersonName
+from domain.entities import Person, Library, Borrower, PersonName
 from library_repository import LibraryRepository
 
+def test_gets_libraries_via_person():
+    # Arrange
+    person_name = PersonName("Testy", "McTesterson")
+    person = Person("test", person_name, [])
 
-class TestLibraryRepository(unittest.TestCase):
-    def test_gets_libraries_via_person(self):
-        # Arrange
-        person_name = PersonName("Testy", "McTesterson")
-        person = Person("test", person_name, [])
+    mock_lib1 = MagicMock(spec=Library)
+    mock_borrower1 = MagicMock(spec=Borrower)
+    mock_borrower1.person = person
+    mock_lib1.borrowers = [mock_borrower1]
 
-        mock_lib1 = MagicMock(spec=ILibrary)
-        mock_borrower1 = MagicMock(spec=IBorrower)
-        mock_borrower1.person = person
-        mock_lib1.borrowers = [mock_borrower1]
+    mock_lib2 = MagicMock(spec=Library)
+    mock_borrower2 = MagicMock(spec=Borrower)
+    mock_borrower2.person = Person("nope", person_name, [])
+    mock_lib2.borrowers = [mock_borrower2]
 
-        mock_lib2 = MagicMock(spec=ILibrary)
-        mock_borrower2 = MagicMock(spec=IBorrower)
-        mock_borrower2.person = Person("nope", person_name, [])
-        mock_lib2.borrowers = [mock_borrower2]
+    under_test = LibraryRepository([mock_lib1, mock_lib2])
 
-        under_test = LibraryRepository([mock_lib1, mock_lib2])
+    # Act
+    res = list(under_test.get_libraries_person_can_use(person))
 
-        # Act
-        res = list(under_test.get_libraries_person_can_use(person))
-
-        # Assert
-        self.assertIsNotNone(res)
-        self.assertEqual(len(res), 1)
-
-
-if __name__ == "__main__":
-    unittest.main()
+    # Assert
+    assert res is not None
+    assert len(res) == 1

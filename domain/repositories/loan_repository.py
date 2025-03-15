@@ -1,14 +1,14 @@
 from typing import Iterable
 from .base_in_memory_repository import BaseInMemoryRepository
-from domain import ILibrary, ILibraryRepository, ILoan, ILoanRepository, Loan, Person, PhysicalLocation
+from domain import Library, LibraryRepository, LoanRepository, Loan, Person, PhysicalLocation
 
 
-class LoanRepository(BaseInMemoryRepository, ILoanRepository):
-    def __init__(self, library_repository: ILibraryRepository):
+class LoanRepository(BaseInMemoryRepository, LoanRepository):
+    def __init__(self, library_repository: LibraryRepository):
         super().__init__()
         self.library_repository = library_repository
 
-    def create(self, entity: ILoan) -> ILoan:
+    def create(self, entity: Loan) -> Loan:
         return Loan(
             self.new_id(),
             entity.item,
@@ -19,12 +19,12 @@ class LoanRepository(BaseInMemoryRepository, ILoanRepository):
             entity.date_returned
         )
 
-    def get_loans_for_person(self, person: Person) -> Iterable[ILoan]:
+    def get_loans_for_person(self, person: Person) -> Iterable[Loan]:
         for loan in self.get_all():
             if loan.borrower.person == person:
                 yield loan
 
-    def get_loans_for_library(self, library: ILibrary) -> Iterable[ILoan]:
+    def get_loans_for_library(self, library: Library) -> Iterable[Loan]:
         for loan in self.get_all():
             if loan.borrower.library.id == library.id:
                 yield loan
