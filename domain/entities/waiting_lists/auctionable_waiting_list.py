@@ -1,14 +1,14 @@
 from typing import List, Dict, Optional, Iterable
 from datetime import datetime
-from entities.thing import Thing
-from entities.waiting_lists.waiting_list import WaitingList
-from entities.waiting_lists.first_come_first_serve_waiting_list import FirstComeFirstServeWaitingList
-from entities.waiting_lists.reservation import Reservation
-from entities.waiting_lists.auction_bid import AuctionBid
-from entities.people.borrower import Borrower
-from value_items.money import Money
-from value_items.time_interval import TimeInterval
-from factories.money_factory import MoneyFactory
+from domain.entities.thing import Thing
+from domain.entities.waiting_lists.waiting_list import WaitingList
+from domain.entities.waiting_lists.first_come_first_serve_waiting_list import FirstComeFirstServeWaitingList
+from domain.entities.waiting_lists.reservation import Reservation
+from domain.entities.waiting_lists.auction_bid import AuctionBid
+from domain.entities.people.borrower import Borrower
+from domain.value_items.money import Money
+from domain.value_items.time_interval import TimeInterval
+from domain.entities.factories.money_factory import MoneyFactory
 from domain.value_items.exceptions import EntityNotAssignedIdError
 
 

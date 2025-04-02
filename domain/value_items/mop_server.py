@@ -1,5 +1,5 @@
 from urllib.parse import urlparse
-from .location import VirtualLocation
+from domain.value_items.location.virtual_location import VirtualLocation
 
 class MOPServer(VirtualLocation):
     def __init__(self, url: str, version: str):

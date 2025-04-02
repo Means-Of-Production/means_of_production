@@ -1,14 +1,13 @@
+from __future__ import annotations
 from abc import ABC, abstractmethod
-from typing import Optional, Iterable, Dict, List
+from typing import Optional, Iterable, Dict, List, TYPE_CHECKING
 from domain.entities.people.borrower import Borrower
 from domain.entities.thing import Thing
 from domain.entities.loans.loan import Loan
 from domain.entities.waiting_lists.waiting_list import WaitingList
-from domain.entities.waiting_lists.auctionable_waiting_list import AuctionableWaitingList
 from domain.entities.factories.waiting_list_factory import WaitingListFactory
 from domain.entities.factories.feeschedules.no_fee_schedule import NoFeeSchedule
 from domain.entities.factories.money_factory import MoneyFactory
-from domain.services.bidding.bidding_strategy import BiddingStrategy
 from domain.value_items.due_date import DueDate
 from domain.value_items.fee_status import FeeStatus
 from domain.value_items.loan_status import LoanStatus
@@ -22,6 +21,10 @@ from domain.value_items.exceptions import (
     ReturnNotStartedError,
     EntityNotAssignedIdError
 )
+
+if TYPE_CHECKING:
+    from domain.services.bidding.bidding_strategy import BiddingStrategy
+    from domain.entities.waiting_lists.auctionable_waiting_list import AuctionableWaitingList
 
 class BaseLibrary(ABC):
     """
@@ -52,8 +55,14 @@ class BaseLibrary(ABC):
         self.money_factory = money_factory
         self.mop_server = mop_server
         self.public_url = public_url
-        self.bidding_strategy = bidding_strategy
         self._loans: List[Loan] = list(loans)
+
+        # Lazy import for bidding strategy
+        if bidding_strategy is not None:
+            from domain.services.bidding.bidding_strategy import BiddingStrategy
+            if not isinstance(bidding_strategy, BiddingStrategy):
+                raise TypeError("bidding_strategy must be a BiddingStrategy instance")
+        self.bidding_strategy = bidding_strategy
 
         self.fee_schedule = fee_schedule if fee_schedule else NoFeeSchedule(money_factory)
         self.default_loan_time = default_loan_time if default_loan_time else TimeInterval.from_days(14)
@@ -71,36 +80,21 @@ class BaseLibrary(ABC):
     @property
     @abstractmethod
     def location(self):
-        """
-        Returns the location of the library.
-        """
         pass
 
     @abstractmethod
     def get_all_things(self) -> Iterable[Thing]:
-        """
-        Retrieves all things (items) in the library.
-        """
         pass
 
     def get_available_things(self) -> Iterable[Thing]:
-        """
-        Retrieves only available items in the library.
-        """
         return (thing for thing in self.get_all_things() if thing.status == ThingStatus.READY)
 
     @abstractmethod
     async def borrow(self, item: Thing, borrower: Borrower, until: DueDate) -> Loan:
-        """
-        Handles borrowing an item from the library.
-        """
         pass
 
     @abstractmethod
     async def start_return(self, loan: Loan) -> Loan:
-        """
-        Initiates the return process for a borrowed item.
-        """
         pass
 
     @property
@@ -140,9 +134,6 @@ class BaseLibrary(ABC):
         self._loans.append(loan)
 
     def get_titles_from_items(self, items: Iterable[Thing]) -> Iterable[ThingTitle]:
-        """
-        Extracts unique titles from a list of items.
-        """
         titles = []
         for item in items:
             if not any(title.equals(item.title) for title in titles):
@@ -150,9 +141,6 @@ class BaseLibrary(ABC):
         return titles
 
     async def finish_return(self, loan: Loan) -> Loan:
-        """
-        Completes the return process for a loan.
-        """
         if loan.status != LoanStatus.WAITING_ON_LENDER_ACCEPTANCE or not loan.date_returned:
             raise ReturnNotStartedError()
 
@@ -190,14 +178,12 @@ class BaseLibrary(ABC):
     async def bid_to_skip_to_front_of_list(
         self, item: Thing, bidder: Borrower, amount, borrower: Borrower
     ) -> WaitingList:
-        """
-        Allows a bidder to place a bid to skip to the front of the waiting list.
-        """
         if not self.bidding_strategy:
             raise InvalidLibraryConfigurationError("This library does not support bidding!")
 
         waiting_list = await self.reserve_item(item, borrower)
-        auctionable_list = waiting_list  # Assuming it's an IAuctionableWaitingList
+        if not hasattr(waiting_list, 'add_bid'):
+            raise InvalidLibraryConfigurationError("Waiting list does not support bidding!")
 
         bid = await self.bidding_strategy.get_bid_for_cost(item, bidder, amount, self, borrower)
-        return auctionable_list.add_bid(bid)
+        return waiting_list.add_bid(bid)

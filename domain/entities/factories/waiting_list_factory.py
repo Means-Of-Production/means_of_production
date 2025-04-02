@@ -1,12 +1,15 @@
+from __future__ import annotations  # Enables forward references
+from typing import TYPE_CHECKING
 from datetime import datetime, timedelta
 from typing import Optional
-from entities.thing import Thing
-from entities.waiting_lists.waiting_list import WaitingList
-from entities.waiting_lists.first_come_first_serve_waiting_list import FirstComeFirstServeWaitingList
-from entities.waiting_lists.auctionable_waiting_list import AuctionableWaitingList
-from value_items.time_interval import TimeInterval
-from factories.money_factory import MoneyFactory
+from domain.entities.thing import Thing
+from domain.entities.waiting_lists.waiting_list import WaitingList
+from domain.entities.waiting_lists.first_come_first_serve_waiting_list import FirstComeFirstServeWaitingList
+from domain.value_items.time_interval import TimeInterval
+from domain.entities.factories.money_factory import MoneyFactory
 
+if TYPE_CHECKING:
+    from domain.entities.waiting_lists.auctionable_waiting_list import AuctionableWaitingList
 
 class IWaitingListFactory:
     """Interface for waiting list factories."""

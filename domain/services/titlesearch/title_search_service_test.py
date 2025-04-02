@@ -1,13 +1,13 @@
 import pytest
 from unittest.mock import AsyncMock, MagicMock
-from title_search_service import TitleSearchService
+from domain.services.titlesearch.title_search_service import TitleSearchService
 from domain.value_items.title_search_result import TitleSearchResult
 from domain.value_items.thing_title import ThingTitle
-from entities.libraries import Library
-from entities import Thing
-from entities.people import Person
-from repositories.library_repository import LibraryRepository
-from value_items.title_search_request import TitleSearchRequest
+from domain.entities.libraries import Library
+from domain.entities import Thing
+from domain.entities.people import Person
+from domain.repositories.library_repository import LibraryRepository
+from domain.value_items.title_search_request import TitleSearchRequest
 
 
 @pytest.mark.asyncio

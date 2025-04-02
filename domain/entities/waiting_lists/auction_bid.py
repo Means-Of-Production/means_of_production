@@ -1,6 +1,6 @@
 from dataclasses import dataclass
-from entities.people.borrower import Borrower
-from value_items.money import Money
+from domain.entities.people.borrower import Borrower
+from domain.value_items.money import Money
 
 
 @dataclass(frozen=True)

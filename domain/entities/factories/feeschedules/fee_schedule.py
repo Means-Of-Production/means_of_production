@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from domain.entities.loans import Loan
+from domain.entities.loans.loan import Loan
 from domain.value_items.money import Money
 
 

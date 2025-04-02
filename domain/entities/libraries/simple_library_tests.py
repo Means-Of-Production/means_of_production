@@ -1,35 +1,47 @@
 import unittest
 from datetime import datetime, timedelta
-
-from people import Person, Borrower
-from value_items import (
-    PersonName, ThingTitle, PhysicalLocation, ThingStatus, DueDate, LoanStatus
-)
-from value_items.exceptions import BorrowerNotInGoodStandingError, InvalidThingStatusToBorrowError
-from value_items.mop_server import MOPServer
-from value_items.fee_status import FeeStatus
-from thing import Thing
-from loans import Loan
-from factories import WaitingListFactory, MoneyFactory, SimpleTimeBasedFeeSchedule
-from value_items.money import USDMoney
-from libraries.simple_library import SimpleLibrary
-from libraries.library_fee import LibraryFee
-from value_items.time_interval import TimeInterval
+from domain.entities.people import Person, Borrower
+from domain.value_items import (PersonName, ThingTitle, PhysicalLocation, ThingStatus, DueDate, LoanStatus)
+from domain.value_items.exceptions import BorrowerNotInGoodStandingError, InvalidThingStatusToBorrowError
+from domain.value_items.mop_server import MOPServer
+from domain.value_items.fee_status import FeeStatus
+from domain.entities.thing import Thing
+from domain.entities.loans import Loan
+from domain.value_items import ID
+from domain.entities.factories import WaitingListFactory, MoneyFactory, SimpleTimeBasedFeeSchedule
+from domain.value_items.money import USDMoney
+from domain.entities.libraries.simple_library import SimpleLibrary
+from domain.entities.libraries.library_fee import LibraryFee
+from domain.value_items.time_interval import TimeInterval
 
 def create_library(waiting_list_factory=None):
     return SimpleLibrary(
-        "testLib1",
-        "testLibrary",
-        Person("1", PersonName("Test", "McTesterson")),
-        PhysicalLocation(0, 0),
-        waiting_list_factory or WaitingListFactory(),
-        USDMoney(100),
-        [],
-        MoneyFactory(),
-        MOPServer.localhost,
-        SimpleTimeBasedFeeSchedule(MoneyFactory()),
-        TimeInterval.from_days(14),
+        id="testLib1",
+        name="testLibrary",
+        administrator=Person(
+            person_id=ID(value="1"),
+            name=PersonName(
+                first_name="Test",
+                last_name="McTesterson"
+            )
+        ),
+        location=PhysicalLocation(
+            latitude=0,
+            longitude=0,
+            street_address="123 Main St",
+            city="Anytown",
+            state="CA",
+            zip_code="12345"
+        ),
+        waiting_list_factory=waiting_list_factory or WaitingListFactory(),
+        max_fines_before_suspension=USDMoney(amount=100),
+        loans=[],
+        money_factory=MoneyFactory(),
+        mop_server=MOPServer.localhost,
+        fee_schedule=SimpleTimeBasedFeeSchedule(MoneyFactory()),
+        default_loan_time=TimeInterval.from_days(14)
     )
+
 
 def create_borrower(library, name="libraryMember"):
     borrower = Borrower(name, library.administrator, library, [])

@@ -1,8 +1,8 @@
 from typing import Dict, Iterable, List
-from thing_title import ThingTitle
+from domain.value_items.thing_title import ThingTitle
 from domain.entities import Thing
 from domain.entities.libraries import Library
-from exceptions import EntityNotAssignedIdError
+from domain.value_items.exceptions import EntityNotAssignedIdError
 
 
 class LibrarySearchResult:

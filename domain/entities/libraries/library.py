@@ -1,7 +1,7 @@
+from __future__ import annotations  # Enables forward references
+from typing import TYPE_CHECKING
 from abc import abstractmethod
 from typing import Iterable
-
-from domain.entities.borrower import Borrower
 from domain.entities.entity import Entity
 from domain.entities.loans import Loan
 from domain.entities.people import Person
@@ -9,6 +9,8 @@ from domain.entities.thing import Thing
 from domain.entities.waiting_lists import WaitingList
 from domain.value_items import ID, DueDate, Location, ThingTitle
 
+if TYPE_CHECKING:
+    from domain.entities.borrower import Borrower
 
 class Library(Entity):
     library_id: ID

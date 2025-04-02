@@ -1,31 +1,35 @@
-from typing import Iterable, Type, TypeVar
+from __future__ import annotations
+from typing import TYPE_CHECKING, Iterable, Type, TypeVar
 from .base_in_memory_repository import BaseInMemoryRepository
 from domain.entities.libraries import Library
 from domain.entities.libraries.simple_library import SimpleLibrary
-from domain.entities.libraries.distributed_library import DistributedLibrary
 from domain.entities.people import Person
 from domain.value_items.location.physical_area import PhysicalArea
+
+if TYPE_CHECKING:
+    from domain.entities.libraries.distributed_library import DistributedLibrary
 
 T = TypeVar("T", bound=Library)
 
 class LibraryRepository(BaseInMemoryRepository[Library]):
     def __init__(self, libraries: Iterable[Library] = ()) -> None:
-        """Initialize repository with optional libraries."""
         super().__init__(libraries)
 
     def get_id_from_entity(self, entity: Library) -> str:
-        """Return unique identifier for a library entity."""
         return entity.entity_id or entity.name
 
     def get_libraries_person_can_use(self, person: Person) -> Iterable[Library]:
-        """Retrieve libraries that a person can access."""
         return (
             library for library in self.get_all()
-            if any(borrower.person.entity_id == person.entity_id for borrower in library.borrowers)
+            if any(borrower.person.entity_id == person.entity_id 
+                 for borrower in library.borrowers)
         )
 
     def create(self, entity: Library) -> Library:
         """Create a new library instance based on its type."""
+        # Lazy import to break circular dependency
+        from domain.entities.libraries.distributed_library import DistributedLibrary
+
         library_class: Type[Library]
         kwargs = {
             "entity_id": self.new_id(),

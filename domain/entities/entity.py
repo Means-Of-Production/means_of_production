@@ -1,6 +1,5 @@
 from abc import ABC, abstractmethod
-
-from domain.value_items import ID
+from domain.value_items.id import ID
 
 
 class Entity(ABC):

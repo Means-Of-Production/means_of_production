@@ -1,11 +1,13 @@
+from __future__ import annotations
+from typing import TYPE_CHECKING
 from typing import Self, Sequence
-
 from pydantic import PrivateAttr
-
-from domain.entities.libraries import LibraryFee
-from domain.entities.people import Person
+from domain.entities.people.person import Person
 from domain.entities.people.borrower import Borrower
 
+
+if TYPE_CHECKING:
+    from domain.entities.libraries.library_fee import LibraryFee
 
 class PersonBorrower(Person, Borrower):
     _fees = PrivateAttr(default_factory=list)

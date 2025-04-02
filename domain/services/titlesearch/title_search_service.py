@@ -1,11 +1,14 @@
+from __future__ import annotations
 from abc import ABC, abstractmethod
-from typing import Iterable, Dict
+from typing import Iterable, Dict, TYPE_CHECKING
 from domain.entities import Thing
 from domain.entities.people import Person
-from domain.repositories.library_repository import LibraryRepository
 from domain.value_items import ThingTitle
 from domain.value_items.title_search_request import TitleSearchRequest
 from domain.value_items.title_search_result import TitleSearchResult
+
+if TYPE_CHECKING:
+    from domain.repositories.library_repository import LibraryRepository
 
 class ITitleSearchService(ABC):
     """Interface for Title Search Service."""
@@ -20,6 +23,10 @@ class TitleSearchService(ITitleSearchService):
     """Implementation of the Title Search Service."""
     
     def __init__(self, library_repository: LibraryRepository):
+        # Local import to break circular dependency
+        from domain.repositories.library_repository import LibraryRepository
+        if not isinstance(library_repository, LibraryRepository):
+            raise TypeError("library_repository must be a LibraryRepository instance")
         self.library_repository = library_repository
 
     def _matches(self, search_request: TitleSearchRequest, thing: Thing) -> bool:

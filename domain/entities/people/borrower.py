@@ -1,11 +1,13 @@
+from __future__ import annotations  # Enables forward references
+from typing import TYPE_CHECKING
 from abc import abstractmethod
 from typing import Self, Sequence
-
 from domain.entities.entity import Entity
-from domain.entities.libraries import Library, LibraryFee
 from domain.value_items import BorrowerVerificationFlags
 
-
+if TYPE_CHECKING:
+    from domain.entities.libraries import Library, LibraryFee
+    
 class Borrower(Entity):
     library: Library  # the library this borrower is a member of
     verification_flags: list[BorrowerVerificationFlags]
