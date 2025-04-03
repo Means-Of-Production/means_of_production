@@ -1,27 +1,36 @@
+from __future__ import annotations
+from typing import TYPE_CHECKING
 from domain.services.bidding.bidding_strategy import BiddingStrategy
-from domain.entities.loans import Loan
-from domain.entities import Thing 
-from domain.entities.people import Borrower 
-from domain.entities.libraries import Library
 from domain.value_items import Money, DueDate
-from domain.entities.waiting_lists import AuctionBid
-from domain.repositories.loan_repository import LoanRepository
+
+if TYPE_CHECKING:
+    from domain.entities.loans import Loan
+    from domain.entities import Thing
+    from domain.entities.people import Borrower
+    from domain.entities.libraries import Library
+    from domain.entities.waiting_lists import AuctionBid
+    from domain.repositories.loan_repository import LoanRepository
 
 class QuadraticBiddingStrategy(BiddingStrategy):
     """
     Form of bidding where the value of a bid decreases the longer it has been held by the same person.
     """
 
-    def __init__(self, loan_repository: LoanRepository):
+    def __init__(self, loan_repository: 'LoanRepository'):
         self.loan_repository = loan_repository
 
     @staticmethod
-    def compare_loans(a: Loan, b: Loan) -> int:
+    def compare_loans(a: 'Loan', b: 'Loan') -> int:
         return DueDate.compare(a.due_date, b.due_date)
 
     async def get_bid_for_cost(
-        self, item: Thing, bidder: Borrower, amount_to_pay: Money, library: Library, beneficiary: Borrower = None
-    ) -> AuctionBid:
+        self, 
+        item: 'Thing', 
+        bidder: 'Borrower', 
+        amount_to_pay: Money, 
+        library: 'Library', 
+        beneficiary: 'Borrower' = None
+    ) -> 'AuctionBid':
         if beneficiary is None:
             beneficiary = bidder
 

@@ -37,8 +37,8 @@ from domain.value_items.time_interval import TimeInterval
 from domain.entities.factories import WaitingListFactory, MoneyFactory, SimpleTimeBasedFeeSchedule
 from domain.entities.factories.feeschedules.fee_schedule import FeeSchedule
 
+
 class TestableDistributedLibrary(DistributedLibrary):
-    """Concrete test implementation that handles all required abstract methods."""
     def __init__(
         self,
         id: str,
@@ -53,18 +53,20 @@ class TestableDistributedLibrary(DistributedLibrary):
         fee_schedule: Optional[FeeSchedule] = None,
         default_loan_time: Optional[TimeInterval] = None,
     ):
-        # Initialize with proper parameter mapping
+        # Initialize with proper Pydantic model syntax
         super().__init__(
             id=id,
             name=name,
             administrator=administrator,
-            max_fines_before_suspension=max_fines_before_suspension,
-            loans=loans,
+            max_fees=max_fines_before_suspension,
+            loans=list(loans),  # Convert to list if needed
             money_factory=money_factory,
             mop_server=mop_server,
             default_loan_time=default_loan_time,
             fee_schedule=fee_schedule,
-            waiting_list_factory=waiting_list_factory
+            waiting_list_factory=waiting_list_factory,
+            bidding_strategy=MockBiddingStrategy()
+            # Add any other required BaseModel fields here
         )
         self._location = location
 
@@ -127,33 +129,32 @@ def lender():
 
 @pytest.fixture
 def library(lender, admin):
-    with patch('domain.services.bidding.bidding_strategy.BiddingStrategy', MockBiddingStrategy):
-        money_factory = MoneyFactory()
-        lib = TestableDistributedLibrary(
-            id="distLib1",
-            name="testDistributedLibrary",
-            administrator=admin,
-            max_fines_before_suspension=USDMoney(amount=100),
-            waiting_list_factory=WaitingListFactory(),
-            loans=[],
-            money_factory=money_factory,
-            location=PhysicalArea(
-                center_point=PhysicalLocation(
-                    latitude=0,
-                    longitude=0,
-                    street_address="456 Center St",
-                    city="Metropolis",
-                    state="NY",
-                    zip_code="10001"
-                ),
-                radius=Distance(kilometers=10)
+    money_factory = MoneyFactory()
+    lib = TestableDistributedLibrary(
+        id="distLib1",
+        name="testDistributedLibrary",
+        administrator=admin,
+        max_fines_before_suspension=USDMoney(amount=100),
+        waiting_list_factory=WaitingListFactory(),
+        loans=[],
+        money_factory=money_factory,
+        location=PhysicalArea(
+            center_point=PhysicalLocation(
+                latitude=0,
+                longitude=0,
+                street_address="456 Center St",
+                city="Metropolis",
+                state="NY",
+                zip_code="10001"
             ),
-            mop_server=MOPServer.localhost,
-            fee_schedule=SimpleTimeBasedFeeSchedule(money_factory),
-            default_loan_time=TimeInterval.from_days(12)
-        )
-        lib.add_lender(lender)
-        return lib
+            radius=Distance(kilometers=10)
+        ),
+        mop_server=MOPServer.localhost,
+        fee_schedule=SimpleTimeBasedFeeSchedule(money_factory),
+        default_loan_time=TimeInterval.from_days(12)
+    )
+    lib.add_lender(lender)
+    return lib
 
 
 @pytest.fixture

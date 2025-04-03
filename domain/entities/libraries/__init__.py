@@ -1,9 +1,8 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING
+from .library import Library  # Actual runtime import
+from .library_fee import LibraryFee
+from .base_library import BaseLibrary
+from .distributed_library import DistributedLibrary
+from .simple_library import SimpleLibrary
 
-if TYPE_CHECKING:
-    from domain.entities.libraries.library import Library
-    from domain.entities.libraries.library_fee import LibraryFee
-
-# Optional: Explicitly declare what should be available when importing the package
-__all__ = ['Library', 'LibraryFee', 'BaseLibrary', 'DistributedLibrary']  # etc.
+__all__ = ['Library', 'LibraryFee', 'BaseLibrary', 'DistributedLibrary', 'SimpleLibrary']

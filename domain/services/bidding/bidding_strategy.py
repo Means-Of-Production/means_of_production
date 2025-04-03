@@ -1,11 +1,13 @@
+from typing import TYPE_CHECKING, Optional
 from abc import ABC, abstractmethod
-from typing import Optional
-from domain.entities import Thing
-from domain.entities.people import Borrower 
-from domain.entities.libraries import Library
-from domain.value_items import Money
-from domain.entities.waiting_lists import AuctionBid
+from domain.entities.thing import Thing
+from domain.entities.people.borrower import Borrower 
+from domain.value_items.money import Money
+from domain.entities.waiting_lists.auction_bid import AuctionBid
 
+if TYPE_CHECKING:
+    from domain.entities.libraries.library import Library
+    
 class BiddingStrategy(ABC):
     """
     Takes an amount of money and returns an AuctionBid. Allows us to control how bidding actually works.
@@ -13,6 +15,11 @@ class BiddingStrategy(ABC):
 
     @abstractmethod
     async def get_bid_for_cost(
-        self, item: Thing, bidder: Borrower, amount_to_pay: Money, library: Library, beneficiary: Optional[Borrower] = None
+        self, 
+        item: Thing, 
+        bidder: Borrower, 
+        amount_to_pay: Money, 
+        library: 'Library',  
+        beneficiary: Optional[Borrower] = None
     ) -> AuctionBid:
         pass
