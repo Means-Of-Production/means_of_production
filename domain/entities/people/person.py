@@ -1,14 +1,28 @@
-from pydantic import BaseModel, EmailStr, Field
+from dataclasses import dataclass
+from typing import List
+from domain.entities.entity import Entity  
+from domain.value_items import PersonName, EmailAddress
 
-from domain.entities.entity import Entity  # Remove if Entity isn't needed
-from domain.value_items import ID, PersonName
-
-
-class Person(BaseModel):  # Changed from Entity to BaseModel
-    person_id: ID
+@dataclass(frozen=True)
+class Person(Entity):
+    """
+    A domain entity representing a person in the system.
+    Inherits from base Entity class to mark this as a domain entity.
+    """
     name: PersonName
-    email: list[EmailStr] = Field(default_factory=list)
+    emails: List[EmailAddress] = None
 
-    @property
-    def id(self) -> ID:
-        return self.person_id
+    def __post_init__(self):
+        """Initialize with empty email list if none provided"""
+        if self.emails is None:
+            object.__setattr__(self, 'emails', [])
+
+    def __eq__(self, other: object) -> bool:
+        """Entity equality comparison based on identity"""
+        if not isinstance(other, Person):
+            return False
+        return self.id == other.id
+
+    def __hash__(self) -> int:
+        """Make entity hashable based on its identity"""
+        return hash(self.id)

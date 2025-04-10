@@ -1,4 +1,4 @@
-from domain.entities.entity import Person
+from domain.entities.people import Person
 from domain.repositories.base_in_memory_repository import BaseInMemoryRepository
 
 class PersonRepository(BaseInMemoryRepository[Person]):

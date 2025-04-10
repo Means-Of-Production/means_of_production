@@ -1,12 +1,12 @@
 from datetime import datetime
-
 from pydantic import PrivateAttr, computed_field
-
-from domain.entities.borrower import Borrower
-from domain.entities.entity import Entity
-from domain.value_items import ID, ReservationStatus, ThingTitle
-from domain.value_items.exceptions import InvalidReservationStateTransitionError
-
+from domain.entities import Borrower, Entity
+from domain.value_items import (
+    ID, 
+    ThingTitle,
+    ReservationStatus,
+    InvalidReservationStateTransitionError
+)
 
 class Reservation(Entity):
     reservation_id: ID

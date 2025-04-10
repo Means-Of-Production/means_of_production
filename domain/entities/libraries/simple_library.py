@@ -1,100 +1,109 @@
-from datetime import datetime, timedelta
 from typing import List, Optional, Iterable
-from dataclasses import dataclass
+from datetime import datetime
+from domain.entities import Thing, Borrower, Loan, Person
+from domain.entities.libraries import BaseLibrary
+from domain.entities.lenders import Lender
+from domain.entities.factories import IWaitingListFactory, MoneyFactory, FeeSchedule
+from domain.services.bidding import BiddingStrategy
+from domain.value_items import (
+    ThingTitle,
+    ThingStatus,
+    PhysicalLocation,
+    MOPServer,
+    LoanStatus,
+    DueDate,
+    TimeInterval,
+    BorrowerNotInGoodStandingError,
+    InvalidThingStatusToBorrowError,
+    Money
+)
 
-# Constants for item and loan statuses
-class ThingStatus:
-    READY = "READY"
-    BORROWED = "BORROWED"
 
-class LoanStatus:
-    BORROWED = "BORROWED"
-    RETURN_STARTED = "RETURN_STARTED"
-    WAITING_ON_LENDER_ACCEPTANCE = "WAITING_ON_LENDER_ACCEPTANCE"
+class SimpleLibrary(BaseLibrary, Lender):
+    def __init__(
+        self,
+        id: str,
+        name: str,
+        admin: Person,
+        location: PhysicalLocation,
+        waiting_list_factory: IWaitingListFactory,
+        max_fines_before_suspension: Money,
+        loans: Iterable[Loan],
+        money_factory: MoneyFactory,
+        mop_server: MOPServer,
+        fee_schedule: Optional[FeeSchedule] = None,
+        default_loan_time: Optional[TimeInterval] = None,
+        bidding_strategy: Optional[BiddingStrategy] = None
+    ):
+        if default_loan_time is None:
+            default_loan_time = TimeInterval.from_days(14)
 
-# Exception classes
-class InvalidThingStatusToBorrowError(Exception):
-    pass
+        super().__init__(
+            id=id,
+            name=name,
+            administrator=admin,
+            max_fines_before_suspension=max_fines_before_suspension,
+            loans=loans,
+            money_factory=money_factory,
+            mop_server=mop_server,
+            default_loan_time=default_loan_time,
+            fee_schedule=fee_schedule,
+            bidding_strategy=bidding_strategy,
+            waiting_list_factory=waiting_list_factory
+        )
 
-class BorrowerNotInGoodStandingError(Exception):
-    pass
-
-# Data classes for core entities
-@dataclass
-class PhysicalLocation:
-    address: str
-
-@dataclass
-class ThingTitle:
-    name: str
-
-@dataclass
-class DueDate:
-    date: datetime
-
-@dataclass
-class Thing:
-    title: ThingTitle
-    status: str = ThingStatus.READY
-
-@dataclass
-class Borrower:
-    name: str
-    fines_due: float = 0.0
-
-@dataclass
-class Loan:
-    item: Thing
-    borrower: Borrower
-    due_date: DueDate
-    status: str
-    return_date: Optional[datetime] = None
-
-# Base Library class
-class BaseLibrary:
-    def __init__(self, id: str, name: str, admin: str, max_fines: float, default_loan_days: int = 14):
-        self.id = id
-        self.name = name
-        self.admin = admin
-        self.max_fines = max_fines
-        self.default_loan_days = default_loan_days
-        self.loans: List[Loan] = []
-
-    def can_borrow(self, borrower: Borrower) -> bool:
-        return borrower.fines_due <= self.max_fines
-
-    def add_loan(self, loan: Loan):
-        self.loans.append(loan)
-
-# Simple Library implementation
-class SimpleLibrary(BaseLibrary):
-    def __init__(self, id: str, name: str, admin: str, location: PhysicalLocation, max_fines: float):
-        super().__init__(id, name, admin, max_fines)
+        self._items: List[Thing] = []
         self.location = location
-        self.items: List[Thing] = []
 
     def add_item(self, item: Thing) -> Thing:
-        self.items.append(item)
+        self._items.append(item)
         return item
 
     def get_all_things(self) -> Iterable[Thing]:
-        return self.items
+        return self._items
+
+    @property
+    def items(self) -> Iterable[Thing]:
+        return self._items
 
     def borrow(self, item: Thing, borrower: Borrower, until: Optional[DueDate] = None) -> Loan:
         if item.status != ThingStatus.READY:
-            raise InvalidThingStatusToBorrowError(f"Item status is {item.status}")
-        
+            raise InvalidThingStatusToBorrowError(item.status)
+
         if not self.can_borrow(borrower):
-            raise BorrowerNotInGoodStandingError("Borrower is not in good standing")
-        
-        until = until or DueDate(datetime.now() + timedelta(days=self.default_loan_days))
-        loan = Loan(item=item, borrower=borrower, due_date=until, status=LoanStatus.BORROWED)
-        
+            raise BorrowerNotInGoodStandingError()
+
+        if not until:
+            until = DueDate(self.default_loan_time.from_now())
+
+        loan = Loan(
+            loan_id=None,
+            item=item,
+            borrower=borrower,
+            due_date=until,
+            status=LoanStatus.BORROWED,
+            location=self.location,
+            date_returned=None
+        )
+
         item.status = ThingStatus.BORROWED
         self.add_loan(loan)
         return loan
 
+    @property
+    def all_titles(self) -> Iterable[ThingTitle]:
+        return self.get_titles_from_items(self.items)
+
+    @property
+    def available_titles(self) -> Iterable[ThingTitle]:
+        available_items = [i for i in self.items if i.status == ThingStatus.READY]
+        return self.get_titles_from_items(available_items)
+
+    def preferred_return_location(self, item: Thing) -> PhysicalLocation:
+        return self.location
+
     def start_return(self, loan: Loan) -> Loan:
+        loan.status = LoanStatus.RETURN_STARTED
         loan.status = LoanStatus.WAITING_ON_LENDER_ACCEPTANCE
-        loan.return_date = datetime.now()
+        loan.date_returned = datetime.now()
         return loan

@@ -1,13 +1,12 @@
-from __future__ import annotations
-from typing import Iterable, TYPE_CHECKING
-from .base_in_memory_repository import BaseInMemoryRepository
-from domain.value_items.location.physical_location import PhysicalLocation
-
-if TYPE_CHECKING:
-    from domain.entities.libraries.library import Library
-    from domain.repositories.library_repository import LibraryRepository
-    from domain.entities.loans.loan import Loan
-    from domain.entities.people.person import Person
+from typing import Iterable
+from repositories import (
+    BaseInMemoryRepository,
+    Loan,
+    Person,
+    LibraryRepository,
+    PhysicalLocation
+)
+from entities.libraries import Library
 
 class LoanRepository(BaseInMemoryRepository):
     def __init__(self, library_repository: 'LibraryRepository'):

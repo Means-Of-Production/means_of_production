@@ -1,13 +1,10 @@
-from __future__ import annotations
-from typing import TYPE_CHECKING, Iterable, Type, TypeVar
+from typing import Iterable, Type, TypeVar
 from .base_in_memory_repository import BaseInMemoryRepository
 from domain.entities.libraries import Library
 from domain.entities.libraries.simple_library import SimpleLibrary
 from domain.entities.people import Person
 from domain.value_items.location.physical_area import PhysicalArea
 
-if TYPE_CHECKING:
-    from domain.entities.libraries.distributed_library import DistributedLibrary
 
 T = TypeVar("T", bound=Library)
 

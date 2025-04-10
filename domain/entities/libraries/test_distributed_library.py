@@ -4,39 +4,17 @@ from typing import List, Iterable, Optional
 from unittest.mock import MagicMock, patch
 import sys
 
-# Create a proper mock BiddingStrategy class
+# Mock setup
 class MockBiddingStrategy:
     pass
 
-# Set up module mocks before any imports
 sys.modules['domain.services.bidding'] = MagicMock()
-sys.modules['domain.services.bidding.bidding_strategy'] = MagicMock()
-sys.modules['domain.services.bidding.bidding_strategy'].BiddingStrategy = MockBiddingStrategy
+sys.modules['domain.services.bidding'].BiddingStrategy = MockBiddingStrategy
 
-# Production imports
-from domain.entities.libraries.distributed_library import DistributedLibrary
-from domain.entities.lenders.individual_distributed_lender import IndividualDistributedLender
-from domain.entities.loans import Loan
-from domain.entities.thing import Thing
-from domain.entities.people import Person, Borrower
-from domain.entities.libraries.library_fee import LibraryFee
-from domain.value_items import (
-    ThingStatus, ThingTitle, DueDate, LoanStatus, ID, PersonName
-)
-from domain.services.bidding.bidding_strategy import BiddingStrategy
-from domain.value_items.location.physical_location import PhysicalLocation
-from domain.value_items.money import USDMoney, Money
-from domain.value_items.fee_status import FeeStatus
-from domain.value_items.exceptions import (
-    BorrowerNotInGoodStandingError, InvalidThingStatusToBorrowError
-)
-from domain.value_items.location.distance import Distance
-from domain.value_items.location.physical_area import PhysicalArea
-from domain.value_items.mop_server import MOPServer
-from domain.value_items.time_interval import TimeInterval
-from domain.entities.factories import WaitingListFactory, MoneyFactory, SimpleTimeBasedFeeSchedule
-from domain.entities.factories.feeschedules.fee_schedule import FeeSchedule
-
+from domain.entities import ( DistributedLibrary,IndividualDistributedLender,Loan,Thing,Person,Borrower,LibraryFee,WaitingListFactory,MoneyFactory,SimpleTimeBasedFeeSchedule)
+from domain.value_items import (ThingStatus,ThingTitle,DueDate,LoanStatus,ID,PersonName,PhysicalLocation,USDMoney,Money,FeeStatus,BorrowerNotInGoodStandingError,InvalidThingStatusToBorrowError,Distance,
+PhysicalArea,MOPServer,TimeInterval)
+from domain.entities.factories.feeschedules.fee_schedule import FeeSchedule 
 
 class TestableDistributedLibrary(DistributedLibrary):
     def __init__(
@@ -53,20 +31,18 @@ class TestableDistributedLibrary(DistributedLibrary):
         fee_schedule: Optional[FeeSchedule] = None,
         default_loan_time: Optional[TimeInterval] = None,
     ):
-        # Initialize with proper Pydantic model syntax
         super().__init__(
             id=id,
             name=name,
             administrator=administrator,
             max_fees=max_fines_before_suspension,
-            loans=list(loans),  # Convert to list if needed
+            loans=list(loans),
             money_factory=money_factory,
             mop_server=mop_server,
-            default_loan_time=default_loan_time,
-            fee_schedule=fee_schedule,
+            default_loan_time=default_loan_time or TimeInterval.from_days(14),  
+            fee_schedule=fee_schedule or SimpleTimeBasedFeeSchedule(money_factory),  
             waiting_list_factory=waiting_list_factory,
             bidding_strategy=MockBiddingStrategy()
-            # Add any other required BaseModel fields here
         )
         self._location = location
 
@@ -82,6 +58,7 @@ class TestableDistributedLibrary(DistributedLibrary):
 
     async def start_return(self, loan: Loan) -> Loan:
         return MagicMock(spec=Loan)
+
 
 @pytest.fixture
 def location():

@@ -1,5 +1,8 @@
 from unittest.mock import Mock
-from domain import Person, PersonName, Borrower, LibraryRepository, Loan
+from domain.entities import Loan
+from domain.entities.people import Person, Borrower
+from domain.repositories.library_repository import LibraryRepository
+from domain.value_items import PersonName
 from loan_repository import LoanRepository
 
 def test_get_loans_for_person_filters_by_borrower():

@@ -1,17 +1,19 @@
-from __future__ import annotations  # Enables forward references
-from typing import TYPE_CHECKING
 from datetime import date, timezone
 from pydantic import field_validator
-from domain.entities.entity import Entity
-from domain.entities.lenders.lender import Lender
-from domain.entities.thing import Thing
-from domain.value_items.id import ID 
-from domain.value_items.due_date import DueDate 
-from domain.value_items.loan_status import LoanStatus
-from domain.value_items.location import Location
+from domain.entities import (
+    Entity,
+    Lender,
+    Thing,
+    Borrower,
+    
+)
+from domain.value_items import (
+   ID,
+    DueDate,
+    LoanStatus,
+    Location 
+)
 
-if TYPE_CHECKING:
-    from domain.entities.borrower import Borrower
     
 class Loan(Entity):
     loan_id: ID

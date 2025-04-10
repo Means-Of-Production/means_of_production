@@ -1,24 +1,18 @@
-from __future__ import annotations  # Enables forward references
-from typing import TYPE_CHECKING
 from datetime import datetime
 from typing import Iterable, Optional
-from domain.entities.thing import Thing
-from domain.entities.loans.loan import Loan
-from domain.entities.lenders.lender import Lender
-from domain.entities.libraries.base_library import BaseLibrary
-from domain.entities.factories import MoneyFactory, FeeSchedule, WaitingListFactory
-from domain.value_items.thing_status import ThingStatus
-from domain.value_items.money import Money
-from domain.value_items.due_date import DueDate 
-from domain.value_items.loan_status import LoanStatus
-from domain.value_items.location.physical_area import PhysicalArea
-from domain.value_items.mop_server import MOPServer
-from domain.value_items.exceptions import BorrowerNotInGoodStandingError, InvalidThingStatusToBorrowError
-from domain.value_items.time_interval import TimeInterval
 
-if TYPE_CHECKING:
-    from domain.entities.people import Borrower, Person
-    
+from domain.entities import (
+    Thing, Loan, Lender, BaseLibrary,
+    MoneyFactory, FeeSchedule, WaitingListFactory,
+    Borrower, Person
+)
+
+from domain.value_items import (
+    ThingStatus, Money, DueDate, LoanStatus,
+    PhysicalArea, MOPServer, TimeInterval,
+    BorrowerNotInGoodStandingError, InvalidThingStatusToBorrowError
+)
+
 class DistributedLibrary(BaseLibrary):
     def __init__(
         self,

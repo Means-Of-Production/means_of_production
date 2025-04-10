@@ -1,11 +1,13 @@
 from typing import List, Optional
-from domain.entities.waiting_lists.base_waiting_list import BaseWaitingList
-from domain.entities.people.borrower import Borrower
-from domain.entities.thing import Thing
-from domain.value_items.time_interval import TimeInterval
-from domain.entities.waiting_lists.reservation import Reservation
-from domain.value_items.reservation_status import ReservationStatus
-
+# In other files, now you can import cleanly:
+from domain.entities.waiting_lists import (
+    BaseWaitingList,
+    Reservation,
+    Borrower,
+    Thing,
+    TimeInterval,
+    ReservationStatus
+)
 
 class FirstComeFirstServeWaitingList(BaseWaitingList):
     """

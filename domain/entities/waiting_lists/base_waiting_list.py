@@ -1,12 +1,13 @@
 from abc import ABC, abstractmethod
 from typing import Optional, List
-from domain.entities.waiting_lists.reservation import Reservation
-from domain.entities.people.borrower import Borrower
-from domain.entities.thing import Thing
-from domain.value_items.time_interval import TimeInterval
-from domain.value_items.thing_status import ThingStatus
-from domain.value_items.reservation_status import ReservationStatus
-
+from domain.entities.waiting_lists import (
+    Reservation,
+    Borrower,
+    Thing,
+    TimeInterval,
+    ThingStatus,
+    ReservationStatus
+)
 
 class BaseWaitingList(ABC):
     """

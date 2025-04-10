@@ -1,17 +1,14 @@
-from __future__ import annotations
-
 from abc import abstractmethod
 from datetime import timedelta
 from typing import Self
-
 from pydantic import PrivateAttr, computed_field
-
-from domain.entities.entity import Entity
-from domain.entities.people.borrower import Borrower
-from domain.entities.thing import Thing
-from domain.entities.waiting_lists.reservation import Reservation
-from domain.value_items import ThingTitle
-
+from domain.entities import (
+    Entity,
+    Borrower,
+    Thing,
+    Reservation,
+    ThingTitle
+)
 
 class WaitingList(Entity):
     _item: Thing = PrivateAttr()

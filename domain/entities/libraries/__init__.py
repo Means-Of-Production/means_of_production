@@ -5,4 +5,10 @@ from .base_library import BaseLibrary
 from .distributed_library import DistributedLibrary
 from .simple_library import SimpleLibrary
 
-__all__ = ['Library', 'LibraryFee', 'BaseLibrary', 'DistributedLibrary', 'SimpleLibrary']
+__all__ = [
+    'Library', 
+    'LibraryFee', 
+    'BaseLibrary', 
+    'DistributedLibrary', 
+    'SimpleLibrary'
+]

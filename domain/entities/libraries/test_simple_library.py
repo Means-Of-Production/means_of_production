@@ -1,18 +1,21 @@
 import unittest
 from datetime import datetime, timedelta
-from domain.entities.people import Person, Borrower
-from domain.value_items import (PersonName, ThingTitle, PhysicalLocation, ThingStatus, DueDate, LoanStatus)
-from domain.value_items.exceptions import BorrowerNotInGoodStandingError, InvalidThingStatusToBorrowError
-from domain.value_items.mop_server import MOPServer
-from domain.value_items.fee_status import FeeStatus
-from domain.entities.thing import Thing
-from domain.entities.loans import Loan
-from domain.value_items import ID
-from domain.entities.factories import WaitingListFactory, MoneyFactory, SimpleTimeBasedFeeSchedule
-from domain.value_items.money import USDMoney
-from domain.entities.libraries.simple_library import SimpleLibrary
-from domain.entities.libraries.library_fee import LibraryFee
-from domain.value_items.time_interval import TimeInterval
+
+from domain.entities import (
+    Person, Borrower, Thing, Loan,
+    WaitingListFactory, MoneyFactory,
+    SimpleLibrary, LibraryFee,
+    SimpleTimeBasedFeeSchedule
+)
+
+from domain.value_items import (
+    PersonName, ThingTitle, PhysicalLocation, ThingStatus,
+    DueDate, LoanStatus, ID, USDMoney,
+    MOPServer, TimeInterval,
+    BorrowerNotInGoodStandingError, InvalidThingStatusToBorrowError,
+    FeeStatus
+)
+
 
 def create_library(waiting_list_factory=None):
     return SimpleLibrary(
@@ -48,14 +51,17 @@ def create_borrower(library, name="libraryMember"):
     library.add_borrower(borrower)
     return borrower
 
+
 def create_thing(library, status=ThingStatus.READY, purchase_cost=None):
     return Thing("item", ThingTitle("title"), library.location, library, status, "", [], purchase_cost)
+
 
 def get_due_date(num_days=1):
     return DueDate(datetime.now() + timedelta(days=num_days))
 
+
 class TestSimpleLibrary(unittest.TestCase):
-    
+
     def test_lists_items_it_has(self):
         library = create_library()
         item = create_thing(library)
@@ -63,7 +69,7 @@ class TestSimpleLibrary(unittest.TestCase):
 
         self.assertEqual(len(list(library.available_titles)), 1)
         self.assertEqual(list(library.available_titles)[0].name, "title")
-    
+
     def test_item_marked_damaged_is_no_longer_available(self):
         library = create_library()
         item = create_thing(library, ThingStatus.DAMAGED)
@@ -71,7 +77,7 @@ class TestSimpleLibrary(unittest.TestCase):
 
         self.assertEqual(len(list(library.available_titles)), 0)
         self.assertEqual(len(list(library.all_titles)), 1)
-    
+
     def test_borrowed_item_is_no_longer_available(self):
         library = create_library()
         borrower = create_borrower(library)
@@ -83,7 +89,7 @@ class TestSimpleLibrary(unittest.TestCase):
         self.assertIsNotNone(loan)
         self.assertEqual(len(list(library.available_titles)), 0)
         self.assertEqual(len(list(library.all_titles)), 1)
-    
+
     def test_cannot_borrow_damaged_item(self):
         library = create_library()
         borrower = create_borrower(library)
@@ -92,7 +98,7 @@ class TestSimpleLibrary(unittest.TestCase):
 
         with self.assertRaises(InvalidThingStatusToBorrowError):
             library.borrow(item, borrower, DueDate(datetime(2022, 12, 12)))
-    
+
     def test_cannot_borrow_if_too_many_fees(self):
         library = create_library()
         borrower = create_borrower(library)
@@ -104,7 +110,7 @@ class TestSimpleLibrary(unittest.TestCase):
 
         with self.assertRaises(BorrowerNotInGoodStandingError):
             library.borrow(item, borrower, DueDate(datetime(2022, 12, 12)))
-    
+
     def test_can_borrow_and_return_on_time(self):
         library = create_library()
         borrower = create_borrower(library)
@@ -114,10 +120,11 @@ class TestSimpleLibrary(unittest.TestCase):
         loan = library.borrow(item, borrower, get_due_date())
         self.assertIsNotNone(loan)
         self.assertEqual(loan.item.status, ThingStatus.BORROWED)
-        
+
         finished = library.finish_return(library.start_return(loan))
         self.assertEqual(finished.status, LoanStatus.RETURNED)
         self.assertEqual(finished.item.status, ThingStatus.READY)
-    
+
+
 if __name__ == '__main__':
     unittest.main()

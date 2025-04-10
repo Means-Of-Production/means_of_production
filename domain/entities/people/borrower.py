@@ -1,22 +1,22 @@
-from __future__ import annotations  # Enables forward references
-from typing import TYPE_CHECKING
 from abc import abstractmethod
 from typing import Self, Sequence
 from domain.entities.entity import Entity
-from domain.value_items import BorrowerVerificationFlags
+from domain.value_items.borrower_verification_flags import BorrowerVerificationFlags
+from domain.entities.libraries import Library, LibraryFee
 
-if TYPE_CHECKING:
-    from domain.entities.libraries import Library, LibraryFee
-    
 class Borrower(Entity):
-    library: Library  # the library this borrower is a member of
+    """Abstract base class representing a library borrower."""
+    
+    library: Library
     verification_flags: list[BorrowerVerificationFlags]
 
     @property
     @abstractmethod
     def fees(self) -> Sequence[LibraryFee]:
+        """Get all fees associated with this borrower."""
         raise NotImplementedError
 
     @abstractmethod
     def apply_fee(self, fee: LibraryFee) -> Self:
+        """Apply a new fee to this borrower."""
         raise NotImplementedError
