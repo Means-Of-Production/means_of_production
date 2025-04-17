@@ -1,13 +1,21 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
 from pydantic import Field, PrivateAttr, computed_field
-from domain.entities import Entity, Lender
+from domain.entities.entity import Entity
+
 from domain.value_items import (
     Location,
     Money,
     ThingStatus,
     ThingTitle,
     ID,
-    InvalidThingStateTransitionError
+    InvalidThingStateTransitionError,
 )
+
+if TYPE_CHECKING:
+    from domain.entities.lenders.lender import Lender
+
 
 class Thing(Entity):
     thing_id: ID

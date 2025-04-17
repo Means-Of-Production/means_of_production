@@ -1,9 +1,10 @@
-from urllib.parse import urlparse
+from domain.value_items.url import URL
 from domain.value_items.location.virtual_location import VirtualLocation
+
 
 class MOPServer(VirtualLocation):
     def __init__(self, url: str, version: str):
-        super().__init__(urlparse(url))
+        super().__init__(url=URL.parse(url))
         self.version = version
 
     @classmethod

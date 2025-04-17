@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta
 
+
 class TimeInterval:
     """
     Represents a time interval in milliseconds.

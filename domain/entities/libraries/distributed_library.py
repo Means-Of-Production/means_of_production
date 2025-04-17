@@ -2,16 +2,29 @@ from datetime import datetime
 from typing import Iterable, Optional
 
 from domain.entities import (
-    Thing, Loan, Lender, BaseLibrary,
-    MoneyFactory, FeeSchedule, WaitingListFactory,
-    Borrower, Person
+    Thing,
+    Loan,
+    Lender,
+    BaseLibrary,
+    MoneyFactory,
+    FeeSchedule,
+    WaitingListFactory,
+    Borrower,
+    Person,
 )
 
 from domain.value_items import (
-    ThingStatus, Money, DueDate, LoanStatus,
-    PhysicalArea, MOPServer, TimeInterval,
-    BorrowerNotInGoodStandingError, InvalidThingStatusToBorrowError
+    ThingStatus,
+    Money,
+    DueDate,
+    LoanStatus,
+    PhysicalArea,
+    MOPServer,
+    TimeInterval,
+    BorrowerNotInGoodStandingError,
+    InvalidThingStatusToBorrowError,
 )
+
 
 class DistributedLibrary(BaseLibrary):
     def __init__(
@@ -29,8 +42,16 @@ class DistributedLibrary(BaseLibrary):
         default_loan_time: Optional[TimeInterval] = None,
     ):
         super().__init__(
-            id, name, administrator, max_fees, loans, money_factory,
-            mop_server, default_loan_time, fee_schedule, waiting_list_factory
+            id,
+            name,
+            administrator,
+            max_fees,
+            loans,
+            money_factory,
+            mop_server,
+            default_loan_time,
+            fee_schedule,
+            waiting_list_factory,
         )
         self._lenders: list[Lender] = []
         self.location = location
@@ -46,7 +67,9 @@ class DistributedLibrary(BaseLibrary):
                 return lender
         raise ValueError(f"Cannot find an owner for {item.title.name}")
 
-    async def borrow(self, item: Thing, borrower: Borrower, until: Optional[DueDate] = None) -> Loan:
+    async def borrow(
+        self, item: Thing, borrower: Borrower, until: Optional[DueDate] = None
+    ) -> Loan:
         """Allows a borrower to borrow an item if they meet eligibility criteria."""
         if item.status != ThingStatus.READY:
             raise InvalidThingStatusToBorrowError(item.status)
@@ -57,7 +80,15 @@ class DistributedLibrary(BaseLibrary):
         until = until or DueDate(self.default_loan_time.from_now())
         item.status = ThingStatus.BORROWED
 
-        return Loan(None, item, borrower, until, LoanStatus.BORROWED, lender.preferred_return_location(item), None)
+        return Loan(
+            None,
+            item,
+            borrower,
+            until,
+            LoanStatus.BORROWED,
+            lender.preferred_return_location(item),
+            None,
+        )
 
     async def finish_return(self, loan: Loan) -> Loan:
         """Finalizes the return process for a loan."""

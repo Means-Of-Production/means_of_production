@@ -2,6 +2,7 @@ from __future__ import annotations
 from urllib.parse import ParseResult, urlparse
 from pydantic import BaseModel
 
+
 class URL(BaseModel):
     value: ParseResult
 

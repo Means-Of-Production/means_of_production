@@ -1,2 +1,1 @@
-__all__ = ['entities', 'repositories', 'services', 'value_items']  
-
+__all__ = ["entities", "repositories", "services", "value_items"]

@@ -1,4 +1,6 @@
 from typing import Dict, Iterable, List
+
+from domain.value_items import ID
 from domain.value_items.thing_title import ThingTitle
 from domain.entities import Thing
 from domain.entities.libraries import Library
@@ -29,7 +31,7 @@ class LibrarySearchResult:
 class TitleSearchResult:
     def __init__(self, title: ThingTitle):
         self.title: ThingTitle = title
-        self._library_results: Dict[str, LibrarySearchResult] = {}
+        self._library_results: Dict[ID, LibrarySearchResult] = {}
 
     @property
     def num_copies(self) -> int:
@@ -44,9 +46,11 @@ class TitleSearchResult:
     def get_for_library(self, library: Library) -> LibrarySearchResult:
         """Gets or creates a LibrarySearchResult for the given library."""
         if not getattr(library, "id", None):
-            raise EntityNotAssignedIdError(f"Library {library.name} has not yet been saved!")
+            raise EntityNotAssignedIdError(
+                f"Library {library.name} has not yet been saved!"
+            )
 
-        if library.id not in self._library_results:
-            self._library_results[library.id] = LibrarySearchResult(library)
+        if library.library_id not in self._library_results:
+            self._library_results[library.library_id] = LibrarySearchResult(library)
 
-        return self._library_results[library.id]
+        return self._library_results[library.library_id]

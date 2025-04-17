@@ -15,7 +15,7 @@ from domain.value_items import (
     TimeInterval,
     BorrowerNotInGoodStandingError,
     InvalidThingStatusToBorrowError,
-    Money
+    Money,
 )
 
 
@@ -33,7 +33,7 @@ class SimpleLibrary(BaseLibrary, Lender):
         mop_server: MOPServer,
         fee_schedule: Optional[FeeSchedule] = None,
         default_loan_time: Optional[TimeInterval] = None,
-        bidding_strategy: Optional[BiddingStrategy] = None
+        bidding_strategy: Optional[BiddingStrategy] = None,
     ):
         if default_loan_time is None:
             default_loan_time = TimeInterval.from_days(14)
@@ -49,7 +49,7 @@ class SimpleLibrary(BaseLibrary, Lender):
             default_loan_time=default_loan_time,
             fee_schedule=fee_schedule,
             bidding_strategy=bidding_strategy,
-            waiting_list_factory=waiting_list_factory
+            waiting_list_factory=waiting_list_factory,
         )
 
         self._items: List[Thing] = []
@@ -66,7 +66,9 @@ class SimpleLibrary(BaseLibrary, Lender):
     def items(self) -> Iterable[Thing]:
         return self._items
 
-    def borrow(self, item: Thing, borrower: Borrower, until: Optional[DueDate] = None) -> Loan:
+    def borrow(
+        self, item: Thing, borrower: Borrower, until: Optional[DueDate] = None
+    ) -> Loan:
         if item.status != ThingStatus.READY:
             raise InvalidThingStatusToBorrowError(item.status)
 
@@ -83,7 +85,7 @@ class SimpleLibrary(BaseLibrary, Lender):
             due_date=until,
             status=LoanStatus.BORROWED,
             location=self.location,
-            date_returned=None
+            date_returned=None,
         )
 
         item.status = ThingStatus.BORROWED

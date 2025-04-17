@@ -2,18 +2,31 @@ import unittest
 from datetime import datetime, timedelta
 
 from domain.entities import (
-    Person, Borrower, Thing, Loan,
-    WaitingListFactory, MoneyFactory,
-    SimpleLibrary, LibraryFee,
-    SimpleTimeBasedFeeSchedule
+    Person,
+    Borrower,
+    Thing,
+    Loan,
+    WaitingListFactory,
+    MoneyFactory,
+    SimpleLibrary,
+    LibraryFee,
+    SimpleTimeBasedFeeSchedule,
 )
 
 from domain.value_items import (
-    PersonName, ThingTitle, PhysicalLocation, ThingStatus,
-    DueDate, LoanStatus, ID, USDMoney,
-    MOPServer, TimeInterval,
-    BorrowerNotInGoodStandingError, InvalidThingStatusToBorrowError,
-    FeeStatus
+    PersonName,
+    ThingTitle,
+    PhysicalLocation,
+    ThingStatus,
+    DueDate,
+    LoanStatus,
+    ID,
+    USDMoney,
+    MOPServer,
+    TimeInterval,
+    BorrowerNotInGoodStandingError,
+    InvalidThingStatusToBorrowError,
+    FeeStatus,
 )
 
 
@@ -23,10 +36,7 @@ def create_library(waiting_list_factory=None):
         name="testLibrary",
         administrator=Person(
             person_id=ID(value="1"),
-            name=PersonName(
-                first_name="Test",
-                last_name="McTesterson"
-            )
+            name=PersonName(first_name="Test", last_name="McTesterson"),
         ),
         location=PhysicalLocation(
             latitude=0,
@@ -34,7 +44,7 @@ def create_library(waiting_list_factory=None):
             street_address="123 Main St",
             city="Anytown",
             state="CA",
-            zip_code="12345"
+            zip_code="12345",
         ),
         waiting_list_factory=waiting_list_factory or WaitingListFactory(),
         max_fines_before_suspension=USDMoney(amount=100),
@@ -42,7 +52,7 @@ def create_library(waiting_list_factory=None):
         money_factory=MoneyFactory(),
         mop_server=MOPServer.localhost,
         fee_schedule=SimpleTimeBasedFeeSchedule(MoneyFactory()),
-        default_loan_time=TimeInterval.from_days(14)
+        default_loan_time=TimeInterval.from_days(14),
     )
 
 
@@ -53,7 +63,16 @@ def create_borrower(library, name="libraryMember"):
 
 
 def create_thing(library, status=ThingStatus.READY, purchase_cost=None):
-    return Thing("item", ThingTitle("title"), library.location, library, status, "", [], purchase_cost)
+    return Thing(
+        "item",
+        ThingTitle("title"),
+        library.location,
+        library,
+        status,
+        "",
+        [],
+        purchase_cost,
+    )
 
 
 def get_due_date(num_days=1):
@@ -126,5 +145,5 @@ class TestSimpleLibrary(unittest.TestCase):
         self.assertEqual(finished.item.status, ThingStatus.READY)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

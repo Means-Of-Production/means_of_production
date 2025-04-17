@@ -4,6 +4,7 @@ from domain.value_items.thing_status import ThingStatus
 
 class CurrencyMismatchException(Exception):
     """Raised when a currency mismatch occurs."""
+
     pass
 
 
@@ -23,7 +24,9 @@ class InvalidThingStateTransitionError(Exception):
 class InvalidReservationStateTransitionError(Exception):
     """Raised when an invalid transition occurs in ReservationStatus."""
 
-    def __init__(self, current_status: ReservationStatus, new_status: ReservationStatus):
+    def __init__(
+        self, current_status: ReservationStatus, new_status: ReservationStatus
+    ):
         self.current_status = current_status
         self.new_status = new_status
         message = (
@@ -56,11 +59,13 @@ class EntityNotAssignedIdError(Exception):
 
 class ConflictingKeyException(Exception):
     """Raised when there is a conflicting key issue."""
+
     pass
 
 
 class ResourceNotFoundException(Exception):
     """Raised when a requested resource is not found."""
+
     pass
 
 
@@ -75,4 +80,5 @@ class InvalidThingStatusToBorrowError(Exception):
 
 class BorrowerNotInGoodStandingError(Exception):
     """Raised when a borrower is not in good standing."""
+
     pass

@@ -1,13 +1,13 @@
 from __future__ import annotations  # Enables forward references
-from typing import TYPE_CHECKING
 from abc import abstractmethod
-from typing import Iterable
+from typing import Iterable, TYPE_CHECKING
 from domain.entities.entity import Entity
-from domain.entities.thing import Thing
 
 if TYPE_CHECKING:
-    from domain.entities.loans import Loan
-    
+    from domain.entities.thing import Thing
+    from domain.entities.loans.loan import Loan
+
+
 class Lender(Entity):
     @property
     @abstractmethod

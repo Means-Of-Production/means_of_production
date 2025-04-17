@@ -1,23 +1,20 @@
 from datetime import date, timezone
+from typing import TYPE_CHECKING
 from pydantic import field_validator
-from domain.entities import (
-    Entity,
-    Lender,
-    Thing,
-    Borrower,
-    
-)
-from domain.value_items import (
-   ID,
-    DueDate,
-    LoanStatus,
-    Location 
-)
 
-    
+from domain.entities.entity import Entity
+from domain.entities.people import Borrower
+
+from domain.value_items import ID, DueDate, LoanStatus, Location
+
+if TYPE_CHECKING:
+    from domain.entities.lenders.lender import Lender
+    from domain.entities.thing import Thing
+
+
 class Loan(Entity):
     loan_id: ID
-    item: Thing
+    item: "Thing"
     due_date: DueDate
     borrower: Borrower
     location: Location
@@ -25,8 +22,12 @@ class Loan(Entity):
     return_location: Location
     date_returned: date | None
 
+    @property
+    def entity_id(self) -> ID:
+        return self.loan_id
+
     @classmethod
-    @field_validator("_date_returned", mode="after")
+    @field_validator("date_returned", mode="after")
     def validate_utc(cls, value):
         if value is not None:
             if value.tzinfo is None or value.tzinfo != timezone.utc:
@@ -37,7 +38,7 @@ class Loan(Entity):
         return value
 
     @property
-    def lender(self) -> Lender:
+    def lender(self) -> "Lender":
         return self.item.owner
 
     @property

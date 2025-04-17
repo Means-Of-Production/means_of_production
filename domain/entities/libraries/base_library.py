@@ -1,16 +1,27 @@
 from typing import Iterable, Optional, Dict, List
-from datetime import datetime
 from dataclasses import dataclass
 from abc import ABC, abstractmethod
-from urllib.parse import urlparse
 from domain.entities import (
-    Thing, Borrower, Person, Loan,
-    FeeSchedule, WaitingListFactory, MoneyFactory, NoFeeSchedule,
-    AuctionableWaitingList, WaitingList
+    Thing,
+    Borrower,
+    Person,
+    Loan,
+    FeeSchedule,
+    WaitingListFactory,
+    MoneyFactory,
+    NoFeeSchedule,
+    WaitingList,
 )
 from domain.value_items import (
-    DueDate, FeeStatus, Location, Money,
-    LoanStatus, MOPServer, ThingStatus, ThingTitle, TimeInterval
+    DueDate,
+    FeeStatus,
+    Location,
+    Money,
+    LoanStatus,
+    MOPServer,
+    ThingStatus,
+    ThingTitle,
+    TimeInterval,
 )
 from domain.services import BiddingStrategy
 
@@ -18,22 +29,28 @@ from domain.services import BiddingStrategy
 class EntityNotAssignedIdError(Exception):
     pass
 
+
 class InvalidLibraryConfigurationError(Exception):
     pass
+
 
 class ReturnNotStartedError(Exception):
     pass
 
+
 @dataclass
 class URL:
     """Simple URL representation"""
+
     url: str
+
 
 class LibraryFee:
     def __init__(self, amount: Money, loan: Loan, status: FeeStatus):
         self.amount = amount
         self.loan = loan
         self.status = status
+
 
 class BaseLibrary(ABC):
     def __init__(
@@ -49,16 +66,14 @@ class BaseLibrary(ABC):
         fee_schedule: Optional[FeeSchedule] = None,
         bidding_strategy: Optional[BiddingStrategy] = None,
         waiting_list_factory: Optional[WaitingListFactory] = None,
-        public_url: Optional[URL] = None
+        public_url: Optional[URL] = None,
     ):
         self._borrowers: List[Borrower] = []
         self._loans: List[Loan] = list(loans)
         self.name = name
         self.id = id
         self.waiting_list_factory = waiting_list_factory or WaitingListFactory(
-            bidding_strategy is not None,
-            None,
-            money_factory
+            bidding_strategy is not None, None, money_factory
         )
         self.waiting_lists_by_item_id: Dict[str, WaitingList] = {}
         self.administrator = administrator
@@ -114,7 +129,9 @@ class BaseLibrary(ABC):
         if borrower.library.name != self.name:
             return False
 
-        fee_amounts = [f.amount for f in borrower.fees if f.status == FeeStatus.OUTSTANDING]
+        fee_amounts = [
+            f.amount for f in borrower.fees if f.status == FeeStatus.OUTSTANDING
+        ]
         total_fees = self.money_factory.total(fee_amounts)
         return not total_fees.greater_than(self.max_fines_before_suspension)
 
@@ -126,13 +143,13 @@ class BaseLibrary(ABC):
         if not waiting_list:
             waiting_list = self.waiting_list_factory.create_list(item)
             self.waiting_lists_by_item_id[item.id] = waiting_list
-        
+
         waiting_list.add(borrower)
         return waiting_list
 
     def get_loans(self) -> Iterable[Loan]:
         return self._loans
-    
+
     def add_loan(self, loan: Loan):
         self._loans.append(loan)
 
@@ -145,7 +162,10 @@ class BaseLibrary(ABC):
         return titles
 
     async def finish_return(self, loan: Loan) -> Loan:
-        if loan.status != LoanStatus.WAITING_ON_LENDER_ACCEPTANCE or not loan.date_returned:
+        if (
+            loan.status != LoanStatus.WAITING_ON_LENDER_ACCEPTANCE
+            or not loan.date_returned
+        ):
             raise ReturnNotStartedError()
 
         if loan.item.status == ThingStatus.DAMAGED:
@@ -171,7 +191,7 @@ class BaseLibrary(ABC):
 
         if not loan.item.id:
             raise EntityNotAssignedIdError("Item must have an ID")
-        
+
         if loan.item.id in self.waiting_lists_by_item_id:
             waiting_list = self.waiting_lists_by_item_id[loan.item.id]
             waiting_list.reserve_item_for_next_borrower()
@@ -182,18 +202,16 @@ class BaseLibrary(ABC):
         return loan
 
     async def bid_to_skip_to_front_of_list(
-        self,
-        item: Thing,
-        bidder: Borrower,
-        amount: Money,
-        borrower: Borrower
+        self, item: Thing, bidder: Borrower, amount: Money, borrower: Borrower
     ) -> WaitingList:
         if not self.bidding_strategy:
-            raise InvalidLibraryConfigurationError("This library does not support bidding!")
-        
+            raise InvalidLibraryConfigurationError(
+                "This library does not support bidding!"
+            )
+
         waiting_list = await self.reserve_item(item, borrower)
         auctionable_list = waiting_list  # type: AuctionableWaitingList
-        
+
         bid = await self.bidding_strategy.get_bid_for_cost(
             item, bidder, amount, self, borrower
         )

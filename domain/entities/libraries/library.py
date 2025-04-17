@@ -1,13 +1,15 @@
 from abc import abstractmethod
-from typing import Iterable
+from typing import Iterable, TYPE_CHECKING
 
-from domain.entities import (
-    Entity, Loan, Person, Thing, WaitingList, Borrower
-)
+from domain.entities.entity import Entity
+from domain.entities.loans import Loan
+from domain.entities.people import Borrower, Person
+from domain.entities.waiting_lists import WaitingList
 
-from domain.value_items import (
-    ID, DueDate, Location, ThingTitle
-)
+from domain.value_items import ID, DueDate, Location, ThingTitle
+
+if TYPE_CHECKING:
+    from domain.entities.thing import Thing
 
 
 class Library(Entity):

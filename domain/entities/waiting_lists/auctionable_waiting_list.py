@@ -10,13 +10,9 @@ from domain.entities import (
     Reservation,
     AuctionBid,
     Borrower,
-    MoneyFactory
+    MoneyFactory,
 )
-from domain.value_items import (
-    Money,
-    TimeInterval,
-    EntityNotAssignedIdError
-)
+from domain.value_items import Money, TimeInterval, EntityNotAssignedIdError, ID
 
 
 class AuctionableWaitingList(WaitingList):
@@ -28,11 +24,11 @@ class AuctionableWaitingList(WaitingList):
         started: datetime,
         is_active: bool = True,
         current_reservation: Optional[Reservation] = None,
-        expired_reservations: Optional[List[Reservation]] = None
+        expired_reservations: Optional[List[Reservation]] = None,
     ):
         super().__init__(item, current_reservation, expired_reservations or [])
         self.backup_list = FirstComeFirstServeWaitingList(item)
-        self.bids_by_for_id: Dict[str, List[AuctionBid]] = {}
+        self.bids_by_for_id: Dict[ID, List[AuctionBid]] = {}
         self.money_factory = money_factory
 
         self.started = started
@@ -44,13 +40,13 @@ class AuctionableWaitingList(WaitingList):
         return self
 
     def add_bid(self, bid: AuctionBid) -> "AuctionableWaitingList":
-        if not bid.made_for.id:
+        if not bid.made_for.entity_id:
             raise EntityNotAssignedIdError("Bid must be assigned an ID.")
-        
-        if bid.made_for.id not in self.bids_by_for_id:
-            self.bids_by_for_id[bid.made_for.id] = []
-        
-        self.bids_by_for_id[bid.made_for.id].append(bid)
+
+        if bid.made_for.entity_id not in self.bids_by_for_id:
+            self.bids_by_for_id[bid.made_for.entity_id] = []
+
+        self.bids_by_for_id[bid.made_for.entity_id].append(bid)
         return self
 
     def get_bids(self) -> Iterable[AuctionBid]:
@@ -73,7 +69,9 @@ class AuctionableWaitingList(WaitingList):
 
         if top_borrower_id:
             return next(
-                bid.made_for for bid in self.get_bids() if bid.made_for.id == top_borrower_id
+                bid.made_for
+                for bid in self.get_bids()
+                if bid.made_for.id == top_borrower_id
             )
         else:
             raise ValueError("No winning borrower found.")
@@ -85,7 +83,7 @@ class AuctionableWaitingList(WaitingList):
         """Finds the next borrower based on highest bid or falls back to backup list."""
         if not self.bids_by_for_id:
             return self.backup_list.find_next_borrower()
-        
+
         return self.get_winning_borrower()
 
     def get_largest_amount(self) -> Money:
@@ -102,7 +100,9 @@ class AuctionableWaitingList(WaitingList):
 
         return amount
 
-    def process_reservation_expired(self, reservation: Reservation) -> "AuctionableWaitingList":
+    def process_reservation_expired(
+        self, reservation: Reservation
+    ) -> "AuctionableWaitingList":
         raise NotImplementedError("Method not implemented.")
 
     def get_reservation_time(self) -> TimeInterval:
@@ -110,16 +110,18 @@ class AuctionableWaitingList(WaitingList):
 
     def cancel(self, borrower: Borrower) -> "AuctionableWaitingList":
         """Removes a borrower from the waiting list and deletes their bids."""
-        if not borrower.id:
+        if not borrower.entity_id:
             raise EntityNotAssignedIdError("Borrower must have an ID.")
 
         self.backup_list.cancel(borrower)
 
-        if borrower.id in self.bids_by_for_id:
-            del self.bids_by_for_id[borrower.id]
+        if borrower.entity_id in self.bids_by_for_id:
+            del self.bids_by_for_id[borrower.entity_id]
 
         # Remove bids made by this borrower
         for bid_list in self.bids_by_for_id.values():
-            bid_list[:] = [bid for bid in bid_list if bid.made_by.id != borrower.id]
+            bid_list[:] = [
+                bid for bid in bid_list if bid.made_by.entity_id != borrower.entity_id
+            ]
 
         return self

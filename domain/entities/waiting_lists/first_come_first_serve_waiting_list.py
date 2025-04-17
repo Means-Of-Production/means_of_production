@@ -1,21 +1,27 @@
-from typing import List, Optional
+from typing import Optional
+
 # In other files, now you can import cleanly:
 from domain.entities.waiting_lists import (
-    BaseWaitingList,
+    WaitingList,
     Reservation,
-    Borrower,
-    Thing,
-    TimeInterval,
-    ReservationStatus
 )
+from domain.entities.thing import Thing
+from domain.entities.people import Borrower
+from domain.value_items import TimeInterval, ReservationStatus
 
-class FirstComeFirstServeWaitingList(BaseWaitingList):
+
+class FirstComeFirstServeWaitingList(WaitingList):
     """
     Implements a first-come-first-serve waiting list for an item.
     """
 
-    def __init__(self, item: Thing, members: Optional[List[Borrower]] = None, reservation_days: int = 3):
-        super().__init__(item)
+    def __init__(
+        self,
+        item: Thing,
+        members: list[Borrower] | None = None,
+        reservation_days: int = 3,
+    ):
+        super().__init__([item])
         self.members = members if members is not None else []
         self.reservation_days = reservation_days
 
@@ -30,8 +36,8 @@ class FirstComeFirstServeWaitingList(BaseWaitingList):
         """
         Checks if a borrower is on the waiting list.
         """
-        member_ids = [b.id for b in self.members]
-        return borrower.id is not None and borrower.id in member_ids
+        member_ids = [b.entity_id for b in self.members]
+        return borrower.entity_id is not None and borrower.entity_id in member_ids
 
     def find_next_borrower(self) -> Optional[Borrower]:
         """
@@ -45,7 +51,9 @@ class FirstComeFirstServeWaitingList(BaseWaitingList):
         """
         return TimeInterval.from_days(self.reservation_days)
 
-    def process_reservation_expired(self, reservation: Reservation) -> "FirstComeFirstServeWaitingList":
+    def process_reservation_expired(
+        self, reservation: Reservation
+    ) -> "FirstComeFirstServeWaitingList":
         """
         Handles an expired reservation.
         """

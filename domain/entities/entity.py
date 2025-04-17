@@ -12,3 +12,7 @@ class Entity(ABC):
         if not isinstance(other, Entity):
             return False
         return self.entity_id == other.entity_id
+
+    def __hash__(self) -> int:
+        """Make entity hashable based on its identity"""
+        return hash(self.entity_id)

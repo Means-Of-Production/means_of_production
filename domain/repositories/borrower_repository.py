@@ -20,5 +20,5 @@ class BorrowerRepository(BaseInMemoryRepository[Borrower]):
             entity.person,
             entity.library,
             list(entity.verification_flags),
-            list(entity.fees)
+            list(entity.fees),
         )

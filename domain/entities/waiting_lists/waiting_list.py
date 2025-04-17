@@ -2,19 +2,20 @@ from abc import abstractmethod
 from datetime import timedelta
 from typing import Self
 from pydantic import PrivateAttr, computed_field
-from domain.entities import (
-    Entity,
-    Borrower,
-    Thing,
-    Reservation,
-    ThingTitle
-)
+from domain.entities import Entity, Borrower, Thing, Reservation, ThingTitle
+from domain.value_items import ID
+
 
 class WaitingList(Entity):
+    waiting_list_id: ID
     _item: Thing = PrivateAttr()
     model_config = {"frozen": True}
     _current_reservation: Reservation | None = PrivateAttr(default=None)
     _expired_reservation: list[Reservation] = PrivateAttr(default_factory=list)
+
+    @property
+    def entity_id(self) -> ID:
+        return self.waiting_list_id
 
     @abstractmethod
     def add(self, borrower: Borrower) -> Self:
@@ -29,7 +30,7 @@ class WaitingList(Entity):
         raise NotImplementedError()
 
     @abstractmethod
-    def process_reservation_expired(self, reservation: Reservation) -> WaitingList:
+    def process_reservation_expired(self, reservation: Reservation) -> "WaitingList":
         raise NotImplementedError()
 
     @abstractmethod

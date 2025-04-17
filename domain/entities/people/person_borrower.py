@@ -4,6 +4,7 @@ from domain.entities.people.person import Person
 from domain.entities.people.borrower import Borrower
 from domain.entities.libraries.library_fee import LibraryFee
 
+
 class PersonBorrower(Person, Borrower):
     _fees = PrivateAttr(default_factory=list)
 
