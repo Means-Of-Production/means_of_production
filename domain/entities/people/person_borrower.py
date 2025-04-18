@@ -8,7 +8,7 @@ from domain.entities.people.borrower import Borrower
 
 
 class PersonBorrower(Person, Borrower):
-    _fees = PrivateAttr(default_factory=list)
+    _fees: list[LibraryFee] = PrivateAttr(default_factory=list)
 
     @property
     def fees(self) -> Sequence[LibraryFee]:

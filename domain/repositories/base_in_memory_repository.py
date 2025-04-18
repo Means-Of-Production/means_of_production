@@ -12,16 +12,20 @@ class BaseInMemoryRepository(Generic[T], ABC):
     def __init__(self) -> None:
         self._entities: dict[ID, T] = {}
 
+    @abstractmethod
+    def get_id_field_name(self) -> str:
+        raise NotImplementedError()
+
+    def create(self, entity: T) -> T:
+        entity_id = self.new_id()
+        setattr(entity, self.get_id_field_name(), entity_id)
+        return entity
+
     def get_id_from_entity(self, entity: T) -> ID:
         entity_id = getattr(entity, "entity_id", None)
         if entity_id is None:
             raise ValueError(f"Entity {entity.__class__.__name__} does not have an id assigned!")
         return entity_id
-
-    @abstractmethod
-    def create(self, entity: T) -> T:
-        """Assign an id to the entity if needed."""
-        pass
 
     def new_id(self) -> str:
         return str(uuid4())

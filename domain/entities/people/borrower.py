@@ -2,12 +2,12 @@ from abc import abstractmethod
 from typing import Self, Sequence
 
 from domain.entities.entity import Entity
-from domain.entities.libraries import Library, LibraryFee
-from domain.value_items import BorrowerVerificationFlags
+from domain.entities.libraries import LibraryFee
+from domain.value_items import BorrowerVerificationFlags, ID
 
 
 class Borrower(Entity):
-    library: Library  # the library this borrower is a member of
+    library_id: ID  # the library this borrower is a member of
     verification_flags: list[BorrowerVerificationFlags]
 
     @property

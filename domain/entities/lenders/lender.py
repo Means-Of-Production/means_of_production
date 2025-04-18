@@ -2,7 +2,7 @@ from abc import abstractmethod
 from typing import Iterable
 
 from domain.entities.entity import Entity
-from domain.entities.loans import Loan
+from domain.entities.loan import Loan
 from domain.entities.thing import Thing
 
 

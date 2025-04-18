@@ -10,5 +10,5 @@ class Person(Entity):
     email: list[EmailStr] = Field(default_factory=list)
 
     @property
-    def id(self) -> ID:
+    def entity_id(self) -> ID:
         return self.person_id

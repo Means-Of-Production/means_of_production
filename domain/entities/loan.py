@@ -4,7 +4,6 @@ from pydantic import field_validator
 
 from domain.entities.borrower import Borrower
 from domain.entities.entity import Entity
-from domain.entities.lenders import Lender
 from domain.entities.thing import Thing
 from domain.value_items import ID, DueDate, LoanStatus, Location
 
@@ -31,11 +30,11 @@ class Loan(Entity):
         return value
 
     @property
-    def lender(self) -> Lender:
-        return self.item.owner
+    def lender_id(self) -> ID:
+        return self.item.owner_id
 
     @property
-    def id(self) -> ID:
+    def entity_id(self) -> ID:
         return self.loan_id
 
     @property
