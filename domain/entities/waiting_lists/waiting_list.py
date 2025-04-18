@@ -2,15 +2,17 @@ from __future__ import annotations
 
 from abc import abstractmethod
 from datetime import timedelta
-from typing import Self
+from typing import Self, TYPE_CHECKING
 
 from pydantic import PrivateAttr, computed_field
 
 from domain.entities.entity import Entity
-from domain.entities.people.borrower import Borrower
 from domain.entities.thing import Thing
 from domain.entities.waiting_lists.reservation import Reservation
 from domain.value_items import ThingTitle
+
+if TYPE_CHECKING:
+    from domain.entities.people.borrower import Borrower
 
 
 class WaitingList(Entity):

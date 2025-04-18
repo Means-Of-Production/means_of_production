@@ -15,6 +15,9 @@ class LibraryRepository(BaseInMemoryRepository[Library]):
     def get_libraries_person_can_use(self, person: Person) -> Iterable[Library]:
         """Retrieve libraries a person can access."""
         return (
-            library for library in self.get_all()
-            if any(borrower.entity_id == person.entity_id for borrower in library.borrowers)
+            library
+            for library in self.get_all()
+            if any(
+                borrower.entity_id == person.entity_id for borrower in library.borrowers
+            )
         )

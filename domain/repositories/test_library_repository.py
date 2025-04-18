@@ -2,6 +2,7 @@ from unittest.mock import MagicMock
 from domain import Person, Library, Borrower, PersonName, ID
 from library_repository import LibraryRepository
 
+
 def test_gets_libraries_via_person():
     # Arrange
     person_name = PersonName(first_name="Testy", last_name="McTesterson")

@@ -1,6 +1,7 @@
 from domain.entities import Person
 from domain.repositories.base_in_memory_repository import BaseInMemoryRepository
 
+
 class PersonRepository(BaseInMemoryRepository[Person]):
     def __init__(self):
         super().__init__()

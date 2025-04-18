@@ -19,9 +19,6 @@ dev = [
     "email-validator>=2.1.1",
     "pyright>=1.1.391",
 ]
-[tool.pdm]
-distribution = false
-
 
 [tool.ruff.lint.per-file-ignores]
 # ignore type annotation errors in test files

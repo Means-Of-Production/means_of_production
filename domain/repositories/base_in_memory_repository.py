@@ -4,9 +4,13 @@ from typing import Generic, TypeVar, Iterable
 
 from domain.entities import Entity
 from domain.value_items import ID
-from domain.value_items.exceptions import ConflictingKeyException, ResourceNotFoundException
+from domain.value_items.exceptions import (
+    ConflictingKeyException,
+    ResourceNotFoundException,
+)
 
 T = TypeVar("T", bound=Entity)
+
 
 class BaseInMemoryRepository(Generic[T], ABC):
     def __init__(self) -> None:
@@ -24,7 +28,9 @@ class BaseInMemoryRepository(Generic[T], ABC):
     def get_id_from_entity(self, entity: T) -> ID:
         entity_id = getattr(entity, "entity_id", None)
         if entity_id is None:
-            raise ValueError(f"Entity {entity.__class__.__name__} does not have an id assigned!")
+            raise ValueError(
+                f"Entity {entity.__class__.__name__} does not have an id assigned!"
+            )
         return entity_id
 
     def new_id(self) -> str:
@@ -42,7 +48,9 @@ class BaseInMemoryRepository(Generic[T], ABC):
     def update(self, entity: T) -> T:
         entity_id = self.get_id_from_entity(entity)
         if entity_id not in self._entities:
-            raise ResourceNotFoundException(f"Entity with id {entity_id} does not exist")
+            raise ResourceNotFoundException(
+                f"Entity with id {entity_id} does not exist"
+            )
         self._entities[entity_id] = entity
         return entity
 
