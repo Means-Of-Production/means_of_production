@@ -2,12 +2,11 @@ from pydantic import BaseModel
 
 
 class ThingTitle(BaseModel):
+    model_config = {"frozen": True}
     name: str
     upc: str | None = None
     isbn: str | None = None
     description: str | None = None
-
-    model_config = {"frozen": True}
 
     def __eq__(self, other):
         if not isinstance(other, ThingTitle):

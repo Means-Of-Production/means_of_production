@@ -6,9 +6,8 @@ from pydantic import BaseModel
 
 
 class URL(BaseModel):
-    value: ParseResult
-
     model_config = {"frozen": True}
+    value: ParseResult
 
     @classmethod
     def try_parse(cls, url_string: str) -> URL | None:

@@ -4,6 +4,7 @@ from pydantic import BaseModel, field_validator
 
 
 class DueDate(BaseModel):
+    model_config = {"frozen": True}
     date: date | None
 
     @classmethod
