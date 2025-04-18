@@ -1,0 +1,55 @@
+name: Serverless Branch Deployments
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, closed]
+
+concurrency:
+  # Cancel in-progress deploys to same branch
+  group: ${{ github.ref }}/branch_deployments
+  cancel-in-progress: true
+env:
+  ENABLE_FAST_DEPLOYS: 'false'
+  PYTHON_VERSION: '3.13'
+
+jobs:
+  unit_test:
+    name: Automated Tests and Code Quality
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  # Ensure full commit history is available
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.13'  # Specify your Python version (e.g., 3.9)
+
+      - name: Install uv
+        run: |
+          curl -LsSf https://astral.sh/uv/install.sh | sh
+          echo "$HOME/.cargo/bin" >> $GITHUB_PATH
+
+      - name: Display uv version
+        run: uv --version
+
+      - name: Install dependencies
+        run: uv pip install -e ".[dev]"
+
+      - name: Lint code and imports
+        run: |
+          ruff check --extend-select I
+
+      - name: Check formatting
+        uses: psf/black@stable
+        with:
+          options: "--verbose --check"
+          version: "<25.0.0,>=24.2.0"
+
+      - name: Run Pytest
+        run: pytest
+
+      - name: Run Pyright Type Checking
+        run: |
+          pyright -p pyproject.toml

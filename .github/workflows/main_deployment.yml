@@ -1,0 +1,14 @@
+name: Serverless Prod Deployment
+on:
+  push:
+    branches:
+      - "main"
+      - "master"
+    
+concurrency:
+  # Cancel in-progress deploys to same branch
+  group: ${{ github.ref }}/deploy
+  cancel-in-progress: true
+env:
+  ENABLE_FAST_DEPLOYS: 'false'
+  PYTHON_VERSION: '3.13'
