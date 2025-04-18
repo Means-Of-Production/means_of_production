@@ -30,3 +30,4 @@ markers = [
 "**/tests/**/*.py" = ["ANN"]
 "conftest.py" = ["ANN"]
 "__init__.py" = ["F401"]
+
