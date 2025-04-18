@@ -4,7 +4,7 @@ from loan_repository import LoanRepository
 
 def test_get_loans_for_person_filters_by_borrower():
     # Create mock person
-    person = Person("personId", PersonName("Testy", "McTesterson"))
+    person = Person(person_id="personId", name=PersonName("Testy", "McTesterson"))
     borrower = Mock(spec=Borrower)
     borrower.person = person
 

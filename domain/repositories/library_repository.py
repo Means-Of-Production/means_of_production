@@ -10,9 +10,6 @@ class LibraryRepository(BaseInMemoryRepository[Library]):
         for lib in libraries:
             self.add(lib)
 
-    def get_id_from_entity(self, entity: Library) -> str:
-        return entity.entity_id or entity.name
-
     def get_libraries_person_can_use(self, person: Person) -> Iterable[Library]:
         """Retrieve libraries a person can access."""
         return (

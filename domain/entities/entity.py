@@ -1,9 +1,10 @@
 from abc import ABC, abstractmethod
 
+from pydantic import BaseModel
 from domain.value_items import ID
 
 
-class Entity(ABC):
+class Entity(BaseModel, ABC):
     @property
     @abstractmethod
     def entity_id(self) -> ID:
