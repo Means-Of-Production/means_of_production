@@ -40,17 +40,6 @@ jobs:
       - name: Install dependencies
         run: uv pip install -e ".[dev]"
 
-      - name: Lint code and imports
-        run: |
-          source .venv/bin/activate
-          ruff check --extend-select I
-
-      - name: Check formatting
-        uses: psf/black@stable
-        with:
-          options: "--verbose --check"
-          version: "<25.0.0,>=24.2.0"
-
       - name: Run Pytest
         run: |
           source .venv/bin/activate
@@ -60,3 +49,14 @@ jobs:
         run: |
           source .venv/bin/activate
           pyright -p pyproject.toml
+
+      - name: Check formatting
+        uses: psf/black@stable
+        with:
+          options: "--verbose --check"
+          version: "<25.0.0,>=24.2.0"
+
+      - name: Lint code and imports
+        run: |
+          source .venv/bin/activate
+          ruff check --extend-select I
