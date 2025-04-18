@@ -1,5 +1,7 @@
 from typing import Iterable
-from domain.entities import PersonBorrower, Person
+
+from domain.entities import Person, PersonBorrower
+
 from .base_in_memory_repository import BaseInMemoryRepository
 
 

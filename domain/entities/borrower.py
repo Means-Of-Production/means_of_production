@@ -5,7 +5,7 @@ from typing import Sequence
 
 from domain.entities.entity import Entity
 from domain.entities.libraries.library_fee import LibraryFee
-from domain.value_items import BorrowerVerificationFlags, ID
+from domain.value_items import ID, BorrowerVerificationFlags
 
 
 class Borrower(Entity):

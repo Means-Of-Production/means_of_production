@@ -1,12 +1,11 @@
 from abc import abstractmethod
 from typing import Iterable
 
+from domain.entities.borrower import Borrower
 from domain.entities.entity import Entity
 from domain.entities.loan import Loan
 from domain.entities.people.person import Person
 from domain.entities.thing import Thing
-from domain.entities.borrower import Borrower
-from domain.entities.waiting_lists import WaitingList
 from domain.value_items import ID, DueDate, Location, ThingTitle
 
 
@@ -54,8 +53,4 @@ class Library(Entity):
 
     @abstractmethod
     def finish_return(self, loan: Loan) -> Loan:
-        raise NotImplementedError()
-
-    @abstractmethod
-    def reserve_item(self, title: ThingTitle, borrower: Borrower) -> WaitingList:
         raise NotImplementedError()

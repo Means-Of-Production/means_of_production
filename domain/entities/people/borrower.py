@@ -3,7 +3,7 @@ from typing import Self, Sequence
 
 from domain.entities.entity import Entity
 from domain.entities.libraries import LibraryFee
-from domain.value_items import BorrowerVerificationFlags, ID
+from domain.value_items import ID, BorrowerVerificationFlags
 
 
 class Borrower(Entity):

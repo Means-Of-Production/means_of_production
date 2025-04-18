@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 
 from pydantic import BaseModel
+
 from domain.value_items import ID
 
 

@@ -1,8 +1,6 @@
 from datetime import datetime, timezone
 from typing import Iterable, Self
 
-from pydantic import PrivateAttr
-
 from domain.entities.lenders.lender import Lender
 from domain.entities.loan import Loan
 from domain.entities.people import Person

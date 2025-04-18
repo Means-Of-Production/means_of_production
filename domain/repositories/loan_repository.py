@@ -1,7 +1,8 @@
 from typing import Iterable
+
+from domain.entities import Library, Loan, Person
 from domain.repositories.base_in_memory_repository import BaseInMemoryRepository
 from domain.repositories.library_repository import LibraryRepository
-from domain.entities import Library, Loan, Person
 
 
 class LoanRepository(BaseInMemoryRepository):

@@ -1,6 +1,8 @@
 from typing import Iterable
-from .base_in_memory_repository import BaseInMemoryRepository
+
 from domain.entities import Library, Person
+
+from .base_in_memory_repository import BaseInMemoryRepository
 
 
 class LibraryRepository(BaseInMemoryRepository[Library]):

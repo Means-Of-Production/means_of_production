@@ -1,3 +1,4 @@
+from domain.value_items import exceptions
 from domain.value_items.borrower_verification_flags import BorrowerVerificationFlags
 from domain.value_items.due_date import DueDate
 from domain.value_items.id import ID
@@ -9,4 +10,3 @@ from domain.value_items.reservation_status import ReservationStatus
 from domain.value_items.thing_status import ThingStatus
 from domain.value_items.thing_title import ThingTitle
 from domain.value_items.user_roles import UserRoles
-from domain.value_items import exceptions

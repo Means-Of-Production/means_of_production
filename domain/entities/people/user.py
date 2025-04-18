@@ -1,5 +1,7 @@
 from typing import List, Optional
+
 from pydantic import BaseModel, EmailStr, Field
+
 from domain.value_items import ID
 from domain.value_items.user_roles import UserRoles
 

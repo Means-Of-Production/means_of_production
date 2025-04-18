@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
+from typing import Generic, Iterable, TypeVar
 from uuid import uuid4
-from typing import Generic, TypeVar, Iterable
 
 from domain.entities import Entity
 from domain.value_items import ID
