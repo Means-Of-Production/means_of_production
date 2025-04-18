@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from pydantic import BaseModel
 from domain.value_items.exceptions import CurrencyMismatchException
 
@@ -22,12 +24,22 @@ class Money(BaseModel):
             )
         return self.amount
 
-    def __eq__(self, other):
-        """Checks equality based on amount and currency."""
+    def __eq__(self, other) -> bool:
         if not isinstance(other, Money):
+            return False
+
+        """Checks equality based on amount and currency."""
+        if other.currency_name != self.currency_name:
             return False
         return self.amount == other.amount and self.currency_name == other.currency_name
 
+    def add(self, other: Money) -> Money:
+        """
+        Adds two USDMoney instances and returns a new instance.
+        """
+        if other.currency_name != self.currency_name:
+            raise CurrencyMismatchException("Cannot add different currency types.")
+        return USDMoney(self.amount + other.amount)
 
 class USDMoney(Money):
     """
@@ -36,14 +48,6 @@ class USDMoney(Money):
 
     def __init__(self, amount: float):
         super().__init__(amount=amount, currency_name="USD", symbol="$")
-
-    def add(self, other: "USDMoney") -> "USDMoney":
-        """
-        Adds two USDMoney instances and returns a new instance.
-        """
-        if not isinstance(other, USDMoney):
-            raise CurrencyMismatchException("Cannot add different currency types.")
-        return USDMoney(self.amount + other.amount)
 
     def multiply(self, factor: float) -> "USDMoney":
         """

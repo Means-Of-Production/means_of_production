@@ -22,14 +22,14 @@ from domain.value_items import (
     MOPServer,
     TimeInterval,
     BorrowerNotInGoodStandingError,
-    InvalidThingStatusToBorrowError,
+    InvalidThingStatusToBorrowError, ID,
 )
 
 
 class DistributedLibrary(BaseLibrary):
     def __init__(
         self,
-        id: str,
+        library_id: ID,
         name: str,
         administrator: Person,
         max_fees: Money,
@@ -42,7 +42,7 @@ class DistributedLibrary(BaseLibrary):
         default_loan_time: Optional[TimeInterval] = None,
     ):
         super().__init__(
-            id,
+            library_id,
             name,
             administrator,
             max_fees,
@@ -77,7 +77,7 @@ class DistributedLibrary(BaseLibrary):
             raise BorrowerNotInGoodStandingError()
 
         lender = self._get_owner_of_item(item)
-        until = until or DueDate(self.default_loan_time.from_now())
+        until = until or DueDate(date=self.default_loan_time.from_now())
         item.status = ThingStatus.BORROWED
 
         return Loan(
@@ -93,7 +93,7 @@ class DistributedLibrary(BaseLibrary):
     async def finish_return(self, loan: Loan) -> Loan:
         """Finalizes the return process for a loan."""
         owner = self._get_owner_of_item(loan.item)
-        return super().finish_return(await owner.finish_return(loan))
+        return await super().finish_return(await owner.finish_return(loan))
 
     async def start_return(self, loan: Loan) -> Loan:
         """Initiates the return process for a borrower."""

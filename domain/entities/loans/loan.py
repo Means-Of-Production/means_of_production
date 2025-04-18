@@ -14,7 +14,7 @@ if TYPE_CHECKING:
 
 class Loan(Entity):
     loan_id: ID
-    item: "Thing"
+    item: Thing
     due_date: DueDate
     borrower: Borrower
     location: Location

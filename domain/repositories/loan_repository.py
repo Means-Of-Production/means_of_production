@@ -9,15 +9,15 @@ class LoanRepository(BaseInMemoryRepository):
         super().__init__()
         self.library_repository = library_repository
 
-    def create(self, entity: 'Loan') -> 'Loan':
+    def create(self, entity: Loan) -> Loan:
         return Loan(
             loan_id=self.new_id(),
             item=entity.item,
-            entity.borrower,
-            entity.due_date,
-            entity.status,
-            entity.return_location if isinstance(entity.return_location, PhysicalLocation) else None,
-            entity.date_returned
+            borrower=entity.borrower,
+            due_date=entity.due_date,
+            status=entity.status,
+            return_location=entity.return_location if isinstance(entity.return_location, PhysicalLocation) else None,
+            date_returned=entity.date_returned
         )
 
     def get_loans_for_person(self, person: 'Person') -> Iterable['Loan']:

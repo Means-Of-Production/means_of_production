@@ -71,7 +71,7 @@ class AuctionableWaitingList(WaitingList):
             return next(
                 bid.made_for
                 for bid in self.get_bids()
-                if bid.made_for.id == top_borrower_id
+                if bid.made_for.entity_id == top_borrower_id
             )
         else:
             raise ValueError("No winning borrower found.")

@@ -21,7 +21,6 @@ class Thing(Entity):
     thing_id: ID
     title: ThingTitle
     description: str | None
-    owner: Lender
     storage_location: Location
     image_urls: list[str] = Field(default_factory=list)
     purchase_cost: Money | None
