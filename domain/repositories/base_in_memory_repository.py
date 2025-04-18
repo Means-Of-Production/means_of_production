@@ -1,10 +1,12 @@
 from abc import ABC, abstractmethod
 from uuid import uuid4
 from typing import Generic, TypeVar, Iterable
+
+from domain.entities import Entity
+from domain.value_items import ID
 from domain.value_items.exceptions import ConflictingKeyException, ResourceNotFoundException
 
-T = TypeVar("T")
-ID = TypeVar("ID")
+T = TypeVar("T", bound=Entity)
 
 class BaseInMemoryRepository(Generic[T], ABC):
     def __init__(self) -> None:
