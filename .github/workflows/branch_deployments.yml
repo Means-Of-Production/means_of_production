@@ -42,6 +42,7 @@ jobs:
 
       - name: Lint code and imports
         run: |
+          source .venv/bin/activate
           ruff check --extend-select I
 
       - name: Check formatting
@@ -51,8 +52,11 @@ jobs:
           version: "<25.0.0,>=24.2.0"
 
       - name: Run Pytest
-        run: pytest
+        run: |
+          source .venv/bin/activate
+          pytest
 
       - name: Run Pyright Type Checking
         run: |
+          source .venv/bin/activate
           pyright -p pyproject.toml
