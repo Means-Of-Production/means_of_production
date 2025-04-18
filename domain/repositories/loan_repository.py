@@ -1,23 +1,17 @@
 from typing import Iterable
-from .base_in_memory_repository import BaseInMemoryRepository
-from domain import Library, LibraryRepository, LoanRepository, Loan, Person, PhysicalLocation
+
+from domain.entities import Library, Loan, Person
+from domain.repositories.base_in_memory_repository import BaseInMemoryRepository
+from domain.repositories.library_repository import LibraryRepository
 
 
-class LoanRepository(BaseInMemoryRepository, LoanRepository):
+class LoanRepository(BaseInMemoryRepository):
     def __init__(self, library_repository: LibraryRepository):
         super().__init__()
         self.library_repository = library_repository
 
-    def create(self, entity: Loan) -> Loan:
-        return Loan(
-            self.new_id(),
-            entity.item,
-            entity.borrower,
-            entity.due_date,
-            entity.status,
-            entity.return_location if isinstance(entity.return_location, PhysicalLocation) else None,
-            entity.date_returned
-        )
+    def get_id_field_name(self) -> str:
+        return "loan_id"
 
     def get_loans_for_person(self, person: Person) -> Iterable[Loan]:
         for loan in self.get_all():
@@ -26,5 +20,5 @@ class LoanRepository(BaseInMemoryRepository, LoanRepository):
 
     def get_loans_for_library(self, library: Library) -> Iterable[Loan]:
         for loan in self.get_all():
-            if loan.borrower.library.id == library.id:
+            if loan.borrower.library.id == library.entity_id:
                 yield loan

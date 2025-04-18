@@ -1,7 +1,6 @@
 from pydantic import Field, PrivateAttr, computed_field
 
 from domain.entities.entity import Entity
-from domain.entities.lenders.lender import Lender
 from domain.value_items import ID, Location, Money, ThingStatus, ThingTitle
 from domain.value_items.exceptions import InvalidThingStateTransitionError
 
@@ -10,7 +9,7 @@ class Thing(Entity):
     thing_id: ID
     title: ThingTitle
     description: str | None
-    owner: Lender
+    owner_id: ID
     storage_location: Location
     image_urls: list[str] = Field(default_factory=list)
     purchase_cost: Money | None

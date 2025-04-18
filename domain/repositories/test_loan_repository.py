@@ -1,14 +1,28 @@
 from unittest.mock import Mock
-from domain import Person, PersonName, Borrower, LibraryRepository, Loan
-from loan_repository import LoanRepository
+
+from domain import (
+    ID,
+    Borrower,
+    LibraryRepository,
+    Loan,
+    LoanRepository,
+    Person,
+    PersonName,
+)
+
 
 def test_get_loans_for_person_filters_by_borrower():
     # Create mock person
-    person = Person(person_id="personId", name=PersonName("Testy", "McTesterson"))
+    person = Person(
+        person_id=ID.generate(),
+        name=PersonName(first_name="Testy", last_name="McTesterson"),
+    )
     borrower = Mock(spec=Borrower)
     borrower.person = person
 
-    other_person = Person("anotherPerson", PersonName("Billy", "Jean"))
+    other_person = Person(
+        person_id=ID.generate(), name=PersonName(first_name="Billy", last_name="Jean")
+    )
     other_borrower = Mock(spec=Borrower)
     other_borrower.person = other_person
 

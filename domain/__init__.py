@@ -1,2 +1,9 @@
-from domain.entities import Person, Entity, PersonBorrower
-from domain.value_items import PersonName
+from domain.entities import Borrower, Entity, Library, Loan, Person, PersonBorrower
+from domain.repositories import LibraryRepository, LoanRepository
+from domain.value_items import (
+    ID,
+    BorrowerVerificationFlags,
+    Location,
+    PersonName,
+    PhysicalLocation,
+)

@@ -1,0 +1,2 @@
+from domain.repositories.library_repository import LibraryRepository
+from domain.repositories.loan_repository import LoanRepository

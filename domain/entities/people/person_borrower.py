@@ -2,13 +2,13 @@ from typing import Self, Sequence
 
 from pydantic import PrivateAttr
 
-from domain.entities.libraries import LibraryFee
+from domain.entities.libraries.library_fee import LibraryFee
 from domain.entities.people import Person
 from domain.entities.people.borrower import Borrower
 
 
 class PersonBorrower(Person, Borrower):
-    _fees = PrivateAttr(default_factory=list)
+    _fees: list[LibraryFee] = PrivateAttr(default_factory=list)
 
     @property
     def fees(self) -> Sequence[LibraryFee]:
