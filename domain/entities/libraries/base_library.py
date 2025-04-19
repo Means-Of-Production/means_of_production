@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from datetime import timedelta
 from typing import Iterable, List, Optional, Dict
 
 from domain.entities.borrower import Borrower
@@ -23,8 +24,8 @@ class BaseLibrary(Library, ABC):
     max_fines_before_suspension: Money
     fee_schedule: 'FeeSchedule'  # Forward reference
     money_factory: 'MoneyFactory'  # Forward reference
-    default_loan_time: TimeInterval
-    bidding_strategy: Optional['BiddingStrategy'] = None  # Forward reference
+    default_loan_time: timedelta 
+    bidding_strategy: BiddingStrategy | None = None  # Forward reference
     mop_server: 'MOPServer'  # Forward reference
     public_url: Optional[str] = None
     
