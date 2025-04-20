@@ -2,7 +2,7 @@ from typing import Self, Sequence
 
 from pydantic import PrivateAttr
 
-from domain.entities.libraries import LibraryFee
+from domain.entities.libraries.library_fee import LibraryFee
 from domain.entities.people import Person
 from domain.entities.people.borrower import Borrower
 

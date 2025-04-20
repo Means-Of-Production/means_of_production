@@ -2,7 +2,7 @@ from abc import abstractmethod
 from typing import Self, Sequence
 
 from domain.entities.entity import Entity
-from domain.entities.libraries import LibraryFee
+from domain.entities.libraries.library_fee import LibraryFee
 from domain.value_items import ID, BorrowerVerificationFlags
 
 
