@@ -1,4 +1,6 @@
-from datetime import datetime
+from __future__ import annotations
+
+from datetime import datetime, timedelta
 from typing import List, Optional, Dict, Iterable
 
 from domain.entities.people.borrower import Borrower
@@ -6,7 +8,7 @@ from domain.entities.thing import Thing
 from domain.entities.waiting_lists.base_waiting_list import BaseWaitingList
 from domain.entities.waiting_lists.first_come_first_serve_waiting_list import FirstComeFirstServeWaitingList
 from domain.entities.waiting_lists.reservation import Reservation
-from domain.value_items import ID, TimeInterval, Money
+from domain.value_items import ID, Money
 
 
 class AuctionBid:
@@ -26,28 +28,27 @@ class AuctionableWaitingList(BaseWaitingList):
     ends: datetime
     is_active: bool = True
     started: datetime
-    money_factory: 'MoneyFactory'  # Forward reference
     
     _backup_list: FirstComeFirstServeWaitingList
-    _bids_by_for_id: Dict[str, List[AuctionBid]] = {}
+    _bids_by_for_id: Dict[ID, list[AuctionBid]] = {}
     
     @property
     def entity_id(self) -> ID:
         return self.waiting_list_id
     
-    def add(self, borrower: Borrower) -> 'AuctionableWaitingList':
+    def add(self, borrower: Borrower) -> AuctionableWaitingList:
         self._backup_list.add(borrower)
         return self
     
-    def add_bid(self, bid: AuctionBid) -> 'AuctionableWaitingList':
+    def add_bid(self, bid: AuctionBid) -> AuctionableWaitingList:
         if not bid.made_for.entity_id:
             from domain.value_items.exceptions import EntityNotAssignedIdError
             raise EntityNotAssignedIdError("")
             
-        if bid.made_for.entity_id.value not in self._bids_by_for_id:
-            self._bids_by_for_id[bid.made_for.entity_id.value] = []
+        if bid.made_for.entity_id not in self._bids_by_for_id:
+            self._bids_by_for_id[bid.made_for.entity_id] = []
             
-        self._bids_by_for_id[bid.made_for.entity_id.value].append(bid)
+        self._bids_by_for_id[bid.made_for.entity_id].append(bid)
         
         return self
     
@@ -71,7 +72,7 @@ class AuctionableWaitingList(BaseWaitingList):
                 top_borrower_id = borrower_id
                 
         for bid in self.get_bids():
-            if bid.made_for.entity_id and bid.made_for.entity_id.value == top_borrower_id:
+            if bid.made_for.entity_id and bid.made_for.entity_id == top_borrower_id:
                 return bid.made_for
                 
         raise ValueError("No winning borrower found")
@@ -102,7 +103,7 @@ class AuctionableWaitingList(BaseWaitingList):
     def process_reservation_expired(self, reservation: Reservation) -> 'AuctionableWaitingList':
         raise NotImplementedError("Method not implemented")
     
-    def get_reservation_time(self) -> TimeInterval:
+    def get_reservation_time(self) -> timedelta:
         raise NotImplementedError("Method not implemented")
     
     def cancel(self, borrower: Borrower) -> 'AuctionableWaitingList':
@@ -112,8 +113,8 @@ class AuctionableWaitingList(BaseWaitingList):
             
         self._backup_list.cancel(borrower)
         
-        if borrower.entity_id.value in self._bids_by_for_id:
-            del self._bids_by_for_id[borrower.entity_id.value]
+        if borrower.entity_id in self._bids_by_for_id:
+            del self._bids_by_for_id[borrower.entity_id]
             
         # Delete any bids for OR by this borrower
         for borrower_id, bids in list(self._bids_by_for_id.items()):

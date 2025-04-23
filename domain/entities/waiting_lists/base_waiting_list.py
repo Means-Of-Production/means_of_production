@@ -5,7 +5,7 @@ from domain.entities.entity import Entity
 from domain.entities.people.borrower import Borrower
 from domain.entities.thing import Thing
 from domain.entities.waiting_lists.reservation import Reservation
-from domain.value_items import ID, TimeInterval, ThingStatus, ReservationStatus
+from domain.value_items import ID, ThingStatus, ReservationStatus
 
 
 class BaseWaitingList(Entity):

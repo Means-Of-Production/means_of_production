@@ -2,6 +2,7 @@ from typing import Dict, Iterable, List, TYPE_CHECKING
 
 from pydantic import BaseModel
 
+from domain import ID
 from domain.value_items.thing_title import ThingTitle
 
 if TYPE_CHECKING:
@@ -30,7 +31,7 @@ class LibrarySearchResult(BaseModel):
 class TitleSearchResult(BaseModel):
     model_config = {"frozen": False}  # Need to be mutable to add library results
     title: ThingTitle
-    _library_results: Dict[str, LibrarySearchResult] = {}
+    _library_results: Dict[ID, LibrarySearchResult] = {}
     
     @property
     def num_copies(self) -> int:
