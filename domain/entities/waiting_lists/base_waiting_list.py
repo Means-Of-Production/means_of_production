@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from datetime import timedelta, datetime, UTC
 from typing import List, Optional, Iterable
 
 from domain.entities.entity import Entity
@@ -39,7 +40,7 @@ class BaseWaitingList(Entity):
         pass
     
     @abstractmethod
-    def get_reservation_time(self) -> TimeInterval:
+    def get_reservation_time(self) -> timedelta:
         pass
     
     @property
@@ -61,14 +62,13 @@ class BaseWaitingList(Entity):
         if not next_borrower:
             raise ValueError("No borrower is waiting for this item!")
         
-        good_until = self.get_reservation_time().from_now()
+        good_until = datetime.now(UTC) + self.get_reservation_time()
         
         # Change item status
         self.item.status = ThingStatus.RESERVED
         
-        from domain.value_items import ID
         res = Reservation(
-            reservation_id=ID(),
+            reservation_id=ID.generate(),
             holder=next_borrower,
             item=self.item,
             good_until=good_until,

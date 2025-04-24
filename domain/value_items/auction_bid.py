@@ -1,9 +1,8 @@
 from pydantic import BaseModel
 from typing import TYPE_CHECKING
 
-if TYPE_CHECKING:
-    from domain.entities.people.borrower import Borrower
-    from domain.value_items.money import Money
+from domain.entities.borrower import Borrower
+from domain.value_items.money import Money
 
 
 class AuctionBid(BaseModel):

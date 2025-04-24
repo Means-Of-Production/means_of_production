@@ -1,8 +1,9 @@
 from datetime import datetime
-from typing import Iterable, List, Optional
+from typing import Iterable
 
+from domain import Location
 from domain.entities.borrower import Borrower
-from domain.entities.libraries.base_library import BaseLibrary
+from domain.entities.libraries.library import Library
 from domain.entities.lenders.lender import Lender
 from domain.entities.loan import Loan
 from domain.entities.people.person import Person
@@ -10,12 +11,11 @@ from domain.entities.thing import Thing
 from domain.value_items import ID, DueDate, ThingTitle, ThingStatus, LoanStatus, Money, TimeInterval, PhysicalLocation
 
 
-class SimpleLibrary(BaseLibrary, Lender):
+class SimpleLibrary(Library, Lender):
     library_id: ID
     name: str
     administrator: Person
-    location: PhysicalLocation
-    _items: List[Thing] = []
+    _items: list[Thing] = []
     
     @property
     def entity_id(self) -> ID:
@@ -33,32 +33,30 @@ class SimpleLibrary(BaseLibrary, Lender):
     def items(self) -> Iterable[Thing]:
         return self._items
     
-    async def borrow(self, thing: Thing, borrower: Borrower, until: Optional[DueDate] = None) -> Loan:
+    async def borrow(self, thing: Thing, borrower: Borrower, until: DueDate | None = None) -> Loan:
         # Check if available
         if thing.status != ThingStatus.READY:
-            from domain.value_items.exceptions import InvalidThingStatusToBorrowError
             raise InvalidThingStatusToBorrowError(thing.status)
             
         # Check if borrower in good standing
         if not self.can_borrow(borrower):
-            from domain.value_items.exceptions import BorrowerNotInGoodStandingError
             raise BorrowerNotInGoodStandingError()
             
         if not until:
-            until = DueDate(self.default_loan_time.from_now())
+            until = DueDate(self.default_loan_time)
             
         # Make loan
         loan = Loan(
-            loan_id=ID(),
+            loan_id=ID.generate(),
             item=thing,
             borrower=borrower,
             due_date=until,
-            status=LoanStatus.BORROWED,
             return_location=self.location,
-            date_returned=None
+            date_returned=None,
         )
-        
+        loan.status = LoanStatus.BORROWED
         thing.status = ThingStatus.BORROWED
+        
         self.add_loan(loan)
         return loan
     
@@ -71,7 +69,7 @@ class SimpleLibrary(BaseLibrary, Lender):
         available_items = [i for i in self.items if i.status == ThingStatus.READY]
         return self.get_titles_from_items(available_items)
     
-    def preferred_return_location(self, item: Thing) -> PhysicalLocation:
+    def preferred_return_location(self, item: Thing) -> Location:
         return self.location
     
     async def start_return(self, loan: Loan) -> Loan:

@@ -12,4 +12,4 @@ class MOPServer(VirtualLocation):
     
     @classmethod
     def localhost(cls) -> MOPServer:
-        return cls(url=URL(value="https://localhost"), version="0.0.0")
+        return cls(url=URL.parse("https://localhost"), version="0.0.0")

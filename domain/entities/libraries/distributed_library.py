@@ -3,7 +3,7 @@ from typing import Iterable, List, Optional
 
 from domain.entities.borrower import Borrower
 from domain.entities.lenders.lender import Lender
-from domain.entities.libraries.base_library import BaseLibrary
+from domain.entities.libraries.library import BaseLibrary
 from domain.entities.loan import Loan
 from domain.entities.people.person import Person
 from domain.entities.thing import Thing

@@ -94,7 +94,7 @@ class AuctionableWaitingList(BaseWaitingList):
             from domain.value_items.exceptions import EntityNotAssignedIdError
             raise EntityNotAssignedIdError("")
             
-        winner_bids = self._bids_by_for_id.get(winner.entity_id.value, [])
+        winner_bids = self._bids_by_for_id.get(winner.entity_id, [])
         for bid in winner_bids:
             amount = amount.add(bid.amount_bid)
             

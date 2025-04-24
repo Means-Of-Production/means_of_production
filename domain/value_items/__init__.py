@@ -13,7 +13,6 @@ from domain.value_items.person_name import PersonName
 from domain.value_items.reservation_status import ReservationStatus
 from domain.value_items.thing_status import ThingStatus
 from domain.value_items.thing_title import ThingTitle
-from domain.value_items.time_interval import TimeInterval
 from domain.value_items.title_search_request import TitleSearchRequest
 from domain.value_items.title_search_result import TitleSearchResult, LibrarySearchResult
 from domain.value_items.user_roles import UserRoles

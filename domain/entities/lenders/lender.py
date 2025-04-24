@@ -13,9 +13,9 @@ class Lender(Entity):
         raise NotImplementedError()
 
     @abstractmethod
-    def start_return(self, loan: Loan) -> Loan:
+    async def start_return(self, loan: Loan) -> Loan:
         raise NotImplementedError()
 
     @abstractmethod
-    def finish_return(self, loan: Loan) -> Loan:
+    async def finish_return(self, loan: Loan) -> Loan:
         raise NotImplementedError()
