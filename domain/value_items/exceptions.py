@@ -40,3 +40,6 @@ class ResourceNotFoundException(Exception):
     """Raised when a requested resource is not found."""
 
     pass
+
+class EntityNotAssignedIdError(Exception):
+    pass

@@ -97,7 +97,7 @@ name = "means-of-production"
 version = "0.1.0"
 source = { virtual = "." }
 
-[package.optional-dependencies]
+[package.dev-dependencies]
 dev = [
     { name = "black" },
     { name = "email-validator" },
@@ -108,15 +108,16 @@ dev = [
 ]
 
 [package.metadata]
-requires-dist = [
-    { name = "black", marker = "extra == 'dev'", specifier = ">=24.10.0" },
-    { name = "email-validator", marker = "extra == 'dev'", specifier = ">=2.1.1" },
-    { name = "pydantic", marker = "extra == 'dev'", specifier = ">=2.10.4" },
-    { name = "pyright", marker = "extra == 'dev'", specifier = ">=1.1.391" },
-    { name = "pytest", marker = "extra == 'dev'", specifier = ">=8.3.4" },
-    { name = "ruff", marker = "extra == 'dev'", specifier = ">=0.8.4" },
+
+[package.metadata.requires-dev]
+dev = [
+    { name = "black", specifier = ">=24.10.0" },
+    { name = "email-validator", specifier = ">=2.1.1" },
+    { name = "pydantic", specifier = ">=2.10.4" },
+    { name = "pyright", specifier = ">=1.1.391" },
+    { name = "pytest", specifier = ">=8.3.4" },
+    { name = "ruff", specifier = ">=0.8.4" },
 ]
-provides-extras = ["dev"]
 
 [[package]]
 name = "mypy-extensions"
