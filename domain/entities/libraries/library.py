@@ -126,7 +126,7 @@ class Library(ABC):
                 library_fee_id=ID.generate(),
                 library_id=self.library_id,
                 amount=fee_amount,
-                charged_for=loan,
+                charged_for_id=loan.loan_id,
                 status=FeeStatus.OUTSTANDING
             )
             loan.borrower.apply_fee(fee)

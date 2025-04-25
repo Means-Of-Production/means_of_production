@@ -1,9 +1,10 @@
+from __future__ import annotations
+
 from abc import ABC, abstractmethod
 from datetime import timedelta, datetime, UTC
-from typing import List, Optional, Iterable
 
 from domain.entities.entity import Entity
-from domain.entities.people.borrower import Borrower
+from domain.entities.borrower import Borrower
 from domain.entities.thing import Thing
 from domain.entities.waiting_lists.reservation import Reservation
 from domain.value_items import ID, ThingStatus, ReservationStatus
@@ -12,8 +13,8 @@ from domain.value_items import ID, ThingStatus, ReservationStatus
 class BaseWaitingList(Entity):
     waiting_list_id: ID
     _item: Thing
-    _current_reservation: Optional[Reservation] = None
-    _expired_reservations: List[Reservation] = []
+    _current_reservation: Reservation | None = None
+    _expired_reservations: list[Reservation] = []
     
     @property
     def entity_id(self) -> ID:
@@ -24,7 +25,7 @@ class BaseWaitingList(Entity):
         pass
     
     @abstractmethod
-    def find_next_borrower(self) -> Optional[Borrower]:
+    def find_next_borrower(self) -> Borrower | None:
         pass
     
     @abstractmethod
@@ -32,7 +33,7 @@ class BaseWaitingList(Entity):
         pass
     
     @abstractmethod
-    def process_reservation_expired(self, reservation: Reservation) -> 'BaseWaitingList':
+    def process_reservation_expired(self, reservation: Reservation) -> BaseWaitingList:
         pass
     
     @abstractmethod
@@ -48,7 +49,7 @@ class BaseWaitingList(Entity):
         return self._item
     
     @property
-    def current_reservation(self) -> Optional[Reservation]:
+    def current_reservation(self) -> Reservation | None:
         return self._current_reservation
     
     def clear_current_reservation(self) -> None:

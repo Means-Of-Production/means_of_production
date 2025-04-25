@@ -1,11 +1,7 @@
-from abc import ABC
 from datetime import datetime
-from typing import Optional
-
-from pydantic import BaseModel
 
 from domain.entities.entity import Entity
-from domain.entities.people.borrower import Borrower
+from domain.entities.borrower import Borrower
 from domain.entities.thing import Thing
 from domain.value_items import ID, ReservationStatus
 

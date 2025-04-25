@@ -8,7 +8,8 @@ from domain.entities.lenders.lender import Lender
 from domain.entities.loan import Loan
 from domain.entities.people.person import Person
 from domain.entities.thing import Thing
-from domain.value_items import ID, DueDate, ThingTitle, ThingStatus, LoanStatus, Money, TimeInterval, PhysicalLocation
+from domain.value_items import ID, DueDate, ThingTitle, ThingStatus, LoanStatus
+from domain.value_items.exceptions import InvalidThingStatusToBorrowError, BorrowerNotInGoodStandingError
 
 
 class SimpleLibrary(Library, Lender):
@@ -43,7 +44,7 @@ class SimpleLibrary(Library, Lender):
             raise BorrowerNotInGoodStandingError()
             
         if not until:
-            until = DueDate(self.default_loan_time)
+            until = DueDate(date=datetime.now() + self.default_loan_time)
             
         # Make loan
         loan = Loan(
