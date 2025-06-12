@@ -1,4 +1,4 @@
-from datetime import date, timezone
+from datetime import datetime, timezone
 
 from pydantic import field_validator, PrivateAttr
 
@@ -9,6 +9,8 @@ from domain.value_items import ID, DueDate, LoanStatus, Location
 
 
 class Loan(Entity):
+    model_config = {"frozen": False}
+    
     loan_id: ID
     item: Thing
     due_date: DueDate
@@ -16,10 +18,10 @@ class Loan(Entity):
     location: Location | None = None
     _status: LoanStatus = PrivateAttr(default=LoanStatus.RETURNED)
     return_location: Location
-    date_returned: date | None
+    time_returned: datetime | None
 
     @classmethod
-    @field_validator("_date_returned", mode="after")
+    @field_validator("time_returned", mode="after")
     def validate_utc(cls, value):
         if value is not None:
             if value.tzinfo is None or value.tzinfo != timezone.utc:

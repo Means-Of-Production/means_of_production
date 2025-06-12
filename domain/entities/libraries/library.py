@@ -3,6 +3,7 @@ from abc import ABC, abstractmethod
 from datetime import timedelta
 from typing import Iterable
 
+from domain.entities.entity import Entity
 from domain.entities.borrower import Borrower
 from domain.entities.libraries.library_fee import LibraryFee
 from domain.entities.loan import Loan
@@ -12,7 +13,7 @@ from domain.entities.waiting_lists.base_waiting_list import BaseWaitingList
 from domain.value_items import ID, DueDate, Location, ThingTitle, ThingStatus, LoanStatus, FeeStatus, Money
 
 
-class Library(ABC):
+class Library(Entity):
     library_id: ID
     name: str
     administrator: Person
@@ -25,7 +26,6 @@ class Library(ABC):
     fee_schedule: FeeSchedule  # Forward reference
     money_factory: 'MoneyFactory'  # Forward reference
     default_loan_time: timedelta 
-    bidding_strategy: BiddingStrategy | None = None  # Forward reference
     mop_server: 'MOPServer'  # Forward reference
     public_url: str | None = None
     
@@ -96,7 +96,7 @@ class Library(ABC):
     
     async def finish_return(self, loan: Loan) -> Loan:
         # This has to call FIRST, so the status can be updated to act here
-        if loan.status != LoanStatus.WAITING_ON_LENDER_ACCEPTANCE or not loan.date_returned:
+        if loan.status != LoanStatus.WAITING_ON_LENDER_ACCEPTANCE or not loan.time_returned:
             from domain.value_items.exceptions import ReturnNotStartedError
             raise ReturnNotStartedError()
             
@@ -104,7 +104,7 @@ class Library(ABC):
             loan.status = LoanStatus.RETURNED_DAMAGED
         else:
             if loan.due_date.date:
-                if loan.date_returned > loan.due_date.date:
+                if loan.time_returned > loan.due_date.date:
                     loan.status = LoanStatus.OVERDUE
                 else:
                     loan.status = LoanStatus.RETURNED
@@ -145,14 +145,3 @@ class Library(ABC):
             loan.item.status = ThingStatus.READY
             
         return loan
-    
-    async def bid_to_skip_to_front_of_list(self, item: Thing, bidder: Borrower, amount: Money, borrower: Borrower) -> BaseWaitingList:
-        if not self.bidding_strategy:
-            raise InvalidLibraryConfigurationError("This library does not support bidding!")
-            
-        waiting_list = await self.reserve_item(item, borrower)
-        from domain.entities.waiting_lists.auctionable_waiting_list import AuctionableWaitingList
-        auctionable_list = waiting_list  # Type assertion
-        
-        bid = await self.bidding_strategy.get_bid_for_cost(item, bidder, amount, self, borrower)
-        return auctionable_list.add_bid(bid)

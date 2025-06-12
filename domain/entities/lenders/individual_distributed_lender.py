@@ -25,14 +25,15 @@ class IndividualDistributedLender(Person, Lender):
         self._items.append(item)
         return self
 
-    def start_return(self, loan: Loan) -> Loan:
+    async def start_return(self, loan: Loan) -> Loan:
         if loan.item.status != ThingStatus.BORROWED:
             raise ReturnNotStartedError()
-        loan.date_returned = datetime.now(tz=timezone.utc).date()
+        
         loan.status = LoanStatus.RETURN_STARTED
+        loan.time_returned = datetime.now(timezone.utc)
         return loan
 
-    def finish_return(self, loan: Loan) -> Loan:
+    async def finish_return(self, loan: Loan) -> Loan:
         if (
             loan.status != LoanStatus.WAITING_ON_LENDER_ACCEPTANCE
             and loan.status != LoanStatus.RETURN_STARTED

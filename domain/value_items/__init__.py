@@ -6,7 +6,7 @@ from domain.value_items.email_address import EmailAddress
 from domain.value_items.fee_status import FeeStatus
 from domain.value_items.id import ID
 from domain.value_items.loan_status import LoanStatus
-from domain.value_items.location import Location, PhysicalLocation
+from domain.value_items.location import Location, PhysicalLocation, PhysicalArea
 from domain.value_items.money import Money
 from domain.value_items.mop_server import MOPServer
 from domain.value_items.person_name import PersonName

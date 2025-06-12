@@ -53,7 +53,7 @@ class SimpleLibrary(Library, Lender):
             borrower=borrower,
             due_date=until,
             return_location=self.location,
-            date_returned=None,
+            time_returned=None,
         )
         loan.status = LoanStatus.BORROWED
         thing.status = ThingStatus.BORROWED
@@ -70,12 +70,13 @@ class SimpleLibrary(Library, Lender):
         available_items = [i for i in self.items if i.status == ThingStatus.READY]
         return self.get_titles_from_items(available_items)
     
-    def preferred_return_location(self, item: Thing) -> Location:
+    @property
+    def preferred_return_location(self) -> Location:
         return self.location
     
     async def start_return(self, loan: Loan) -> Loan:
         # Simple library does not have an acceptance step, only the library starts returns!
         loan.status = LoanStatus.RETURN_STARTED
         loan.status = LoanStatus.WAITING_ON_LENDER_ACCEPTANCE
-        loan.date_returned = datetime.now()
+        loan.time_returned = datetime.now()
         return loan

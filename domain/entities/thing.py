@@ -6,6 +6,8 @@ from domain.value_items.exceptions import InvalidThingStateTransitionError
 
 
 class Thing(Entity):
+    model_config = {"frozen": False}
+
     thing_id: ID
     title: ThingTitle
     description: str | None
@@ -17,7 +19,7 @@ class Thing(Entity):
     _status: ThingStatus = PrivateAttr()
 
     @property
-    def id(self) -> ID:
+    def entity_id(self) -> ID:
         return self.thing_id
 
     @computed_field

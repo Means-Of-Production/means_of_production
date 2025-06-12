@@ -3,7 +3,7 @@ from __future__ import annotations
 from datetime import datetime, timedelta
 from typing import List, Optional, Dict, Iterable
 
-from domain.entities.people.borrower import Borrower
+from domain.entities.borrower import Borrower
 from domain.entities.thing import Thing
 from domain.entities.waiting_lists.base_waiting_list import BaseWaitingList
 from domain.entities.waiting_lists.first_come_first_serve_waiting_list import FirstComeFirstServeWaitingList

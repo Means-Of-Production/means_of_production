@@ -4,7 +4,7 @@ from pydantic import PrivateAttr
 
 from domain.entities.libraries.library_fee import LibraryFee
 from domain.entities.people import Person
-from domain.entities.people.borrower import Borrower
+from domain.entities.borrower import Borrower
 
 
 class PersonBorrower(Person, Borrower):

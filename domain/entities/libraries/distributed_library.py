@@ -1,20 +1,16 @@
-from datetime import datetime
+from datetime import datetime, UTC
 from typing import Iterable, List, Optional
 
 from domain.entities.borrower import Borrower
 from domain.entities.lenders.lender import Lender
-from domain.entities.libraries.library import BaseLibrary
+from domain.entities.libraries.library import Library
 from domain.entities.loan import Loan
-from domain.entities.people.person import Person
 from domain.entities.thing import Thing
-from domain.value_items import ID, DueDate, Location, PhysicalArea, ThingStatus, LoanStatus
+from domain.value_items import ID, DueDate, PhysicalArea, ThingStatus, LoanStatus
 
 
-class DistributedLibrary(BaseLibrary):
-    library_id: ID
-    name: str
-    administrator: Person
-    location: PhysicalArea
+class DistributedLibrary(Library):
+    area: PhysicalArea
     _lenders: List[Lender] = []
     
     @property
@@ -50,19 +46,20 @@ class DistributedLibrary(BaseLibrary):
             raise ValueError(f"Cannot find owner of item {thing.entity_id}")
             
         if not until:
-            until = DueDate(self.default_loan_time.from_now())
+            until = DueDate(date=(datetime.now(tz=UTC) + self.default_loan_time))
             
         thing.status = ThingStatus.BORROWED
         
-        return Loan(
-            loan_id=ID(),
+        loan = Loan(
+            loan_id=ID.generate(),
             item=thing,
             borrower=borrower,
             due_date=until,
-            status=LoanStatus.BORROWED,
-            return_location=lender.preferred_return_location(thing),
-            date_returned=None
+            return_location=lender.preferred_return_location,
+            time_returned=None
         )
+        loan.status = LoanStatus.BORROWED
+        return loan
     
     async def finish_return(self, loan: Loan) -> Loan:
         owner = self.get_owner_of_item(loan.item)
@@ -74,7 +71,7 @@ class DistributedLibrary(BaseLibrary):
         owner = self.get_owner_of_item(loan.item)
         updated = await owner.start_return(loan)
         
-        loan.date_returned = datetime.now()
+        loan.time_returned = datetime.now()
         # TODO notify the owner that we have started the return
         
         loan.status = LoanStatus.WAITING_ON_LENDER_ACCEPTANCE
