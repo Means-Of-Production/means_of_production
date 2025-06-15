@@ -10,7 +10,7 @@ from domain.value_items import ID, DueDate, LoanStatus, Location
 
 class Loan(Entity):
     model_config = {"frozen": False}
-    
+
     loan_id: ID
     item: Thing
     due_date: DueDate

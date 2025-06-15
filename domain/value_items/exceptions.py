@@ -41,15 +41,19 @@ class ResourceNotFoundException(Exception):
 
     pass
 
+
 class EntityNotAssignedIdError(Exception):
     pass
+
 
 class InvalidThingStatusToBorrowError(Exception):
     def __init__(self, status: ThingStatus):
         super().__init__(status)
 
+
 class BorrowerNotInGoodStandingError(Exception):
     pass
+
 
 class InvalidLibraryConfigurationError(Exception):
     pass

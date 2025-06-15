@@ -24,7 +24,7 @@ class Reservation(Entity):
     @status.setter
     def status(self, status: ReservationStatus) -> None:
         valid_next_status = []
-        
+
         if self.status == ReservationStatus.ASSIGNED:
             valid_next_status = [ReservationStatus.BORROWER_NOTIFIED]
         elif self.status == ReservationStatus.BORROWER_NOTIFIED:
@@ -35,9 +35,12 @@ class Reservation(Entity):
             valid_next_status = []
         elif self.status == ReservationStatus.CANCELLED:
             valid_next_status = []
-            
+
         if status not in valid_next_status:
-            from domain.value_items.exceptions import InvalidReservationStateTransitionError
+            from domain.value_items.exceptions import (
+                InvalidReservationStateTransitionError,
+            )
+
             raise InvalidReservationStateTransitionError(self.status, status)
-            
+
         self._status = status

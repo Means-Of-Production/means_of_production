@@ -28,7 +28,7 @@ class IndividualDistributedLender(Person, Lender):
     async def start_return(self, loan: Loan) -> Loan:
         if loan.item.status != ThingStatus.BORROWED:
             raise ReturnNotStartedError()
-        
+
         loan.status = LoanStatus.RETURN_STARTED
         loan.time_returned = datetime.now(timezone.utc)
         return loan

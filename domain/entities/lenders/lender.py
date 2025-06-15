@@ -20,7 +20,7 @@ class Lender(Entity):
     @abstractmethod
     async def finish_return(self, loan: Loan) -> Loan:
         raise NotImplementedError()
-    
+
     @property
     @abstractmethod
     def preferred_return_location(self) -> Location:

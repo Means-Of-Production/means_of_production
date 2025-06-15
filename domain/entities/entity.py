@@ -7,7 +7,7 @@ from domain.value_items import ID
 
 class Entity(BaseModel, ABC):
     model_config = {"frozen": True}
-    
+
     @property
     @abstractmethod
     def entity_id(self) -> ID:
