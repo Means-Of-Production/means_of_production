@@ -1,5 +1,5 @@
 from domain.entities.entity import Entity
-from domain.value_items import ID, Money, FeeStatus
+from domain.value_items import ID, FeeStatus, Money
 
 
 class LibraryFee(Entity):

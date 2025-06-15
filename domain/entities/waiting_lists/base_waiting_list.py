@@ -1,13 +1,13 @@
 from __future__ import annotations
 
 from abc import abstractmethod
-from datetime import timedelta, datetime, UTC
+from datetime import UTC, datetime, timedelta
 
-from domain.entities.entity import Entity
 from domain.entities.borrower import Borrower
+from domain.entities.entity import Entity
 from domain.entities.thing import Thing
 from domain.entities.waiting_lists.reservation import Reservation
-from domain.value_items import ID, ThingStatus, ReservationStatus
+from domain.value_items import ID, ReservationStatus, ThingStatus
 
 
 class BaseWaitingList(Entity):

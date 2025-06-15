@@ -1,4 +1,4 @@
-from typing import Dict, Iterable, List, TYPE_CHECKING
+from typing import TYPE_CHECKING, Dict, Iterable, List
 
 from pydantic import BaseModel
 

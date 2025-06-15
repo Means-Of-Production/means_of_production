@@ -1,7 +1,7 @@
 from datetime import datetime
 
-from domain.entities.entity import Entity
 from domain.entities.borrower import Borrower
+from domain.entities.entity import Entity
 from domain.entities.thing import Thing
 from domain.value_items import ID, ReservationStatus
 

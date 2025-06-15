@@ -1,6 +1,6 @@
 from datetime import datetime, timezone
 
-from pydantic import field_validator, PrivateAttr
+from pydantic import PrivateAttr, field_validator
 
 from domain.entities.borrower import Borrower
 from domain.entities.entity import Entity

@@ -1,26 +1,29 @@
 from __future__ import annotations
+
 from abc import abstractmethod
 from datetime import timedelta
 from typing import Iterable
 
-from domain.entities.entity import Entity
 from domain.entities.borrower import Borrower
+from domain.entities.entity import Entity
 from domain.entities.libraries.library_fee import LibraryFee
 from domain.entities.loan import Loan
+from domain.entities.mop_server import MOPServer
 from domain.entities.people.person import Person
 from domain.entities.thing import Thing
 from domain.entities.waiting_lists.base_waiting_list import BaseWaitingList
 from domain.factories import MoneyFactory
 from domain.value_items import (
-    BaseFeeSchedule,
     ID,
+    BaseFeeSchedule,
     DueDate,
-    Location,
-    ThingTitle,
-    ThingStatus,
-    LoanStatus,
     FeeStatus,
+    LoanStatus,
+    Location,
     Money,
+    ThingStatus,
+    ThingTitle,
+    WaitingListType,
 )
 
 
@@ -31,13 +34,13 @@ class Library(Entity):
     location: Location
     _borrowers: list[Borrower] = []
     _loans: list[Loan] = []
-    waiting_list_factory: WaitingListFactory  # Forward reference
+    waiting_list_type: WaitingListType
     waiting_lists_by_item_id: dict[ID, BaseWaitingList] = {}
     max_fines_before_suspension: Money
-    fee_schedule: BaseFeeSchedule  # Forward reference
+    fee_schedule: BaseFeeSchedule
     money_factory: MoneyFactory
     default_loan_time: timedelta
-    mop_server: "MOPServer"  # Forward reference
+    mop_server: MOPServer
     public_url: str | None = None
 
     @property

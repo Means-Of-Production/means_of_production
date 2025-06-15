@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from datetime import datetime, timedelta
-from typing import Optional, Dict, Iterable
+from typing import Dict, Iterable, Optional
 
 from domain.entities.borrower import Borrower
 from domain.entities.thing import Thing

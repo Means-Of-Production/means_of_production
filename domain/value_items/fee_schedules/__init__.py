@@ -1,1 +1,1 @@
-from domain.value_items.fee_schedules.base_fee_schedule import BaseFeeSchedule
+from domain.value_items.fee_schedules.fee_schedule import BaseFeeSchedule

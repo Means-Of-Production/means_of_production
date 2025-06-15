@@ -1,4 +1,4 @@
-from datetime import datetime, UTC
+from datetime import UTC, datetime
 from typing import Iterable, List, Optional
 
 from domain.entities.borrower import Borrower
@@ -6,7 +6,7 @@ from domain.entities.lenders.lender import Lender
 from domain.entities.libraries.library import Library
 from domain.entities.loan import Loan
 from domain.entities.thing import Thing
-from domain.value_items import ID, DueDate, PhysicalArea, ThingStatus, LoanStatus
+from domain.value_items import ID, DueDate, LoanStatus, PhysicalArea, ThingStatus
 
 
 class DistributedLibrary(Library):

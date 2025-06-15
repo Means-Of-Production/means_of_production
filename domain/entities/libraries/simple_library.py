@@ -3,15 +3,15 @@ from typing import Iterable
 
 from domain import Location
 from domain.entities.borrower import Borrower
-from domain.entities.libraries.library import Library
 from domain.entities.lenders.lender import Lender
+from domain.entities.libraries.library import Library
 from domain.entities.loan import Loan
 from domain.entities.people.person import Person
 from domain.entities.thing import Thing
-from domain.value_items import ID, DueDate, ThingTitle, ThingStatus, LoanStatus
+from domain.value_items import ID, DueDate, LoanStatus, ThingStatus, ThingTitle
 from domain.value_items.exceptions import (
-    InvalidThingStatusToBorrowError,
     BorrowerNotInGoodStandingError,
+    InvalidThingStatusToBorrowError,
 )
 
 
