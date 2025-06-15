@@ -12,6 +12,7 @@ from domain.entities.thing import Thing
 from domain.entities.waiting_lists.base_waiting_list import BaseWaitingList
 from domain.factories import MoneyFactory
 from domain.value_items import (
+    BaseFeeSchedule,
     ID,
     DueDate,
     Location,
@@ -33,7 +34,7 @@ class Library(Entity):
     waiting_list_factory: WaitingListFactory  # Forward reference
     waiting_lists_by_item_id: dict[ID, BaseWaitingList] = {}
     max_fines_before_suspension: Money
-    fee_schedule: FeeSchedule  # Forward reference
+    fee_schedule: BaseFeeSchedule  # Forward reference
     money_factory: MoneyFactory
     default_loan_time: timedelta
     mop_server: "MOPServer"  # Forward reference
@@ -133,11 +134,11 @@ class Library(Entity):
         fee_amount = None
         if loan.item.status == ThingStatus.DAMAGED:
             # Apply the fees
-            fee_amount = self.fee_schedule.fees_for_damaged_item(loan)
+            fee_amount = self.fee_schedule.fee_for_damaged_item(loan)
 
         if loan.status == LoanStatus.OVERDUE:
             # Calculate the late fee and apply
-            fee_amount = self.fee_schedule.fees_for_overdue_item(loan)
+            fee_amount = self.fee_schedule.fee_for_overdue_item(loan)
 
         if fee_amount:
             fee = LibraryFee(
