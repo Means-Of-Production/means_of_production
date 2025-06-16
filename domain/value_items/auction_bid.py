@@ -1,7 +1,7 @@
 from pydantic import BaseModel
 
-from domain.value_items.money import Money
 from domain.value_items.id import ID
+from domain.value_items.money import Money
 
 
 class AuctionBid(BaseModel):

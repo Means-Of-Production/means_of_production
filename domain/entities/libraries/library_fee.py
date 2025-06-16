@@ -3,6 +3,7 @@ from domain.value_items import ID, FeeStatus, Money
 
 
 class LibraryFee(Entity):
+    model_config = {"frozen": False}
     library_fee_id: ID
     library_id: ID
     amount: Money

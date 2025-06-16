@@ -1,10 +1,11 @@
 from __future__ import annotations
 
-from abc import abstractmethod, ABC
+from abc import ABC, abstractmethod
 from datetime import UTC, datetime, timedelta
 from typing import Self
 
 from pydantic import Field
+
 from domain.entities.borrower import Borrower
 from domain.entities.entity import Entity
 from domain.entities.thing import Thing

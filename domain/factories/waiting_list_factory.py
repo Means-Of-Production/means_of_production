@@ -1,4 +1,8 @@
 from domain.entities.thing import Thing
+from domain.entities.waiting_lists.first_come_first_serve_waiting_list import (
+    FirstComeFirstServeWaitingList,
+)
+from domain.entities.waiting_lists.null_waiting_list import NullWaitingList
 from domain.entities.waiting_lists.waiting_list import WaitingList
 from domain.value_items import WaitingListType
 

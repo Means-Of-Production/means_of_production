@@ -4,11 +4,11 @@ from datetime import datetime, timedelta
 from typing import Dict, Iterable, Optional
 
 from domain.entities.borrower import Borrower
-from domain.entities.waiting_lists.waiting_list import WaitingList
 from domain.entities.waiting_lists.first_come_first_serve_waiting_list import (
     FirstComeFirstServeWaitingList,
 )
 from domain.entities.waiting_lists.reservation import Reservation
+from domain.entities.waiting_lists.waiting_list import WaitingList
 from domain.factories import MoneyFactory
 from domain.value_items import ID, Money
 

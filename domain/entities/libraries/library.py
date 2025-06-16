@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from abc import abstractmethod, ABC
+from abc import ABC, abstractmethod
 from datetime import timedelta
 from typing import Iterable
 
@@ -15,8 +15,8 @@ from domain.entities.waiting_lists.waiting_list import WaitingList
 from domain.factories import MoneyFactory, WaitingListFactory
 from domain.value_items import (
     ID,
-    FeeSchedule,
     DueDate,
+    FeeSchedule,
     FeeStatus,
     LoanStatus,
     Location,
@@ -28,7 +28,7 @@ from domain.value_items import (
 
 
 class Library(Entity, ABC):
-    model_config = {"arbitrary_types_allowed": True, "frozen": True}
+    model_config = {"arbitrary_types_allowed": True, "frozen": False}
 
     library_id: ID
     name: str

@@ -11,6 +11,8 @@ class MoneyFactory:
 
     @staticmethod
     def total(amounts: list[Money]) -> Money:
+        if not amounts:
+            raise ValueError("Cannot create total of empty list")
         total = MoneyFactory.empty(amounts[0].currency_name)
         for amount in amounts:
             total.amount += amount.amount

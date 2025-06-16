@@ -1,12 +1,13 @@
 from __future__ import annotations
 
 from datetime import timedelta
-from pydantic import PrivateAttr
 from typing import Self
 
+from pydantic import PrivateAttr
+
 from domain.entities.borrower import Borrower
-from domain.entities.waiting_lists.waiting_list import WaitingList
 from domain.entities.waiting_lists.reservation import Reservation
+from domain.entities.waiting_lists.waiting_list import WaitingList
 from domain.value_items import ID, ReservationStatus
 
 
