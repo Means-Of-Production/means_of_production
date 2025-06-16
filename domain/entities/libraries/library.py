@@ -15,7 +15,7 @@ from domain.entities.waiting_lists.waiting_list import WaitingList
 from domain.factories import MoneyFactory, WaitingListFactory
 from domain.value_items import (
     ID,
-    BaseFeeSchedule,
+    FeeSchedule,
     DueDate,
     FeeStatus,
     LoanStatus,
@@ -28,6 +28,8 @@ from domain.value_items import (
 
 
 class Library(Entity, ABC):
+    model_config = {"arbitrary_types_allowed": True, "frozen": True}
+
     library_id: ID
     name: str
     administrator: Person
@@ -37,7 +39,7 @@ class Library(Entity, ABC):
     waiting_list_type: WaitingListType
     waiting_lists_by_item_id: dict[ID, WaitingList] = {}
     max_fines_before_suspension: Money
-    fee_schedule: BaseFeeSchedule
+    fee_schedule: FeeSchedule
     money_factory: MoneyFactory
     default_loan_time: timedelta
     mop_server: MOPServer
@@ -112,7 +114,7 @@ class Library(Entity, ABC):
                 titles.append(item.title)
         return titles
 
-    async def finish_return(self, loan: Loan) -> Loan:
+    async def finish_return(self, loan: Loan, borrower: Borrower) -> Loan:
         # This has to call FIRST, so the status can be updated to act here
         if (
             loan.status != LoanStatus.WAITING_ON_LENDER_ACCEPTANCE
@@ -151,7 +153,7 @@ class Library(Entity, ABC):
                 charged_for_id=loan.loan_id,
                 status=FeeStatus.OUTSTANDING,
             )
-            loan.borrower.apply_fee(fee)
+            borrower.apply_fee(fee)
 
         # Is there a waiting list for the item?
         if not loan.item.entity_id:

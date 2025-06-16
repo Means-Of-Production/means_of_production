@@ -2,7 +2,6 @@ from datetime import datetime, timezone
 
 from pydantic import PrivateAttr, field_validator
 
-from domain.entities.borrower import Borrower
 from domain.entities.entity import Entity
 from domain.entities.thing import Thing
 from domain.value_items import ID, DueDate, LoanStatus, Location
@@ -14,7 +13,7 @@ class Loan(Entity):
     loan_id: ID
     item: Thing
     due_date: DueDate
-    borrower: Borrower
+    borrower_id: ID
     location: Location | None = None
     _status: LoanStatus = PrivateAttr(default=LoanStatus.RETURNED)
     return_location: Location

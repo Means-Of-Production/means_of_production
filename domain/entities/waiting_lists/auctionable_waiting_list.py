@@ -4,12 +4,12 @@ from datetime import datetime, timedelta
 from typing import Dict, Iterable, Optional
 
 from domain.entities.borrower import Borrower
-from domain.entities.thing import Thing
 from domain.entities.waiting_lists.waiting_list import WaitingList
 from domain.entities.waiting_lists.first_come_first_serve_waiting_list import (
     FirstComeFirstServeWaitingList,
 )
 from domain.entities.waiting_lists.reservation import Reservation
+from domain.factories import MoneyFactory
 from domain.value_items import ID, Money
 
 
@@ -28,6 +28,7 @@ class AuctionableWaitingList(WaitingList):
     ends: datetime
     is_active: bool = True
     started: datetime
+    currency_name: str
 
     _backup_list: FirstComeFirstServeWaitingList
     _bids_by_for_id: Dict[ID, list[AuctionBid]] = {}
@@ -60,15 +61,15 @@ class AuctionableWaitingList(WaitingList):
         return result
 
     def get_winning_borrower(self) -> Borrower:
-        top_amount = self.money_factory.get_empty_money()
+        top_amount = MoneyFactory.empty(self.currency_name)
         top_borrower_id = None
 
         for borrower_id, bids in self._bids_by_for_id.items():
-            amount = self.money_factory.get_empty_money()
+            amount = MoneyFactory.empty(self.currency_name)
             for bid in bids:
-                amount = amount.add(bid.amount_bid)
+                amount = amount + bid.amount_bid
 
-            if amount.greater_than(top_amount):
+            if amount > top_amount:
                 top_amount = amount
                 top_borrower_id = borrower_id
 
@@ -88,7 +89,7 @@ class AuctionableWaitingList(WaitingList):
         return self.get_winning_borrower()
 
     def get_largest_amount(self) -> Money:
-        amount = self.money_factory.get_empty_money()
+        amount = MoneyFactory.empty(self.currency_name)
         winner = self.get_winning_borrower()
 
         if not winner.entity_id:
@@ -98,7 +99,7 @@ class AuctionableWaitingList(WaitingList):
 
         winner_bids = self._bids_by_for_id.get(winner.entity_id, [])
         for bid in winner_bids:
-            amount = amount.add(bid.amount_bid)
+            amount = amount + bid.amount_bid
 
         return amount
 

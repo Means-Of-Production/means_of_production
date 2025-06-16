@@ -2,7 +2,7 @@ from typing import TYPE_CHECKING, Dict, Iterable, List
 
 from pydantic import BaseModel
 
-from domain import ID
+from domain.value_items.id import ID
 from domain.value_items.thing_title import ThingTitle
 
 if TYPE_CHECKING:

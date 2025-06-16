@@ -3,8 +3,8 @@ from __future__ import annotations
 from datetime import timedelta
 from typing import Self
 
-from domain import Borrower
-from domain.entities import Reservation
+from domain.entities.borrower import Borrower
+from domain.entities.waiting_lists.reservation import Reservation
 from domain.entities.waiting_lists.waiting_list import WaitingList
 
 
@@ -19,6 +19,7 @@ class NullWaitingList(WaitingList):
     that all operations related to the waiting list are safely ignored or return
     default values without disrupting other parts of the system.
     """
+
     def add(self, borrower: Borrower) -> Self:
         return self
 
