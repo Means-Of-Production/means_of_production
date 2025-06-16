@@ -1,8 +1,10 @@
 from __future__ import annotations
 
-from abc import abstractmethod
+from abc import abstractmethod, ABC
 from datetime import UTC, datetime, timedelta
+from typing import Self
 
+from pydantic import Field
 from domain.entities.borrower import Borrower
 from domain.entities.entity import Entity
 from domain.entities.thing import Thing
@@ -10,18 +12,19 @@ from domain.entities.waiting_lists.reservation import Reservation
 from domain.value_items import ID, ReservationStatus, ThingStatus
 
 
-class BaseWaitingList(Entity):
-    waiting_list_id: ID
-    _item: Thing
-    _current_reservation: Reservation | None = None
-    _expired_reservations: list[Reservation] = []
+class WaitingList(Entity, ABC):
+    model_config = {"frozen": False}
+    waiting_list_id: ID = Field(default_factory=ID.generate)
+    item: Thing
+    current_reservation: Reservation | None = None
+    expired_reservations: list[Reservation] = []
 
     @property
     def entity_id(self) -> ID:
         return self.waiting_list_id
 
     @abstractmethod
-    def add(self, borrower: Borrower) -> "BaseWaitingList":
+    def add(self, borrower: Borrower) -> Self:
         pass
 
     @abstractmethod
@@ -33,27 +36,19 @@ class BaseWaitingList(Entity):
         pass
 
     @abstractmethod
-    def process_reservation_expired(self, reservation: Reservation) -> BaseWaitingList:
+    def process_reservation_expired(self, reservation: Reservation) -> Self:
         pass
 
     @abstractmethod
-    def cancel(self, borrower: Borrower) -> "BaseWaitingList":
+    def cancel(self, borrower: Borrower) -> Self:
         pass
 
     @abstractmethod
     def get_reservation_time(self) -> timedelta:
         pass
 
-    @property
-    def item(self) -> Thing:
-        return self._item
-
-    @property
-    def current_reservation(self) -> Reservation | None:
-        return self._current_reservation
-
     def clear_current_reservation(self) -> None:
-        self._current_reservation = None
+        self.current_reservation = None
 
     def reserve_item_for_next_borrower(self) -> Reservation:
         if self.current_reservation:
@@ -79,6 +74,6 @@ class BaseWaitingList(Entity):
         )
 
         self.cancel(next_borrower)
-        self._current_reservation = res
+        self.current_reservation = res
 
         return res

@@ -1,20 +1,19 @@
 from __future__ import annotations
 
 from datetime import timedelta
+from pydantic import PrivateAttr
 from typing import Self
 
 from domain.entities.borrower import Borrower
-from domain.entities.thing import Thing
-from domain.entities.waiting_lists.base_waiting_list import BaseWaitingList
+from domain.entities.waiting_lists.waiting_list import WaitingList
 from domain.entities.waiting_lists.reservation import Reservation
 from domain.value_items import ID, ReservationStatus
 
 
-class FirstComeFirstServeWaitingList(BaseWaitingList):
-    waiting_list_id: ID
-    _item: Thing
+class FirstComeFirstServeWaitingList(WaitingList):
     members: list[Borrower] = []
     reservation_days: int = 3
+    _expired_reservations: list[Reservation] = PrivateAttr(default_factory=list)
 
     @property
     def entity_id(self) -> ID:

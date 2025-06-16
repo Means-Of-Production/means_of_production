@@ -5,7 +5,7 @@ from typing import Dict, Iterable, Optional
 
 from domain.entities.borrower import Borrower
 from domain.entities.thing import Thing
-from domain.entities.waiting_lists.base_waiting_list import BaseWaitingList
+from domain.entities.waiting_lists.waiting_list import WaitingList
 from domain.entities.waiting_lists.first_come_first_serve_waiting_list import (
     FirstComeFirstServeWaitingList,
 )
@@ -24,9 +24,7 @@ class AuctionBid:
         self.made_for = made_for
 
 
-class AuctionableWaitingList(BaseWaitingList):
-    waiting_list_id: ID
-    _item: Thing
+class AuctionableWaitingList(WaitingList):
     ends: datetime
     is_active: bool = True
     started: datetime

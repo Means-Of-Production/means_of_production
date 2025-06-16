@@ -7,6 +7,7 @@ from domain.value_items import ID, ReservationStatus
 
 
 class Reservation(Entity):
+    model_config = {"frozen": False}
     reservation_id: ID
     holder: Borrower
     item: Thing

@@ -28,11 +28,21 @@ class Money(BaseModel):
         if self.currency_name != other.currency_name:
             raise CurrencyMismatchException()
         return self.amount > other.amount
+    
+    def __ge__(self, other: Money) -> bool:
+        if self.currency_name != other.currency_name:
+            raise CurrencyMismatchException()
+        return self.amount >= other.amount
 
     def __lt__(self, other: Money) -> bool:
         if self.currency_name != other.currency_name:
             raise CurrencyMismatchException()
         return self.amount < other.amount
+    
+    def __le__(self, other: Money) -> bool:
+        if self.currency_name != other.currency_name:
+            raise CurrencyMismatchException()
+        return self.amount <= other.amount
 
     def __add__(self, other: Money) -> Money:
         if self.currency_name != other.currency_name:

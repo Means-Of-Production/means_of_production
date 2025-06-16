@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from abc import abstractmethod
+from abc import abstractmethod, ABC
 from datetime import timedelta
 from typing import Iterable
 
@@ -11,8 +11,8 @@ from domain.entities.loan import Loan
 from domain.entities.mop_server import MOPServer
 from domain.entities.people.person import Person
 from domain.entities.thing import Thing
-from domain.entities.waiting_lists.base_waiting_list import BaseWaitingList
-from domain.factories import MoneyFactory
+from domain.entities.waiting_lists.waiting_list import WaitingList
+from domain.factories import MoneyFactory, WaitingListFactory
 from domain.value_items import (
     ID,
     BaseFeeSchedule,
@@ -27,7 +27,7 @@ from domain.value_items import (
 )
 
 
-class Library(Entity):
+class Library(Entity, ABC):
     library_id: ID
     name: str
     administrator: Person
@@ -35,7 +35,7 @@ class Library(Entity):
     _borrowers: list[Borrower] = []
     _loans: list[Loan] = []
     waiting_list_type: WaitingListType
-    waiting_lists_by_item_id: dict[ID, BaseWaitingList] = {}
+    waiting_lists_by_item_id: dict[ID, WaitingList] = {}
     max_fines_before_suspension: Money
     fee_schedule: BaseFeeSchedule
     money_factory: MoneyFactory
@@ -82,9 +82,9 @@ class Library(Entity):
             f.amount for f in borrower.fees if f.status == FeeStatus.OUTSTANDING
         ]
         total_fees = self.money_factory.total(fee_amounts)
-        return not total_fees > self.max_fines_before_suspension
+        return total_fees <= self.max_fines_before_suspension
 
-    async def reserve_item(self, item: Thing, borrower: Borrower) -> BaseWaitingList:
+    async def reserve_item(self, item: Thing, borrower: Borrower) -> WaitingList:
         if not item.entity_id:
             from domain.value_items.exceptions import EntityNotAssignedIdError
 
@@ -92,7 +92,7 @@ class Library(Entity):
 
         waiting_list = self.waiting_lists_by_item_id.get(item.entity_id)
         if not waiting_list:
-            waiting_list = self.waiting_list_factory.create_list(item)
+            waiting_list = WaitingListFactory.create_new_list(self, item)
             self.waiting_lists_by_item_id[item.entity_id] = waiting_list
 
         waiting_list.add(borrower)
