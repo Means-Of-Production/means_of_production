@@ -32,3 +32,8 @@ markers = [
 "**/tests/**/*.py" = ["ANN"]
 "conftest.py" = ["ANN"]
 "__init__.py" = ["F401"]
+
+[dependency-groups]
+dev = [
+    "pytest-cov>=6.2.1",
+]
