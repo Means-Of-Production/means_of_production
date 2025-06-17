@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import timedelta
 from unittest.mock import MagicMock
 
 import pytest
@@ -47,6 +47,7 @@ class TestSimpleLibrary(SimpleLibrary):
         if not until:
             # Use a date object instead of a datetime object
             from datetime import date
+
             today = date.today()
             future_date = today + self.default_loan_time
             until = DueDate(date=future_date)
@@ -168,6 +169,7 @@ async def test_borrow_success(simple_library, thing, borrower):
     # Test borrowing an item
     # Use a date object instead of a datetime object
     from datetime import date
+
     today = date.today()
     future_date = today + timedelta(days=14)
     due_date = DueDate(date=future_date)
@@ -200,6 +202,7 @@ async def test_borrow_with_default_due_date(simple_library, thing, borrower):
     assert loan.due_date is not None
     # Due date should be approximately default_loan_time in the future
     from datetime import date
+
     today = date.today()
     assert loan.due_date.date > today
     future_date = today + simple_library.default_loan_time + timedelta(days=1)
