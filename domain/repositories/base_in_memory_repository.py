@@ -1,6 +1,5 @@
 from abc import ABC, abstractmethod
 from typing import Generic, Iterable, TypeVar
-from uuid import uuid4
 
 from domain.entities import Entity
 from domain.value_items import ID
@@ -32,9 +31,6 @@ class BaseInMemoryRepository(Generic[T], ABC):
                 f"Entity {entity.__class__.__name__} does not have an id assigned!"
             )
         return entity_id
-
-    def new_id(self) -> str:
-        return str(uuid4())
 
     def add(self, entity: T) -> T:
         if not hasattr(entity, "entity_id") or entity.entity_id is None:

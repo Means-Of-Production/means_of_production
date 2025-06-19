@@ -6,6 +6,9 @@ from .base_in_memory_repository import BaseInMemoryRepository
 
 
 class BorrowerRepository(BaseInMemoryRepository[PersonBorrower]):
+    def get_id_field_name(self) -> str:
+        return "borrower_id"
+
     def __init__(self) -> None:
         super().__init__()
 

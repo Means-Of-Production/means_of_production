@@ -57,7 +57,7 @@ class DistributedLibrary(Library):
         loan = Loan(
             loan_id=ID.generate(),
             item=thing,
-            borrower=borrower,
+            borrower_id=borrower.entity_id,
             due_date=until,
             return_location=lender.preferred_return_location,
             time_returned=None,

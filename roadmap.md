@@ -5,10 +5,12 @@ Items to be done . . .
 - [ ] add GitHub actions to keep tests, lint, and pyright enforced
 - [ ] create API spec
 - [ ] implement API
+- [ ] create basic client (web)
+   - [ ] allow create distributed library
+   - [ ] allow borrow and return
 - [ ] create PG repositories
 - [ ] create alembic migrations
 - [ ] host postgres and API in cloud
-- [ ] create basic client (web)
 - [ ] create phone client
 - RELEASE 0.1!!!!!!
 - [ ] ensure bidding waiting list works

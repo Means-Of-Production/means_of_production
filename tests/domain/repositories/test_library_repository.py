@@ -1,11 +1,11 @@
 from unittest.mock import MagicMock
 
-import pytest
 
-from domain import ID, Borrower, Library, LibraryRepository, Person, PersonName
+from domain.entities import Borrower, Library, Person
+from domain.value_items import ID, PersonName
+from domain.repositories.library_repository import LibraryRepository
 
 
-@pytest.mark.skip(reason="Needs to be reworked")
 def test_gets_libraries_via_person():
     # Arrange
     person_name = PersonName(first_name="Testy", last_name="McTesterson")
