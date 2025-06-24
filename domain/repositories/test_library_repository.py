@@ -2,7 +2,8 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from domain import ID, Borrower, Library, LibraryRepository, Person, PersonName
+from domain import ID, LibraryRepository, PersonName
+from domain.entities import Borrower, Library, Person
 
 
 @pytest.mark.skip(reason="Needs to be reworked")

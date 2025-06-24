@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import timedelta
 from unittest.mock import MagicMock
 
 import pytest
@@ -30,7 +30,7 @@ from domain.value_items.fee_schedules.fee_schedule import FeeSchedule
 
 
 # Create a test version of SimpleLibrary that allows modification of attributes
-class TestSimpleLibrary(SimpleLibrary):
+class TestableSimpleLibrary(SimpleLibrary):
     model_config = {"arbitrary_types_allowed": True, "frozen": False, "extra": "allow"}
 
     async def borrow(
@@ -47,6 +47,7 @@ class TestSimpleLibrary(SimpleLibrary):
         if not until:
             # Use a date object instead of a datetime object
             from datetime import date
+
             today = date.today()
             future_date = today + self.default_loan_time
             until = DueDate(date=future_date)
@@ -70,7 +71,7 @@ class TestSimpleLibrary(SimpleLibrary):
 
 
 # Create a concrete implementation of FeeSchedule for testing
-class TestFeeSchedule(FeeSchedule):
+class TestableFeeSchedule(FeeSchedule):
     def fee_for_overdue_item(self, loan) -> Money:
         return Money(amount=5.0, currency_name="USD")
 
@@ -90,10 +91,10 @@ def person():
 @pytest.fixture
 def simple_library(person):
     money_factory = MoneyFactory()
-    fee_schedule = TestFeeSchedule()
+    fee_schedule = TestableFeeSchedule()
     mop_server = MOPServer(id=ID.generate(), base_url=URL.parse("https://example.com"))
 
-    return TestSimpleLibrary(
+    return TestableSimpleLibrary(
         library_id=ID.generate(),
         name="Test Simple Library",
         administrator=person,
@@ -168,6 +169,7 @@ async def test_borrow_success(simple_library, thing, borrower):
     # Test borrowing an item
     # Use a date object instead of a datetime object
     from datetime import date
+
     today = date.today()
     future_date = today + timedelta(days=14)
     due_date = DueDate(date=future_date)
@@ -200,6 +202,7 @@ async def test_borrow_with_default_due_date(simple_library, thing, borrower):
     assert loan.due_date is not None
     # Due date should be approximately default_loan_time in the future
     from datetime import date
+
     today = date.today()
     assert loan.due_date.date > today
     future_date = today + simple_library.default_loan_time + timedelta(days=1)

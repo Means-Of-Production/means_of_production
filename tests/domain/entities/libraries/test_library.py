@@ -153,7 +153,9 @@ def test_can_borrow_with_fees(test_library, borrower):
     # Case 1: Borrower has no fees
     borrower.fees = []
     # Mock the money_factory.total method to return a value for empty list
-    test_library.money_factory.total = MagicMock(return_value=Money(amount=0.0, currency_name="USD"))
+    test_library.money_factory.total = MagicMock(
+        return_value=Money(amount=0.0, currency_name="USD")
+    )
     assert test_library.can_borrow(borrower)
 
     # Case 2: Borrower has fees but under the limit
@@ -249,6 +251,7 @@ async def test_finish_return(test_library, borrower):
     loan.item = thing
     # Use a date object instead of a datetime object
     from datetime import date
+
     today = date.today()
     yesterday = today - timedelta(days=1)
     loan.due_date = DueDate(date=yesterday)  # Overdue
