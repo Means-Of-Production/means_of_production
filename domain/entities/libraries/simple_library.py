@@ -85,3 +85,10 @@ class SimpleLibrary(Library, Lender):
         loan.status = LoanStatus.WAITING_ON_LENDER_ACCEPTANCE
         loan.time_returned = datetime.now()
         return loan
+
+    async def finish_library_return(self, loan: Loan, borrower: Borrower) -> Loan:
+        return await self.finish_return(loan)
+
+    async def finish_return(self, loan: Loan) -> Loan:
+        loan.status = LoanStatus.RETURNED
+        return loan

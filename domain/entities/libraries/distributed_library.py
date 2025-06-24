@@ -57,7 +57,7 @@ class DistributedLibrary(Library):
         loan = Loan(
             loan_id=ID.generate(),
             item=thing,
-            borrower=borrower,
+            borrower_id=borrower.entity_id,
             due_date=until,
             return_location=lender.preferred_return_location,
             time_returned=None,
@@ -65,10 +65,10 @@ class DistributedLibrary(Library):
         loan.status = LoanStatus.BORROWED
         return loan
 
-    async def finish_return(self, loan: Loan) -> Loan:
+    async def finish_library_return(self, loan: Loan, borrower: Borrower) -> Loan:
         owner = self.get_owner_of_item(loan.item)
         from_owner = await owner.finish_return(loan)
-        return await super().finish_return(from_owner)
+        return await super().finish_library_return(from_owner, borrower)
 
     async def start_return(self, loan: Loan) -> Loan:
         # TODO check the borrower is somewhere near where they should be!

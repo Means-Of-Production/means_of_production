@@ -114,7 +114,7 @@ class Library(Entity, ABC):
                 titles.append(item.title)
         return titles
 
-    async def finish_return(self, loan: Loan, borrower: Borrower) -> Loan:
+    async def finish_library_return(self, loan: Loan, borrower: Borrower) -> Loan:
         # This has to call FIRST, so the status can be updated to act here
         if (
             loan.status != LoanStatus.WAITING_ON_LENDER_ACCEPTANCE

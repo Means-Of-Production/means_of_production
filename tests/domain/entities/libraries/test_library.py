@@ -37,10 +37,11 @@ class TestFeeSchedule(FeeSchedule):
 
 
 # Create a concrete implementation of Library for testing
-class TestLibrary(Library):
+class TestableLibrary(Library):
     model_config = {"arbitrary_types_allowed": True, "frozen": False, "extra": "allow"}
 
     def __init__(self, **kwargs):
+        self._items = []
         self.__dict__.update(kwargs)
 
     @property
@@ -78,7 +79,7 @@ def test_library():
 
     money_factory = MoneyFactory()
 
-    return TestLibrary(
+    return TestableLibrary(
         library_id=ID.generate(),
         name="Test Library",
         administrator=person,
