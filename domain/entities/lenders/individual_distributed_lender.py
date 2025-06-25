@@ -1,6 +1,8 @@
 from datetime import datetime, timezone
 from typing import Iterable, Self
 
+from pydantic import PrivateAttr
+
 from domain.entities.lenders.lender import Lender
 from domain.entities.loan import Loan
 from domain.entities.people import Person
@@ -10,7 +12,7 @@ from domain.value_items.exceptions import ReturnNotStartedError
 
 
 class IndividualDistributedLender(Person, Lender):
-    _items: list[Thing] = []
+    _items: list[Thing] = PrivateAttr(default_factory=list)
     return_location_override: Location | None = None
 
     @property
@@ -20,6 +22,10 @@ class IndividualDistributedLender(Person, Lender):
     @property
     def items(self) -> Iterable[Thing]:
         return self._items
+
+    @property
+    def preferred_return_location(self) -> Location:
+        raise NotImplementedError()
 
     def add_item(self, item: Thing) -> Self:
         self._items.append(item)

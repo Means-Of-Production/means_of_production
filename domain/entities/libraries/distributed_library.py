@@ -1,6 +1,8 @@
 from datetime import UTC, datetime
 from typing import Iterable, List, Optional
 
+from pydantic import PrivateAttr
+
 from domain.entities.borrower import Borrower
 from domain.entities.lenders.lender import Lender
 from domain.entities.libraries.library import Library
@@ -11,7 +13,7 @@ from domain.value_items import ID, DueDate, LoanStatus, PhysicalArea, ThingStatu
 
 class DistributedLibrary(Library):
     area: PhysicalArea
-    _lenders: List[Lender] = []
+    _lenders: List[Lender] = PrivateAttr(default_factory=list)
 
     @property
     def entity_id(self) -> ID:
