@@ -65,6 +65,9 @@ class TestableLibrary(Library):
         loan.time_returned = datetime.now()
         return loan
 
+    async def finish_return(self, loan: Loan, borrower: Borrower) -> Loan:
+        return await self.finish_library_return(loan, borrower)
+
     def get_loans(self) -> Iterable[Loan]:
         return self._loans
 

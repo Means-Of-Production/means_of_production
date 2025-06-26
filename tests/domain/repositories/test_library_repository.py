@@ -1,6 +1,5 @@
 from unittest.mock import MagicMock
 
-
 from domain import ID, LibraryRepository, PersonName
 from domain.entities import Borrower, Library, Person
 
@@ -26,5 +25,5 @@ def test_gets_libraries_via_person():
     res = list(under_test.get_libraries_person_can_use(person))
 
     # Assert
-    assert res is not None
+    assert res
     assert len(res) == 1
