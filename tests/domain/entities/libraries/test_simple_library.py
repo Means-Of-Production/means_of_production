@@ -30,7 +30,7 @@ from domain.value_items.fee_schedules.fee_schedule import FeeSchedule
 
 
 # Create a test version of SimpleLibrary that allows modification of attributes
-class TestSimpleLibrary(SimpleLibrary):
+class TestableSimpleLibrary(SimpleLibrary):
     model_config = {"arbitrary_types_allowed": True, "frozen": False, "extra": "allow"}
 
     async def borrow(
@@ -71,7 +71,7 @@ class TestSimpleLibrary(SimpleLibrary):
 
 
 # Create a concrete implementation of FeeSchedule for testing
-class TestFeeSchedule(FeeSchedule):
+class TestableFeeSchedule(FeeSchedule):
     def fee_for_overdue_item(self, loan) -> Money:
         return Money(amount=5.0, currency_name="USD")
 
@@ -91,10 +91,10 @@ def person():
 @pytest.fixture
 def simple_library(person):
     money_factory = MoneyFactory()
-    fee_schedule = TestFeeSchedule()
+    fee_schedule = TestableFeeSchedule()
     mop_server = MOPServer(id=ID.generate(), base_url=URL.parse("https://example.com"))
 
-    return TestSimpleLibrary(
+    return TestableSimpleLibrary(
         library_id=ID.generate(),
         name="Test Simple Library",
         administrator=person,

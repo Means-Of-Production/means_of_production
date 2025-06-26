@@ -1,9 +1,8 @@
 from unittest.mock import MagicMock
 
 
+from domain import ID, LibraryRepository, PersonName
 from domain.entities import Borrower, Library, Person
-from domain.value_items import ID, PersonName
-from domain.repositories.library_repository import LibraryRepository
 
 
 def test_gets_libraries_via_person():

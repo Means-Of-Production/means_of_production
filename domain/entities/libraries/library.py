@@ -4,6 +4,8 @@ from abc import ABC, abstractmethod
 from datetime import timedelta
 from typing import Iterable
 
+from pydantic import PrivateAttr
+
 from domain.entities.borrower import Borrower
 from domain.entities.entity import Entity
 from domain.entities.libraries.library_fee import LibraryFee
@@ -34,8 +36,6 @@ class Library(Entity, ABC):
     name: str
     administrator: Person
     location: Location
-    _borrowers: list[Borrower] = []
-    _loans: list[Loan] = []
     waiting_list_type: WaitingListType
     waiting_lists_by_item_id: dict[ID, WaitingList] = {}
     max_fines_before_suspension: Money
@@ -44,6 +44,9 @@ class Library(Entity, ABC):
     default_loan_time: timedelta
     mop_server: MOPServer
     public_url: str | None = None
+
+    _borrowers: list[Borrower] = PrivateAttr(default_factory=list)
+    _loans: list[Loan] = PrivateAttr(default_factory=list)
 
     @property
     def entity_id(self) -> ID:
@@ -114,7 +117,7 @@ class Library(Entity, ABC):
                 titles.append(item.title)
         return titles
 
-    async def finish_return(self, loan: Loan, borrower: Borrower) -> Loan:
+    async def finish_library_return(self, loan: Loan, borrower: Borrower) -> Loan:
         # This has to call FIRST, so the status can be updated to act here
         if (
             loan.status != LoanStatus.WAITING_ON_LENDER_ACCEPTANCE

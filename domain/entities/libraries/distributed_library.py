@@ -1,6 +1,8 @@
 from datetime import UTC, datetime
 from typing import Iterable, List, Optional
 
+from pydantic import PrivateAttr
+
 from domain.entities.borrower import Borrower
 from domain.entities.lenders.lender import Lender
 from domain.entities.libraries.library import Library
@@ -11,7 +13,7 @@ from domain.value_items import ID, DueDate, LoanStatus, PhysicalArea, ThingStatu
 
 class DistributedLibrary(Library):
     area: PhysicalArea
-    _lenders: List[Lender] = []
+    _lenders: List[Lender] = PrivateAttr(default_factory=list)
 
     @property
     def entity_id(self) -> ID:
@@ -65,10 +67,10 @@ class DistributedLibrary(Library):
         loan.status = LoanStatus.BORROWED
         return loan
 
-    async def finish_return(self, loan: Loan) -> Loan:
+    async def finish_library_return(self, loan: Loan, borrower: Borrower) -> Loan:
         owner = self.get_owner_of_item(loan.item)
         from_owner = await owner.finish_return(loan)
-        return await super().finish_return(from_owner)
+        return await super().finish_library_return(from_owner, borrower)
 
     async def start_return(self, loan: Loan) -> Loan:
         # TODO check the borrower is somewhere near where they should be!
