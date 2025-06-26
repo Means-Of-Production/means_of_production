@@ -6,9 +6,8 @@ from pydantic import BaseModel
 
 
 class ID(BaseModel):
-    id: UUID
-
     model_config = {"frozen": True}
+    id: UUID
 
     def __eq__(self, other):
         if not isinstance(other, ID):

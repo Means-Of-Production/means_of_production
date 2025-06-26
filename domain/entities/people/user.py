@@ -11,6 +11,3 @@ class User(BaseModel):
     email: List[EmailStr] = Field(default_factory=list)
     token: Optional[str] = None
     roles: List[UserRoles] = []
-
-    class Config:
-        frozen = True

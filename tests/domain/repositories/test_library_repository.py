@@ -1,11 +1,9 @@
 from unittest.mock import MagicMock
 
-import pytest
+from domain import ID, LibraryRepository, PersonName
+from domain.entities import Borrower, Library, Person
 
-from domain import ID, Borrower, Library, LibraryRepository, Person, PersonName
 
-
-@pytest.mark.skip(reason="Needs to be reworked")
 def test_gets_libraries_via_person():
     # Arrange
     person_name = PersonName(first_name="Testy", last_name="McTesterson")
@@ -27,5 +25,5 @@ def test_gets_libraries_via_person():
     res = list(under_test.get_libraries_person_can_use(person))
 
     # Assert
-    assert res is not None
+    assert res
     assert len(res) == 1

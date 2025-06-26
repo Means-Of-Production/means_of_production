@@ -40,3 +40,20 @@ class ResourceNotFoundException(Exception):
     """Raised when a requested resource is not found."""
 
     pass
+
+
+class EntityNotAssignedIdError(Exception):
+    pass
+
+
+class InvalidThingStatusToBorrowError(Exception):
+    def __init__(self, status: ThingStatus):
+        super().__init__(status)
+
+
+class BorrowerNotInGoodStandingError(Exception):
+    pass
+
+
+class InvalidLibraryConfigurationError(Exception):
+    pass

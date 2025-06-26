@@ -1,18 +1,19 @@
+from __future__ import annotations
+
 from pydantic import BaseModel
 
 from domain.value_items.exceptions import CurrencyMismatchException
 
 
 class Money(BaseModel):
+    model_config = {"frozen": True}
     amount: float
     currency_name: str
-    symbol: str
-
-    model_config = {"frozen": True}
+    symbol: str | None = None
 
     @property
     def dollars(self) -> float:
-        if not self.currency_name == "USD":
+        if self.currency_name != "USD":
             raise CurrencyMismatchException(
                 "Can only convert to dollars if currency is USD"
             )
@@ -22,3 +23,33 @@ class Money(BaseModel):
         if not isinstance(other, Money):
             return False
         return self.amount == other.amount and self.currency_name == other.currency_name
+
+    def __gt__(self, other: Money) -> bool:
+        if self.currency_name != other.currency_name:
+            raise CurrencyMismatchException()
+        return self.amount > other.amount
+
+    def __ge__(self, other: Money) -> bool:
+        if self.currency_name != other.currency_name:
+            raise CurrencyMismatchException()
+        return self.amount >= other.amount
+
+    def __lt__(self, other: Money) -> bool:
+        if self.currency_name != other.currency_name:
+            raise CurrencyMismatchException()
+        return self.amount < other.amount
+
+    def __le__(self, other: Money) -> bool:
+        if self.currency_name != other.currency_name:
+            raise CurrencyMismatchException()
+        return self.amount <= other.amount
+
+    def __add__(self, other: Money) -> Money:
+        if self.currency_name != other.currency_name:
+            raise CurrencyMismatchException(
+                "Can only add Money objects with the same currency"
+            )
+
+        return Money(
+            amount=self.amount + other.amount, currency_name=self.currency_name
+        )
