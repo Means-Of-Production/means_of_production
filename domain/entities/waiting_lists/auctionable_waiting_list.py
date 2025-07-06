@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from pydantic import Field
 from datetime import datetime, timedelta
 from typing import Dict, Iterable, Optional
 
@@ -30,7 +31,7 @@ class AuctionableWaitingList(WaitingList):
     started: datetime
     currency_name: str
 
-    _backup_list: FirstComeFirstServeWaitingList
+    _backup_list: FirstComeFirstServeWaitingList = Field(default_factory=FirstComeFirstServeWaitingList)
     _bids_by_for_id: Dict[ID, list[AuctionBid]] = {}
 
     @property

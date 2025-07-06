@@ -1,3 +1,4 @@
+import decimal
 from datetime import datetime, timedelta
 from typing import Iterable
 from unittest.mock import MagicMock, patch
@@ -30,10 +31,10 @@ from domain.value_items.fee_schedules.fee_schedule import FeeSchedule
 # Create a concrete implementation of FeeSchedule for testing
 class TestFeeSchedule(FeeSchedule):
     def fee_for_overdue_item(self, loan) -> Money:
-        return Money(amount=5.0, currency_name="USD")
+        return Money(amount=decimal.Decimal(5.0), currency_name="USD")
 
     def fee_for_damaged_item(self, loan) -> Money:
-        return Money(amount=20.0, currency_name="USD")
+        return Money(amount=decimal.Decimal(20.0), currency_name="USD")
 
 
 # Create a concrete implementation of Library for testing
@@ -77,7 +78,7 @@ def test_library():
     person = Person(
         person_id=ID.generate(),
         name=PersonName(first_name="Admin", last_name="User"),
-        email=["admin@library.com"],
+        emails=["admin@library.com"],
     )
 
     money_factory = MoneyFactory()
@@ -87,16 +88,13 @@ def test_library():
         name="Test Library",
         administrator=person,
         location=MagicMock(spec=Location),
-        _borrowers=[],
-        _loans=[],
         waiting_list_type=WaitingListType.FIRST_COME_FIRST_SERVE,
         waiting_lists_by_item_id={},
-        max_fines_before_suspension=Money(amount=50.0, currency_name="USD"),
+        max_fines_before_suspension=Money(amount=decimal.Decimal(50.0), currency_name="USD"),
         fee_schedule=MagicMock(),
         money_factory=money_factory,
         default_loan_time=timedelta(days=14),
         mop_server=MagicMock(),
-        _items=[],
     )
 
 
@@ -158,25 +156,25 @@ def test_can_borrow_with_fees(test_library, borrower):
     borrower.fees = []
     # Mock the money_factory.total method to return a value for empty list
     test_library.money_factory.total = MagicMock(
-        return_value=Money(amount=0.0, currency_name="USD")
+        return_value=Money(amount=decimal.Decimal(0.0), currency_name="USD")
     )
     assert test_library.can_borrow(borrower)
 
     # Case 2: Borrower has fees but under the limit
     fee = MagicMock()
     fee.status = FeeStatus.OUTSTANDING
-    fee.amount = Money(amount=10.0, currency_name="USD")
+    fee.amount = Money(amount=decimal.Decimal(10.0), currency_name="USD")
     borrower.fees = [fee]
 
     # Mock the money_factory.total method to return a value less than max_fines
     test_library.money_factory.total = MagicMock(
-        return_value=Money(amount=10.0, currency_name="USD")
+        return_value=Money(amount=decimal.Decimal(10.0), currency_name="USD")
     )
     assert test_library.can_borrow(borrower)
 
     # Case 3: Borrower has fees over the limit
     test_library.money_factory.total = MagicMock(
-        return_value=Money(amount=60.0, currency_name="USD")
+        return_value=Money(amount=decimal.Decimal(60.0), currency_name="USD")
     )
     assert not test_library.can_borrow(borrower)
 
@@ -262,16 +260,16 @@ async def test_finish_return(test_library, borrower):
     loan.loan_id = ID.generate()
 
     # Mock the finish_return method to avoid the datetime comparison issue
-    async def mock_finish_return(loan, borrower):
+    def mock_finish_return(loan, borrower):
         loan.status = LoanStatus.OVERDUE
         thing.status = ThingStatus.READY
         fee = LibraryFee(
             library_fee_id=ID.generate(),
             library_id=test_library.library_id,
-            amount=Money(amount=5.0, currency_name="USD"),
+            amount=Money(amount=decimal.Decimal(5.0), currency_name="USD"),
             charged_for_id=loan.loan_id,
-            status=FeeStatus.OUTSTANDING,
         )
+        fee.status = FeeStatus.OUTSTANDING
         borrower.apply_fee(fee)
         return loan
 

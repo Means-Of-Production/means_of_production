@@ -6,4 +6,6 @@ from domain.value_items import (
     Location,
     PersonName,
     PhysicalLocation,
+    WaitingListType,
+    Money
 )

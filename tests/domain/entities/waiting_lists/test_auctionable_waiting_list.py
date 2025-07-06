@@ -1,3 +1,4 @@
+import decimal
 from datetime import datetime, timedelta
 from unittest.mock import MagicMock
 
@@ -71,12 +72,12 @@ def waiting_list(thing, backup_list):
 
 @pytest.fixture
 def money():
-    return Money(amount=10.0, currency_name="USD")
+    return Money(amount=decimal.Decimal(10.0), currency_name="USD")
 
 
 @pytest.fixture
 def another_money():
-    return Money(amount=20.0, currency_name="USD")
+    return Money(amount=decimal.Decimal(20.0), currency_name="USD")
 
 
 @pytest.fixture
@@ -364,7 +365,7 @@ def test_cancel(waiting_list, borrower, backup_list):
 
     # Add a bid
     bid = AuctionBid(
-        amount_bid=Money(amount=10.0, currency_name="USD"),
+        amount_bid=Money(amount=decimal.Decimal(10.0), currency_name="USD"),
         made_by=borrower,
         made_for=borrower,
     )

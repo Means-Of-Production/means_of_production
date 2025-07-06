@@ -1,3 +1,5 @@
+import decimal
+
 from domain.value_items import Money
 
 
@@ -5,7 +7,7 @@ class MoneyFactory:
     @staticmethod
     def empty(currency_name: str) -> Money:
         return Money(
-            amount=0,
+            amount=decimal.Decimal(0),
             currency_name=currency_name,
         )
 
