@@ -11,11 +11,15 @@ from domain import (
     Person,
     PersonName,
     PhysicalLocation,
+    Thing,
     WaitingListType,
+    PersonBorrower,
 )
 from domain.entities.libraries.simple_library import SimpleLibrary
-from domain.value_items import URL, FeeSchedule
+from domain.value_items import URL, FeeSchedule, ThingTitle, ThingStatus
 from domain.value_items.fee_schedules.per_day_fee_schedule import PerDayFeeSchedule
+from tests.domain.entities.waiting_lists.test_first_come_first_serve_waiting_list import \
+    test_reserve_item_for_next_borrower_empty_list
 
 
 @pytest.fixture
@@ -46,6 +50,33 @@ def administrator() -> Person:
         ),
         emails=["admin@testlibrary.com", "anotheremail@gmail.com"],
     )
+
+@pytest.fixture
+def person_one(simple_library) -> PersonBorrower:
+    return PersonBorrower(
+        person_id=ID.generate(),
+        name=PersonName(
+            first_name="Testy",
+            last_name="McTesterson",
+        ),
+        library_id=simple_library.library_id,
+        verification_flags=[]
+    )
+
+@pytest.fixture
+def item_one(simple_library, library_location) -> Thing:
+    item = Thing(
+        thing_id=ID.generate(),
+        title=ThingTitle(name="Test Item"),
+        description="This is a test item",
+        owner_id=simple_library.library_id,
+        storage_location=library_location,
+        image_urls=[],
+        purchase_cost=Money(amount=decimal.Decimal(10.0), currency_name="EUR"),
+    )
+    item.status = ThingStatus.READY
+    return item
+
 
 
 @pytest.fixture
