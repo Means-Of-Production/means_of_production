@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 from datetime import timedelta
 from typing import Iterable
 
-from pydantic import PrivateAttr, Field
+from pydantic import Field, PrivateAttr
 
 from domain.entities.borrower import Borrower
 from domain.entities.entity import Entity

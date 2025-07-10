@@ -90,7 +90,9 @@ def test_library():
         location=MagicMock(spec=Location),
         waiting_list_type=WaitingListType.FIRST_COME_FIRST_SERVE,
         waiting_lists_by_item_id={},
-        max_fines_before_suspension=Money(amount=decimal.Decimal(50.0), currency_name="USD"),
+        max_fines_before_suspension=Money(
+            amount=decimal.Decimal(50.0), currency_name="USD"
+        ),
         fee_schedule=MagicMock(),
         money_factory=money_factory,
         default_loan_time=timedelta(days=14),

@@ -1,10 +1,9 @@
 from __future__ import annotations
 
-from dataclasses import Field
 from datetime import timedelta
 from typing import Self
 
-from pydantic import PrivateAttr, Field
+from pydantic import Field, PrivateAttr
 
 from domain.entities.borrower import Borrower
 from domain.entities.waiting_lists.reservation import Reservation

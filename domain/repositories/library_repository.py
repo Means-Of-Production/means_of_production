@@ -20,6 +20,7 @@ class LibraryRepository(BaseInMemoryRepository[Library]):
             library
             for library in self.get_all()
             if any(
-                getattr(borrower, 'person', None) == person for borrower in library.borrowers
+                getattr(borrower, "person", None) == person
+                for borrower in library.borrowers
             )
         )

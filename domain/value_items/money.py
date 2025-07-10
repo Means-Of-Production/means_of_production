@@ -55,9 +55,9 @@ class Money(BaseModel):
         return Money(
             amount=self.amount + other.amount, currency_name=self.currency_name
         )
-    
+
     def __mul__(self, other: int | float) -> Money:
         return Money(
             amount=self.amount * decimal.Decimal(other),
-            currency_name=self.currency_name
+            currency_name=self.currency_name,
         )

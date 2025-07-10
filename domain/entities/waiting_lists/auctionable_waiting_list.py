@@ -1,8 +1,9 @@
 from __future__ import annotations
 
-from pydantic import Field
 from datetime import datetime, timedelta
 from typing import Dict, Iterable, Optional
+
+from pydantic import PrivateAttr
 
 from domain.entities.borrower import Borrower
 from domain.entities.waiting_lists.first_come_first_serve_waiting_list import (
@@ -30,16 +31,21 @@ class AuctionableWaitingList(WaitingList):
     is_active: bool = True
     started: datetime
     currency_name: str
-
-    _backup_list: FirstComeFirstServeWaitingList = Field(default_factory=FirstComeFirstServeWaitingList)
     _bids_by_for_id: Dict[ID, list[AuctionBid]] = {}
+
+    _backup_list: WaitingList = PrivateAttr()
 
     @property
     def entity_id(self) -> ID:
         return self.waiting_list_id
 
+    def _get_backup_list(self) -> WaitingList:
+        if not self._backup_list:
+            self._backup_list = FirstComeFirstServeWaitingList(item=self.item)
+        return self._backup_list
+
     def add(self, borrower: Borrower) -> AuctionableWaitingList:
-        self._backup_list.add(borrower)
+        self._get_backup_list().add(borrower)
         return self
 
     def add_bid(self, bid: AuctionBid) -> AuctionableWaitingList:
@@ -85,7 +91,7 @@ class AuctionableWaitingList(WaitingList):
 
     def find_next_borrower(self) -> Optional[Borrower]:
         if not self._bids_by_for_id:
-            return self._backup_list.find_next_borrower()
+            return self._get_backup_list().find_next_borrower()
 
         return self.get_winning_borrower()
 
@@ -118,7 +124,7 @@ class AuctionableWaitingList(WaitingList):
 
             raise EntityNotAssignedIdError("")
 
-        self._backup_list.cancel(borrower)
+        self._get_backup_list().cancel(borrower)
 
         if borrower.entity_id in self._bids_by_for_id:
             del self._bids_by_for_id[borrower.entity_id]
