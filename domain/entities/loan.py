@@ -50,6 +50,8 @@ class Loan(Entity):
     def status(self, value: LoanStatus):
         valid_new_statuses = []
         match self._status:
+            case LoanStatus.RETURNED:
+                valid_new_statuses = [LoanStatus.BORROWED]
             case LoanStatus.BORROWED:
                 valid_new_statuses = [LoanStatus.RETURN_STARTED, LoanStatus.OVERDUE]
             case LoanStatus.OVERDUE:

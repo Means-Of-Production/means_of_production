@@ -49,7 +49,7 @@ class SimpleLibrary(Library, Lender):
             raise BorrowerNotInGoodStandingError()
 
         if not until:
-            until = DueDate(date=datetime.now() + self.default_loan_time)
+            until = DueDate(date=datetime.now().date() + self.default_loan_time)
 
         # Make loan
         loan = Loan(
