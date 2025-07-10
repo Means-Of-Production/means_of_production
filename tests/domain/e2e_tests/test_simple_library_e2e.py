@@ -19,3 +19,12 @@ class TestSimpleLibraryEndToEnd:
         loan = await simple_library.finish_library_return(loan, person_one)
         assert loan.status == LoanStatus.RETURNED
         assert item_one.status == ThingStatus.READY
+
+    @pytest.mark.asyncio
+    async def test_borrow_and_return_overdue(
+        self, simple_library, person_one, item_one
+    ):
+        loan = await simple_library.borrow(thing=item_one, borrower=person_one)
+
+        assert loan.due_date
+        # todo use freezegun to move the time forward past the due date

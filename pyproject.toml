@@ -32,4 +32,5 @@ dev = [
     "ruff>=0.8.4",
     "pyright>=1.1.391",
     "pytest-asyncio>=1.0.0",
+    "freezegun>=1.5.2",
 ]

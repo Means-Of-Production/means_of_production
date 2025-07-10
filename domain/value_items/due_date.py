@@ -43,3 +43,8 @@ class DueDate(BaseModel):
         if not self.date and not other.date:
             return True
         return self.date == other.date
+
+    def is_after_now(self) -> bool:
+        if not self.date:
+            return False
+        return self.date > datetime.now(timezone.utc).date()

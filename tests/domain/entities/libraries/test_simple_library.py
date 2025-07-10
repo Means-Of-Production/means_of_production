@@ -63,8 +63,7 @@ class TestableSimpleLibrary(SimpleLibrary):
             time_returned=None,
         )
 
-        # Directly set the private attribute to bypass the status transition validation
-        loan._status = LoanStatus.BORROWED
+        loan.status = LoanStatus.BORROWED
         thing.status = ThingStatus.BORROWED
 
         self.add_loan(loan)

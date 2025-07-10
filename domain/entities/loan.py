@@ -44,6 +44,8 @@ class Loan(Entity):
 
     @property
     def status(self) -> LoanStatus:
+        if self.due_date and not self.due_date.is_after_now():
+            self._status = LoanStatus.OVERDUE
         return self._status
 
     @status.setter
