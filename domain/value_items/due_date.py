@@ -1,4 +1,4 @@
-from datetime import date, timezone
+from datetime import date, datetime, timezone
 
 from pydantic import BaseModel, field_validator
 
@@ -20,7 +20,17 @@ class DueDate(BaseModel):
     def __lt__(self, other):
         if not self.date:
             return False
-        return self.date < other.date
+
+        other_date: date
+        if isinstance(other, DueDate):
+            if not other.date:
+                return True
+            other_date = other.date
+        elif isinstance(other, datetime):
+            other_date = other.date()
+        else:
+            other_date = other
+        return self.date < other_date
 
     def __gt__(self, other):
         if not self.date:

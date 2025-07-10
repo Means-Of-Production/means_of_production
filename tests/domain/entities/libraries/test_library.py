@@ -94,9 +94,9 @@ def testable_library():
     # Create a minimal MOPServer instance
     from domain.entities.mop_server import MOPServer
     from domain.value_items.url import URL
+
     mop_server = MOPServer(
-        id=ID.generate(),
-        base_url=URL.parse("http://test-server.com")
+        id=ID.generate(), base_url=URL.parse("http://test-server.com")
     )
 
     return TestableLibrary(
@@ -173,7 +173,11 @@ def test_can_borrow_with_fees(testable_library, borrower):
     # Case 1: Borrower has no fees
     borrower.fees = []
     # Use patch to mock the total method
-    with patch.object(MoneyFactory, 'total', return_value=Money(amount=decimal.Decimal(0.0), currency_name="USD")):
+    with patch.object(
+        MoneyFactory,
+        "total",
+        return_value=Money(amount=decimal.Decimal(0.0), currency_name="USD"),
+    ):
         assert testable_library.can_borrow(borrower)
 
     # Case 2: Borrower has fees but under the limit
@@ -183,11 +187,19 @@ def test_can_borrow_with_fees(testable_library, borrower):
     borrower.fees = [fee]
 
     # Mock the money_factory.total method to return a value less than max_fines
-    with patch.object(MoneyFactory, 'total', return_value=Money(amount=decimal.Decimal(10.0), currency_name="USD")):
+    with patch.object(
+        MoneyFactory,
+        "total",
+        return_value=Money(amount=decimal.Decimal(10.0), currency_name="USD"),
+    ):
         assert testable_library.can_borrow(borrower)
 
     # Case 3: Borrower has fees over the limit
-    with patch.object(MoneyFactory, 'total', return_value=Money(amount=decimal.Decimal(60.0), currency_name="USD")):
+    with patch.object(
+        MoneyFactory,
+        "total",
+        return_value=Money(amount=decimal.Decimal(60.0), currency_name="USD"),
+    ):
         assert not testable_library.can_borrow(borrower)
 
 
@@ -206,7 +218,8 @@ async def test_reserve_item(testable_library, thing, borrower):
         mock_waiting_list.add.assert_called_once_with(borrower)
         assert result == mock_waiting_list
         assert (
-            testable_library.waiting_lists_by_item_id[thing.entity_id] == mock_waiting_list
+            testable_library.waiting_lists_by_item_id[thing.entity_id]
+            == mock_waiting_list
         )
 
 
@@ -286,7 +299,7 @@ async def test_finish_return(testable_library, borrower):
         return loan
 
     # Patch the finish_library_return method
-    with patch.object(Library, 'finish_library_return', mock_finish_library_return):
+    with patch.object(Library, "finish_library_return", mock_finish_library_return):
         # Test finishing a return for an overdue item
         result = await testable_library.finish_return(loan, borrower)
 

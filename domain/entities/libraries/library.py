@@ -130,8 +130,8 @@ class Library(Entity, ABC):
         if loan.item.status == ThingStatus.DAMAGED:
             loan.status = LoanStatus.RETURNED_DAMAGED
         else:
-            if loan.due_date.date:
-                if loan.time_returned > loan.due_date.date:
+            if loan.due_date:
+                if loan.time_returned > loan.due_date:
                     loan.status = LoanStatus.OVERDUE
                 else:
                     loan.status = LoanStatus.RETURNED
