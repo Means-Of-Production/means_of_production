@@ -74,7 +74,7 @@ class TestableLibrary(Library):
 
 
 @pytest.fixture
-def test_library():
+def testable_library():
     person = Person(
         person_id=ID.generate(),
         name=PersonName(first_name="Admin", last_name="User"),
@@ -114,11 +114,11 @@ def thing():
     return thing
 
 
-def test_entity_id(test_library):
-    assert test_library.entity_id == test_library.library_id
+def test_entity_id(testable_library):
+    assert testable_library.entity_id == testable_library.library_id
 
 
-def test_available_things(test_library):
+def test_available_things(testable_library):
     # Create some things with different statuses
     ready_thing = MagicMock(spec=Thing)
     ready_thing.status = ThingStatus.READY
@@ -126,41 +126,41 @@ def test_available_things(test_library):
     borrowed_thing = MagicMock(spec=Thing)
     borrowed_thing.status = ThingStatus.BORROWED
 
-    test_library._items = [ready_thing, borrowed_thing]
+    testable_library._items = [ready_thing, borrowed_thing]
 
     # Test that only READY things are returned
-    available = list(test_library.available_things)
+    available = list(testable_library.available_things)
     assert len(available) == 1
     assert available[0] == ready_thing
 
 
-def test_add_borrower(test_library, borrower):
+def test_add_borrower(testable_library, borrower):
     # Test adding a borrower
-    result = test_library.add_borrower(borrower)
+    result = testable_library.add_borrower(borrower)
 
     assert result == borrower
-    assert borrower in test_library._borrowers
+    assert borrower in testable_library._borrowers
 
 
-def test_can_borrow_different_library(test_library, borrower):
+def test_can_borrow_different_library(testable_library, borrower):
     # Set up borrower from a different library
-    borrower.library_id = ID.generate()  # Different from test_library.entity_id
+    borrower.library_id = ID.generate()  # Different from testable_library.entity_id
 
     # Test that borrower from different library can't borrow
-    assert not test_library.can_borrow(borrower)
+    assert not testable_library.can_borrow(borrower)
 
 
-def test_can_borrow_with_fees(test_library, borrower):
+def test_can_borrow_with_fees(testable_library, borrower):
     # Set up a borrower from this library
-    borrower.library_id = test_library.entity_id
+    borrower.library_id = testable_library.entity_id
 
     # Case 1: Borrower has no fees
     borrower.fees = []
     # Mock the money_factory.total method to return a value for empty list
-    test_library.money_factory.total = MagicMock(
+    testable_library.money_factory.total = MagicMock(
         return_value=Money(amount=decimal.Decimal(0.0), currency_name="USD")
     )
-    assert test_library.can_borrow(borrower)
+    assert testable_library.can_borrow(borrower)
 
     # Case 2: Borrower has fees but under the limit
     fee = MagicMock()
@@ -169,59 +169,59 @@ def test_can_borrow_with_fees(test_library, borrower):
     borrower.fees = [fee]
 
     # Mock the money_factory.total method to return a value less than max_fines
-    test_library.money_factory.total = MagicMock(
+    testable_library.money_factory.total = MagicMock(
         return_value=Money(amount=decimal.Decimal(10.0), currency_name="USD")
     )
-    assert test_library.can_borrow(borrower)
+    assert testable_library.can_borrow(borrower)
 
     # Case 3: Borrower has fees over the limit
-    test_library.money_factory.total = MagicMock(
+    testable_library.money_factory.total = MagicMock(
         return_value=Money(amount=decimal.Decimal(60.0), currency_name="USD")
     )
-    assert not test_library.can_borrow(borrower)
+    assert not testable_library.can_borrow(borrower)
 
 
 @pytest.mark.asyncio
-async def test_reserve_item(test_library, thing, borrower):
+async def test_reserve_item(testable_library, thing, borrower):
     # Mock the WaitingListFactory
     with patch.object(WaitingListFactory, "create_new_list") as mock_create:
         mock_waiting_list = MagicMock(spec=WaitingList)
         mock_create.return_value = mock_waiting_list
 
         # Test reserving an item
-        result = await test_library.reserve_item(thing, borrower)
+        result = await testable_library.reserve_item(thing, borrower)
 
         # Verify the waiting list was created and the borrower was added
-        mock_create.assert_called_once_with(test_library, thing)
+        mock_create.assert_called_once_with(testable_library, thing)
         mock_waiting_list.add.assert_called_once_with(borrower)
         assert result == mock_waiting_list
         assert (
-            test_library.waiting_lists_by_item_id[thing.entity_id] == mock_waiting_list
+            testable_library.waiting_lists_by_item_id[thing.entity_id] == mock_waiting_list
         )
 
 
-def test_get_loans(test_library):
+def test_get_loans(testable_library):
     # Create some test loans
     loan1 = MagicMock(spec=Loan)
     loan2 = MagicMock(spec=Loan)
 
     # Add loans using the add_loan method
-    test_library.add_loan(loan1)
-    test_library.add_loan(loan2)
+    testable_library.add_loan(loan1)
+    testable_library.add_loan(loan2)
 
     # Test getting loans directly from the _loans attribute
-    assert len(test_library._loans) == 2
-    assert loan1 in test_library._loans
-    assert loan2 in test_library._loans
+    assert len(testable_library._loans) == 2
+    assert loan1 in testable_library._loans
+    assert loan2 in testable_library._loans
 
 
-def test_add_loan(test_library):
+def test_add_loan(testable_library):
     # Create a test loan
     loan = MagicMock(spec=Loan)
 
     # Test adding a loan
-    test_library.add_loan(loan)
-    assert loan in test_library._loans
+    testable_library.add_loan(loan)
+    assert loan in testable_library._loans
 
 
 def test_get_titles_from_items():
@@ -243,7 +243,7 @@ def test_get_titles_from_items():
 
 
 @pytest.mark.asyncio
-async def test_finish_return(test_library, borrower):
+async def test_finish_return(testable_library, borrower):
     # Create a test loan in the correct state for return
     thing = MagicMock(spec=Thing)
     thing.status = ThingStatus.BORROWED
@@ -267,7 +267,7 @@ async def test_finish_return(test_library, borrower):
         thing.status = ThingStatus.READY
         fee = LibraryFee(
             library_fee_id=ID.generate(),
-            library_id=test_library.library_id,
+            library_id=testable_library.library_id,
             amount=Money(amount=decimal.Decimal(5.0), currency_name="USD"),
             charged_for_id=loan.loan_id,
         )
@@ -275,10 +275,10 @@ async def test_finish_return(test_library, borrower):
         borrower.apply_fee(fee)
         return loan
 
-    test_library.finish_return = mock_finish_return
+    testable_library.finish_return = mock_finish_return
 
     # Test finishing a return for an overdue item
-    result = await test_library.finish_return(loan, borrower)
+    result = await testable_library.finish_return(loan, borrower)
 
     # Verify the loan status was updated
     assert result.status == LoanStatus.OVERDUE

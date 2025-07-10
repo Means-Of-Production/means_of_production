@@ -30,7 +30,7 @@ class AuctionableWaitingList(WaitingList):
     ends: datetime
     is_active: bool = True
     started: datetime
-    currency_name: str
+    money_factory: MoneyFactory = MoneyFactory()
     _bids_by_for_id: Dict[ID, list[AuctionBid]] = {}
 
     _backup_list: WaitingList = PrivateAttr()
@@ -68,11 +68,11 @@ class AuctionableWaitingList(WaitingList):
         return result
 
     def get_winning_borrower(self) -> Borrower:
-        top_amount = MoneyFactory.empty(self.currency_name)
+        top_amount = self.money_factory.empty()
         top_borrower_id = None
 
         for borrower_id, bids in self._bids_by_for_id.items():
-            amount = MoneyFactory.empty(self.currency_name)
+            amount = self.money_factory.empty()
             for bid in bids:
                 amount = amount + bid.amount_bid
 
@@ -96,7 +96,7 @@ class AuctionableWaitingList(WaitingList):
         return self.get_winning_borrower()
 
     def get_largest_amount(self) -> Money:
-        amount = MoneyFactory.empty(self.currency_name)
+        amount = self.money_factory.empty()
         winner = self.get_winning_borrower()
 
         if not winner.entity_id:
