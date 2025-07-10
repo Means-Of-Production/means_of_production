@@ -11,3 +11,11 @@ class TestSimpleLibraryEndToEnd:
         assert loan
         assert loan.status == LoanStatus.BORROWED
         assert item_one.status == ThingStatus.BORROWED
+
+        # return the item
+        loan = await simple_library.start_return(loan)
+        assert loan.status == LoanStatus.WAITING_ON_LENDER_ACCEPTANCE
+
+        loan = await simple_library.finish_library_return(loan, person_one)
+        assert loan.status == LoanStatus.RETURNED
+        assert item_one.status == ThingStatus.READY

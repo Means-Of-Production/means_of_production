@@ -87,7 +87,7 @@ class SimpleLibrary(Library, Lender):
         return loan
 
     async def finish_library_return(self, loan: Loan, borrower: Borrower) -> Loan:
-        return await self.finish_return(loan)
+        return await super().finish_library_return(loan, borrower)
 
     async def finish_return(self, loan: Loan) -> Loan:
         loan.status = LoanStatus.RETURNED
