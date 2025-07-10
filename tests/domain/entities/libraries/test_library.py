@@ -42,8 +42,13 @@ class TestableLibrary(Library):
     model_config = {"arbitrary_types_allowed": True, "frozen": False, "extra": "allow"}
 
     def __init__(self, **kwargs):
-        self._items = []
-        self.__dict__.update(kwargs)
+        # Initialize the Pydantic model first
+        super().__init__(**kwargs)
+        # Then initialize our private attributes
+        # We need to use object.__setattr__ to bypass Pydantic's __setattr__
+        object.__setattr__(self, "_items", [])
+        object.__setattr__(self, "_borrowers", [])
+        object.__setattr__(self, "_loans", [])
 
     @property
     def all_things(self) -> Iterable[Thing]:
@@ -83,6 +88,17 @@ def testable_library():
 
     money_factory = MoneyFactory()
 
+    # Use TestFeeSchedule instead of MagicMock for fee_schedule
+    fee_schedule = TestFeeSchedule()
+
+    # Create a minimal MOPServer instance
+    from domain.entities.mop_server import MOPServer
+    from domain.value_items.url import URL
+    mop_server = MOPServer(
+        id=ID.generate(),
+        base_url=URL.parse("http://test-server.com")
+    )
+
     return TestableLibrary(
         library_id=ID.generate(),
         name="Test Library",
@@ -93,10 +109,10 @@ def testable_library():
         max_fines_before_suspension=Money(
             amount=decimal.Decimal(50.0), currency_name="USD"
         ),
-        fee_schedule=MagicMock(),
+        fee_schedule=fee_schedule,
         money_factory=money_factory,
         default_loan_time=timedelta(days=14),
-        mop_server=MagicMock(),
+        mop_server=mop_server,
     )
 
 
@@ -156,11 +172,9 @@ def test_can_borrow_with_fees(testable_library, borrower):
 
     # Case 1: Borrower has no fees
     borrower.fees = []
-    # Mock the money_factory.total method to return a value for empty list
-    testable_library.money_factory.total = MagicMock(
-        return_value=Money(amount=decimal.Decimal(0.0), currency_name="USD")
-    )
-    assert testable_library.can_borrow(borrower)
+    # Use patch to mock the total method
+    with patch.object(MoneyFactory, 'total', return_value=Money(amount=decimal.Decimal(0.0), currency_name="USD")):
+        assert testable_library.can_borrow(borrower)
 
     # Case 2: Borrower has fees but under the limit
     fee = MagicMock()
@@ -169,16 +183,12 @@ def test_can_borrow_with_fees(testable_library, borrower):
     borrower.fees = [fee]
 
     # Mock the money_factory.total method to return a value less than max_fines
-    testable_library.money_factory.total = MagicMock(
-        return_value=Money(amount=decimal.Decimal(10.0), currency_name="USD")
-    )
-    assert testable_library.can_borrow(borrower)
+    with patch.object(MoneyFactory, 'total', return_value=Money(amount=decimal.Decimal(10.0), currency_name="USD")):
+        assert testable_library.can_borrow(borrower)
 
     # Case 3: Borrower has fees over the limit
-    testable_library.money_factory.total = MagicMock(
-        return_value=Money(amount=decimal.Decimal(60.0), currency_name="USD")
-    )
-    assert not testable_library.can_borrow(borrower)
+    with patch.object(MoneyFactory, 'total', return_value=Money(amount=decimal.Decimal(60.0), currency_name="USD")):
+        assert not testable_library.can_borrow(borrower)
 
 
 @pytest.mark.asyncio
@@ -261,8 +271,8 @@ async def test_finish_return(testable_library, borrower):
     loan.due_date = DueDate(date=yesterday)  # Overdue
     loan.loan_id = ID.generate()
 
-    # Mock the finish_return method to avoid the datetime comparison issue
-    def mock_finish_return(loan, borrower):
+    # Create an async mock function for finish_library_return
+    async def mock_finish_library_return(self, loan, borrower):
         loan.status = LoanStatus.OVERDUE
         thing.status = ThingStatus.READY
         fee = LibraryFee(
@@ -275,16 +285,16 @@ async def test_finish_return(testable_library, borrower):
         borrower.apply_fee(fee)
         return loan
 
-    testable_library.finish_return = mock_finish_return
+    # Patch the finish_library_return method
+    with patch.object(Library, 'finish_library_return', mock_finish_library_return):
+        # Test finishing a return for an overdue item
+        result = await testable_library.finish_return(loan, borrower)
 
-    # Test finishing a return for an overdue item
-    result = await testable_library.finish_return(loan, borrower)
+        # Verify the loan status was updated
+        assert result.status == LoanStatus.OVERDUE
 
-    # Verify the loan status was updated
-    assert result.status == LoanStatus.OVERDUE
+        # Verify the thing status was updated
+        assert thing.status == ThingStatus.READY
 
-    # Verify the thing status was updated
-    assert thing.status == ThingStatus.READY
-
-    # Verify a fee was applied for the overdue item
-    borrower.apply_fee.assert_called_once()
+        # Verify a fee was applied for the overdue item
+        borrower.apply_fee.assert_called_once()
