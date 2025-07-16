@@ -96,7 +96,7 @@ def testable_library():
     from domain.value_items.url import URL
 
     mop_server = MOPServer(
-        id=ID.generate(), base_url=URL.parse("http://test-server.com")
+        id=ID.generate(), base_url=URL.parse("https://test-server.com")
     )
 
     return TestableLibrary(
