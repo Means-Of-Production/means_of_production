@@ -1,3 +1,4 @@
+import decimal
 from datetime import timedelta
 from unittest.mock import MagicMock
 
@@ -62,8 +63,7 @@ class TestableSimpleLibrary(SimpleLibrary):
             time_returned=None,
         )
 
-        # Directly set the private attribute to bypass the status transition validation
-        loan._status = LoanStatus.BORROWED
+        loan.status = LoanStatus.BORROWED
         thing.status = ThingStatus.BORROWED
 
         self.add_loan(loan)
@@ -73,10 +73,10 @@ class TestableSimpleLibrary(SimpleLibrary):
 # Create a concrete implementation of FeeSchedule for testing
 class TestableFeeSchedule(FeeSchedule):
     def fee_for_overdue_item(self, loan) -> Money:
-        return Money(amount=5.0, currency_name="USD")
+        return Money(amount=decimal.Decimal(5.0), currency_name="USD")
 
     def fee_for_damaged_item(self, loan) -> Money:
-        return Money(amount=20.0, currency_name="USD")
+        return Money(amount=decimal.Decimal(20.0), currency_name="USD")
 
 
 @pytest.fixture
@@ -84,7 +84,7 @@ def person():
     return Person(
         person_id=ID.generate(),
         name=PersonName(first_name="Admin", last_name="User"),
-        email=["admin@library.com"],
+        emails=["admin@library.com"],
     )
 
 
@@ -99,11 +99,11 @@ def simple_library(person):
         name="Test Simple Library",
         administrator=person,
         location=MagicMock(spec=Location),
-        _borrowers=[],
-        _loans=[],
         waiting_list_type=WaitingListType.FIRST_COME_FIRST_SERVE,
         waiting_lists_by_item_id={},
-        max_fines_before_suspension=Money(amount=50.0, currency_name="USD"),
+        max_fines_before_suspension=Money(
+            amount=decimal.Decimal(50.0), currency_name="USD"
+        ),
         fee_schedule=fee_schedule,
         money_factory=money_factory,
         default_loan_time=timedelta(days=14),

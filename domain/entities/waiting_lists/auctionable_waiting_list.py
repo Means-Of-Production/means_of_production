@@ -3,6 +3,8 @@ from __future__ import annotations
 from datetime import datetime, timedelta
 from typing import Dict, Iterable, Optional
 
+from pydantic import PrivateAttr
+
 from domain.entities.borrower import Borrower
 from domain.entities.waiting_lists.first_come_first_serve_waiting_list import (
     FirstComeFirstServeWaitingList,
@@ -28,17 +30,22 @@ class AuctionableWaitingList(WaitingList):
     ends: datetime
     is_active: bool = True
     started: datetime
-    currency_name: str
-
-    _backup_list: FirstComeFirstServeWaitingList
+    money_factory: MoneyFactory = MoneyFactory()
     _bids_by_for_id: Dict[ID, list[AuctionBid]] = {}
+
+    _backup_list: WaitingList = PrivateAttr()
 
     @property
     def entity_id(self) -> ID:
         return self.waiting_list_id
 
+    def _get_backup_list(self) -> WaitingList:
+        if not self._backup_list:
+            self._backup_list = FirstComeFirstServeWaitingList(item=self.item)
+        return self._backup_list
+
     def add(self, borrower: Borrower) -> AuctionableWaitingList:
-        self._backup_list.add(borrower)
+        self._get_backup_list().add(borrower)
         return self
 
     def add_bid(self, bid: AuctionBid) -> AuctionableWaitingList:
@@ -61,11 +68,11 @@ class AuctionableWaitingList(WaitingList):
         return result
 
     def get_winning_borrower(self) -> Borrower:
-        top_amount = MoneyFactory.empty(self.currency_name)
+        top_amount = self.money_factory.empty()
         top_borrower_id = None
 
         for borrower_id, bids in self._bids_by_for_id.items():
-            amount = MoneyFactory.empty(self.currency_name)
+            amount = self.money_factory.empty()
             for bid in bids:
                 amount = amount + bid.amount_bid
 
@@ -84,12 +91,12 @@ class AuctionableWaitingList(WaitingList):
 
     def find_next_borrower(self) -> Optional[Borrower]:
         if not self._bids_by_for_id:
-            return self._backup_list.find_next_borrower()
+            return self._get_backup_list().find_next_borrower()
 
         return self.get_winning_borrower()
 
     def get_largest_amount(self) -> Money:
-        amount = MoneyFactory.empty(self.currency_name)
+        amount = self.money_factory.empty()
         winner = self.get_winning_borrower()
 
         if not winner.entity_id:
@@ -117,7 +124,7 @@ class AuctionableWaitingList(WaitingList):
 
             raise EntityNotAssignedIdError("")
 
-        self._backup_list.cancel(borrower)
+        self._get_backup_list().cancel(borrower)
 
         if borrower.entity_id in self._bids_by_for_id:
             del self._bids_by_for_id[borrower.entity_id]

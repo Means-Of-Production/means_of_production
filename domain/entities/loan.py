@@ -44,12 +44,16 @@ class Loan(Entity):
 
     @property
     def status(self) -> LoanStatus:
+        if self.due_date and not self.due_date.is_after_now() and self._status == LoanStatus.BORROWED:
+            self._status = LoanStatus.OVERDUE
         return self._status
 
     @status.setter
     def status(self, value: LoanStatus):
         valid_new_statuses = []
         match self._status:
+            case LoanStatus.RETURNED:
+                valid_new_statuses = [LoanStatus.BORROWED]
             case LoanStatus.BORROWED:
                 valid_new_statuses = [LoanStatus.RETURN_STARTED, LoanStatus.OVERDUE]
             case LoanStatus.OVERDUE:

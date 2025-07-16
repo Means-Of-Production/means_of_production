@@ -20,7 +20,7 @@ class BaseInMemoryRepository(Generic[T], ABC):
         raise NotImplementedError()
 
     def create(self, entity: T) -> T:
-        entity_id = self.new_id()
+        entity_id = ID.generate()
         setattr(entity, self.get_id_field_name(), entity_id)
         return entity
 

@@ -1,3 +1,5 @@
+import decimal
+
 from domain.entities.libraries.library_fee import LibraryFee
 from domain.value_items import ID, FeeStatus, Money
 
@@ -7,15 +9,15 @@ def test_library_fee_creation():
     fee_id = ID.generate()
     library_id = ID.generate()
     charged_for_id = ID.generate()
-    amount = Money(amount=10.50, currency_name="USD")
+    amount = Money(amount=decimal.Decimal(10.50), currency_name="USD")
 
     fee = LibraryFee(
         library_fee_id=fee_id,
         library_id=library_id,
         amount=amount,
-        status=FeeStatus.OUTSTANDING,
         charged_for_id=charged_for_id,
     )
+    fee.status = FeeStatus.OUTSTANDING
 
     # Verify the fee was created correctly
     assert fee.library_fee_id == fee_id
@@ -33,10 +35,10 @@ def test_library_fee_status_change():
     fee = LibraryFee(
         library_fee_id=ID.generate(),
         library_id=ID.generate(),
-        amount=Money(amount=10.50, currency_name="USD"),
-        status=FeeStatus.OUTSTANDING,
+        amount=Money(amount=decimal.Decimal(10.50), currency_name="USD"),
         charged_for_id=ID.generate(),
     )
+    fee.status = FeeStatus.OUTSTANDING
 
     # Verify initial status
     assert fee.status == FeeStatus.OUTSTANDING

@@ -1,18 +1,24 @@
+import decimal
+
+from pydantic import BaseModel
+
 from domain.value_items import Money
 
 
-class MoneyFactory:
-    @staticmethod
-    def empty(currency_name: str) -> Money:
+class MoneyFactory(BaseModel):
+    default_currency_name: str = "EUR"
+
+    def empty(self, currency_name: str | None = None) -> Money:
+        if not currency_name:
+            currency_name = self.default_currency_name
         return Money(
-            amount=0,
+            amount=decimal.Decimal(0),
             currency_name=currency_name,
         )
 
-    @staticmethod
-    def total(amounts: list[Money]) -> Money:
+    def total(self, amounts: list[Money]) -> Money:
         if not amounts:
-            raise ValueError("Cannot create total of empty list")
+            return self.empty()
         total = MoneyFactory.empty(amounts[0].currency_name)
         for amount in amounts:
             total.amount += amount.amount

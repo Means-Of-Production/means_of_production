@@ -1,3 +1,4 @@
+import decimal
 from datetime import datetime, timedelta
 from unittest.mock import MagicMock
 
@@ -61,7 +62,6 @@ def waiting_list(thing, backup_list):
     waiting_list = AuctionableWaitingList(
         waiting_list_id=ID.generate(),
         item=thing,
-        currency_name="USD",
         started=datetime.now(),
         ends=datetime.now() + timedelta(days=7),
     )
@@ -71,12 +71,12 @@ def waiting_list(thing, backup_list):
 
 @pytest.fixture
 def money():
-    return Money(amount=10.0, currency_name="USD")
+    return Money(amount=decimal.Decimal(10.0), currency_name="EUR")
 
 
 @pytest.fixture
 def another_money():
-    return Money(amount=20.0, currency_name="USD")
+    return Money(amount=decimal.Decimal(20.0), currency_name="EUR")
 
 
 @pytest.fixture
@@ -327,7 +327,6 @@ def test_get_largest_amount_no_entity_id(waiting_list, money, borrower):
     test_list = TestAuctionableWaitingList(
         waiting_list_id=waiting_list.waiting_list_id,
         item=waiting_list.item,
-        currency_name=waiting_list.currency_name,
         started=waiting_list.started,
         ends=waiting_list.ends,
     )
@@ -364,7 +363,7 @@ def test_cancel(waiting_list, borrower, backup_list):
 
     # Add a bid
     bid = AuctionBid(
-        amount_bid=Money(amount=10.0, currency_name="USD"),
+        amount_bid=Money(amount=decimal.Decimal(10.0), currency_name="USD"),
         made_by=borrower,
         made_for=borrower,
     )

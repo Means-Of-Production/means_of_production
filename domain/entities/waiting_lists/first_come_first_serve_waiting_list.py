@@ -3,7 +3,7 @@ from __future__ import annotations
 from datetime import timedelta
 from typing import Self
 
-from pydantic import PrivateAttr
+from pydantic import Field, PrivateAttr
 
 from domain.entities.borrower import Borrower
 from domain.entities.waiting_lists.reservation import Reservation
@@ -12,7 +12,7 @@ from domain.value_items import ID, ReservationStatus
 
 
 class FirstComeFirstServeWaitingList(WaitingList):
-    members: list[Borrower] = []
+    members: list[Borrower] = Field(default_factory=list)
     reservation_days: int = 3
     _expired_reservations: list[Reservation] = PrivateAttr(default_factory=list)
 

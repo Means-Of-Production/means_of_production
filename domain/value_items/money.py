@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import decimal
+
 from pydantic import BaseModel
 
 from domain.value_items.exceptions import CurrencyMismatchException
@@ -7,12 +9,12 @@ from domain.value_items.exceptions import CurrencyMismatchException
 
 class Money(BaseModel):
     model_config = {"frozen": True}
-    amount: float
+    amount: decimal.Decimal
     currency_name: str
     symbol: str | None = None
 
     @property
-    def dollars(self) -> float:
+    def dollars(self) -> decimal.Decimal:
         if self.currency_name != "USD":
             raise CurrencyMismatchException(
                 "Can only convert to dollars if currency is USD"
@@ -52,4 +54,10 @@ class Money(BaseModel):
 
         return Money(
             amount=self.amount + other.amount, currency_name=self.currency_name
+        )
+
+    def __mul__(self, other: int | float) -> Money:
+        return Money(
+            amount=self.amount * decimal.Decimal(other),
+            currency_name=self.currency_name,
         )

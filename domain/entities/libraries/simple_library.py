@@ -49,7 +49,7 @@ class SimpleLibrary(Library, Lender):
             raise BorrowerNotInGoodStandingError()
 
         if not until:
-            until = DueDate(date=datetime.now() + self.default_loan_time)
+            until = DueDate(date=datetime.now().date() + self.default_loan_time)
 
         # Make loan
         loan = Loan(
@@ -85,9 +85,6 @@ class SimpleLibrary(Library, Lender):
         loan.status = LoanStatus.WAITING_ON_LENDER_ACCEPTANCE
         loan.time_returned = datetime.now()
         return loan
-
-    async def finish_library_return(self, loan: Loan, borrower: Borrower) -> Loan:
-        return await self.finish_return(loan)
 
     async def finish_return(self, loan: Loan) -> Loan:
         loan.status = LoanStatus.RETURNED

@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 from datetime import timedelta
 from typing import Iterable
 
-from pydantic import PrivateAttr
+from pydantic import Field, PrivateAttr
 
 from domain.entities.borrower import Borrower
 from domain.entities.entity import Entity
@@ -37,10 +37,10 @@ class Library(Entity, ABC):
     administrator: Person
     location: Location
     waiting_list_type: WaitingListType
-    waiting_lists_by_item_id: dict[ID, WaitingList] = {}
+    waiting_lists_by_item_id: dict[ID, WaitingList] = Field(default_factory=dict)
     max_fines_before_suspension: Money
     fee_schedule: FeeSchedule
-    money_factory: MoneyFactory
+    money_factory: MoneyFactory = Field(default_factory=MoneyFactory)
     default_loan_time: timedelta
     mop_server: MOPServer
     public_url: str | None = None
@@ -130,8 +130,8 @@ class Library(Entity, ABC):
         if loan.item.status == ThingStatus.DAMAGED:
             loan.status = LoanStatus.RETURNED_DAMAGED
         else:
-            if loan.due_date.date:
-                if loan.time_returned > loan.due_date.date:
+            if loan.due_date:
+                if loan.time_returned > loan.due_date:
                     loan.status = LoanStatus.OVERDUE
                 else:
                     loan.status = LoanStatus.RETURNED
@@ -154,8 +154,8 @@ class Library(Entity, ABC):
                 library_id=self.library_id,
                 amount=fee_amount,
                 charged_for_id=loan.loan_id,
-                status=FeeStatus.OUTSTANDING,
             )
+            fee.status = FeeStatus.OUTSTANDING
             borrower.apply_fee(fee)
 
         # Is there a waiting list for the item?

@@ -10,6 +10,7 @@ class PhysicalLocation(Location):
     city: str = Field(...)
     state: str = Field(...)
     zip_code: str = Field(...)
+    country: str = Field(...)
 
     model_config = {"frozen": True}
 
