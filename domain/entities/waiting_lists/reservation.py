@@ -4,32 +4,36 @@ from domain.entities.borrower import Borrower
 from domain.entities.entity import Entity
 from domain.entities.thing import Thing
 from domain.value_items import ID, ReservationStatus
+from domain.value_items.exceptions import InvalidReservationStateTransitionError
 
 
 class Reservation(Entity):
     model_config = {"frozen": False}
+
     reservation_id: ID
     holder: Borrower
     item: Thing
     good_until: datetime
-    _status: ReservationStatus
+    status: ReservationStatus = ReservationStatus.ASSIGNED
 
     @property
     def entity_id(self) -> ID:
         return self.reservation_id
 
-    @property
-    def status(self) -> ReservationStatus:
-        return self._status
-
-    @status.setter
-    def status(self, status: ReservationStatus) -> None:
+    def transition_to(self, new_status: ReservationStatus) -> None:
         valid_next_status = []
 
         if self.status == ReservationStatus.ASSIGNED:
-            valid_next_status = [ReservationStatus.BORROWER_NOTIFIED]
+            valid_next_status = [
+                ReservationStatus.BORROWER_NOTIFIED,
+                ReservationStatus.CANCELLED,
+            ]
         elif self.status == ReservationStatus.BORROWER_NOTIFIED:
-            valid_next_status = [ReservationStatus.EXPIRED, ReservationStatus.BORROWED]
+            valid_next_status = [
+                ReservationStatus.BORROWED,
+                ReservationStatus.EXPIRED,
+                ReservationStatus.CANCELLED,
+            ]
         elif self.status == ReservationStatus.BORROWED:
             valid_next_status = []
         elif self.status == ReservationStatus.EXPIRED:
@@ -37,11 +41,7 @@ class Reservation(Entity):
         elif self.status == ReservationStatus.CANCELLED:
             valid_next_status = []
 
-        if status not in valid_next_status:
-            from domain.value_items.exceptions import (
-                InvalidReservationStateTransitionError,
-            )
+        if new_status not in valid_next_status:
+            raise InvalidReservationStateTransitionError(self.status, new_status)
 
-            raise InvalidReservationStateTransitionError(self.status, status)
-
-        self._status = status
+        self.status = new_status

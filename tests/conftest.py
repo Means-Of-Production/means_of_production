@@ -99,3 +99,13 @@ def simple_library(
             id=ID.generate(), base_url=URL.parse("https://meansofp.org")
         ),
     )
+
+
+@pytest.fixture
+def borrower(simple_library) -> PersonBorrower:
+    return PersonBorrower(
+        person_id=ID.generate(),
+        name=PersonName(first_name="John", last_name="Doe"),
+        library_id=simple_library.library_id,
+        verification_flags=[],
+    )
