@@ -1,0 +1,254 @@
+openapi: 3.0.4
+info:
+  title: MeansOfProduction API
+  description: |-
+    This server allows clients to use the MeansOfProduction protocol and servers.  MeansOfProduction
+    powers libraries, both traditional and virtual/distributed, as well as allowing cross functionality
+    between other supported platforms.
+    
+    Some useful links:
+    - [Project Site](https://meansofpo.org)
+  termsOfService: https://swagger.io/terms/
+  contact:
+    email: admin@meansofp.org
+  license:
+    name: MIT
+  version: 0.0.1
+externalDocs:
+  description: Find out more about Swagger
+  url: https://swagger.io
+servers:
+  - url: https://meansofp.org/api/v1
+tags:
+  - name: library
+    description: Basic library methods
+paths:
+  /library:
+    get:
+      tags:
+        - library
+      description: retrieves a list of current libraries
+      parameters:
+        - name: active
+          description: whether to return only libraries that are currently active
+          in: query
+          required: false
+          schema:
+            type: boolean
+            default: true
+        - name: max_items
+          description: number of libraries to return
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 20
+            maximum: 100
+            minimum: 1
+        - name: skip
+          description: Number of items to skip in results, used for paging
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 0
+            minimum: 0
+      responses:
+        200:
+          description: successful
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  oneOf:
+                    - $ref: "#/components/schemas/SimpleLibrary"
+    post:
+      tags: 
+        - library
+      summary: creates a new simple library
+      requestBody: 
+        description: The Library object we want to create
+        required: true
+        content: 
+          application/json:
+            schema:
+              oneOf:
+                - $ref: "#/components/schemas/SimpleLibrary"
+components:
+  schemas:
+    Person:
+      type: object
+      properties:
+        person_id:
+          type: string
+          format: uuid
+          description: A unique identifier for the person
+        salutation:
+          type: string
+          nullable: true
+        first_name:
+          type: string
+        middle_name:
+          type: string
+          nullable: true
+        last_name:
+          type: string
+        suffix:
+          type: string
+          nullable: true
+        emails:
+          type: array
+          items:
+            type: string
+            format: email
+      required:
+        - person_id
+        - first_name
+        - last_name
+        -
+    PhysicalLocation:
+      type: object
+      description: A physical location with address information
+      allOf:
+        - type: object
+          properties:
+            latitude:
+              type: number
+              format: float
+              nullable: true
+              description: Latitude coordinate
+            longitude:
+              type: number
+              format: float
+              nullable: true
+              description: Longitude coordinate
+            street_address:
+              type: string
+              description: Street address
+            city:
+              type: string
+              description: City
+            state:
+              type: string
+              description: State or province
+            zip_code:
+              type: string
+              description: Postal or ZIP code
+            country:
+              type: string
+              description: Country
+          required:
+            - street_address
+            - city
+            - state
+            - zip_code
+            - country
+    
+    WaitingListType:
+      type: string
+      enum:
+        - NONE
+        - QUADRATIC_WAITING_LIST
+        - FIRST_COME_FIRST_SERVE
+    
+    Money:
+      type: object
+      properties:
+        amount:
+          type: number
+          description: Decimal amount of money
+        currency_name:
+          type: string
+          enum:
+            - Euro
+            - US Dollar
+            - Labor Token
+        symbol:
+          type: string
+          nullable: true
+          enum:
+            - EUR
+            - USD
+            - LABOR
+      required:
+        - amount
+        - currency_name
+    
+    FeeSchedule:
+      type: object
+      description: Abstract base class for fee schedules
+    
+    SimpleLibrary:
+      type: object
+      properties:
+        library_id:
+          type: string
+          format: uuid
+          description: A unique identifier for the library
+        name:
+          type: string
+        administrator:
+          $ref: '#/components/schemas/Person'
+        location:
+          $ref: '#/components/schemas/PhysicalLocation'
+        waiting_list_type:
+          $ref: '#/components/schemas/WaitingListType'
+        max_fines_before_suspension:
+          $ref: '#/components/schemas/Money'
+        currency:
+          type: string
+          enum:
+            - EUR
+            - USD
+            - LABOR_TOKEN
+        default_loan_time:
+          type: string
+          description: Duration of the default loan period (ISO 8601 duration format, e.g., 'P14D' for 14 days)
+        mop_server_address:
+          type: string
+          format: uri
+          description: URL address of the MOP server
+        public_url:
+          type: string
+          format: uri
+          nullable: true
+      required:
+        - library_id
+        - name
+        - administrator
+        - currency
+        - location
+        - waiting_list_type
+        - max_fines_before_suspension
+        - default_loan_time
+        - mop_server_address
+
+
+    Thing:
+      type: object
+      description: An item that can be borrowed
+
+    Reservation:
+      type: object
+      description: A reservation for a thing
+
+    WaitingList:
+      type: object
+      properties:
+        waiting_list_id:
+          type: string
+          format: uuid
+          description: A unique identifier for the waiting list
+        item:
+          $ref: '#/components/schemas/Thing'
+        current_reservation:
+          $ref: '#/components/schemas/Reservation'
+          nullable: true
+        expired_reservations:
+          type: array
+          items:
+            $ref: '#/components/schemas/Reservation'
+      required:
+        - waiting_list_id
+        - item
