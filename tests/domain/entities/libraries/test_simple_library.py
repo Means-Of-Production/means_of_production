@@ -4,6 +4,7 @@ from unittest.mock import MagicMock
 
 import pytest
 
+from domain import PhysicalLocation
 from domain.entities.borrower import Borrower
 from domain.entities.libraries.simple_library import SimpleLibrary
 from domain.entities.loan import Loan
@@ -98,7 +99,7 @@ def simple_library(person):
         library_id=ID.generate(),
         name="Test Simple Library",
         administrator=person,
-        location=MagicMock(spec=Location),
+        location=MagicMock(spec=PhysicalLocation),
         waiting_list_type=WaitingListType.FIRST_COME_FIRST_SERVE,
         waiting_lists_by_item_id={},
         max_fines_before_suspension=Money(

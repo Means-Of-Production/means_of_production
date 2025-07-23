@@ -1,7 +1,9 @@
 from datetime import datetime
 from typing import Iterable
 
-from domain import Location
+from pydantic import PrivateAttr
+
+from domain import Location, PhysicalLocation
 from domain.entities.borrower import Borrower
 from domain.entities.lenders.lender import Lender
 from domain.entities.libraries.library import Library
@@ -16,10 +18,8 @@ from domain.value_items.exceptions import (
 
 
 class SimpleLibrary(Library, Lender):
-    library_id: ID
-    name: str
-    administrator: Person
-    _items: list[Thing] = []
+    _items: list[Thing] = PrivateAttr(default_factory=list)
+    location: PhysicalLocation
 
     @property
     def entity_id(self) -> ID:
