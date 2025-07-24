@@ -24,6 +24,8 @@ tags:
     description: Basic library methods
   - name: inventory
     description: items and inventory of items
+  - name: search
+    description: allows search capability
 paths:
   /library:
     get:
@@ -152,7 +154,43 @@ paths:
             type: boolean
             default: true
             description: If true, only list items which are currently available to borrow
+          in: query
       responses:
+        200:
+          description: successful
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Thing"
+  /things/search/{search_term}:
+    get:
+      description: search for items by title, etc
+      tags:
+        - inventory
+        - search
+      parameters:
+        - name: search_term
+          in: path
+          schema:
+            type: string
+          required: true
+        - name: available
+          schema:
+            type: boolean
+            default: true
+            description: If true, only list items which are currently available to borrow
+          in: query
+      responses:
+        200:
+          description: successful
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Thing"
 
 components:
   schemas:
@@ -358,9 +396,71 @@ components:
         - default_loan_time
         - mop_server_address
 
+    ThingTitle:
+      type: object
+      description: The title and identifiers of a thing
+      properties:
+        name:
+          type: string
+          description: The name of the thing
+        upc:
+          type: string
+          nullable: true
+          description: Universal Product Code (if applicable)
+        isbn:
+          type: string
+          nullable: true
+          description: International Standard Book Number (if applicable)
+        description:
+          type: string
+          nullable: true
+          description: A brief description of the thing
+      required:
+        - name
+
     Thing:
       type: object
       description: An item that can be borrowed
+      properties:
+        thing_id:
+          type: string
+          format: uuid
+          description: A unique identifier for the thing
+        title:
+          $ref: '#/components/schemas/ThingTitle'
+        description:
+          type: string
+          nullable: true
+          description: A detailed description of the thing
+        owner_id:
+          type: string
+          format: uuid
+          description: The ID of the owner of the thing
+        storage_location:
+          $ref: '#/components/schemas/PhysicalLocation'
+        image_urls:
+          type: array
+          items:
+            type: string
+            format: uri
+          description: URLs of images of the thing
+        purchase_cost:
+          $ref: '#/components/schemas/Money'
+          nullable: true
+        status:
+          type: string
+          description: The status of a thing
+          enum:
+            - READY
+            - BORROWED
+            - DAMAGED
+            - RESERVED
+      required:
+        - thing_id
+        - title
+        - owner_id
+        - storage_location
+        - status
 
     Reservation:
       type: object
