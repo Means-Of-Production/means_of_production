@@ -149,11 +149,15 @@ paths:
       tags:
         - inventory
       parameters:
-        - name: available
+        - name: status
           schema:
-            type: boolean
-            default: true
-            description: If true, only list items which are currently available to borrow
+            type: string
+            enum:
+              - READY
+              - BORROWED
+              - DAMAGED
+              - RESERVED
+              - ANY
           in: query
       responses:
         200:
@@ -176,11 +180,15 @@ paths:
           schema:
             type: string
           required: true
-        - name: available
+        - name: status
           schema:
-            type: boolean
-            default: true
-            description: If true, only list items which are currently available to borrow
+            type: string
+            enum:
+              - READY
+              - BORROWED
+              - DAMAGED
+              - RESERVED
+              - ANY
           in: query
       responses:
         200:
