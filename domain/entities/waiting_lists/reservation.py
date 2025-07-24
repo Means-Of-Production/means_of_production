@@ -1,4 +1,5 @@
 from datetime import datetime
+from pydantic import PrivateAttr
 
 from domain.entities.borrower import Borrower
 from domain.entities.entity import Entity
@@ -14,7 +15,13 @@ class Reservation(Entity):
     holder: Borrower
     item: Thing
     good_until: datetime
-    status: ReservationStatus = ReservationStatus.ASSIGNED
+
+    _status: ReservationStatus = PrivateAttr(default=ReservationStatus.ASSIGNED)
+
+    @property
+    def status(self) -> ReservationStatus:
+        """Read-only access to the reservation status."""
+        return self._status
 
     @property
     def entity_id(self) -> ID:
@@ -23,25 +30,21 @@ class Reservation(Entity):
     def transition_to(self, new_status: ReservationStatus) -> None:
         valid_next_status = []
 
-        if self.status == ReservationStatus.ASSIGNED:
+        if self._status == ReservationStatus.ASSIGNED:
             valid_next_status = [
                 ReservationStatus.BORROWER_NOTIFIED,
                 ReservationStatus.CANCELLED,
             ]
-        elif self.status == ReservationStatus.BORROWER_NOTIFIED:
+        elif self._status == ReservationStatus.BORROWER_NOTIFIED:
             valid_next_status = [
                 ReservationStatus.BORROWED,
                 ReservationStatus.EXPIRED,
                 ReservationStatus.CANCELLED,
             ]
-        elif self.status == ReservationStatus.BORROWED:
-            valid_next_status = []
-        elif self.status == ReservationStatus.EXPIRED:
-            valid_next_status = []
-        elif self.status == ReservationStatus.CANCELLED:
+        elif self._status in {ReservationStatus.BORROWED, ReservationStatus.EXPIRED, ReservationStatus.CANCELLED}:
             valid_next_status = []
 
         if new_status not in valid_next_status:
-            raise InvalidReservationStateTransitionError(self.status, new_status)
+            raise InvalidReservationStateTransitionError(self._status, new_status)
 
-        self.status = new_status
+        self._status = new_status
