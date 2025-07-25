@@ -20,14 +20,12 @@ class Reservation(Entity):
 
     @property
     def status(self) -> ReservationStatus:
-        """Read-only access to the reservation status."""
+        """Access the reservation status."""
         return self._status
 
-    @property
-    def entity_id(self) -> ID:
-        return self.reservation_id
-
-    def transition_to(self, new_status: ReservationStatus) -> None:
+    @status.setter
+    def status(self, new_status: ReservationStatus) -> None:
+        """Set reservation status with validation on allowed transitions."""
         valid_next_status = []
 
         if self._status == ReservationStatus.ASSIGNED:
@@ -41,10 +39,18 @@ class Reservation(Entity):
                 ReservationStatus.EXPIRED,
                 ReservationStatus.CANCELLED,
             ]
-        elif self._status in {ReservationStatus.BORROWED, ReservationStatus.EXPIRED, ReservationStatus.CANCELLED}:
+        elif self._status in {
+            ReservationStatus.BORROWED,
+            ReservationStatus.EXPIRED,
+            ReservationStatus.CANCELLED,
+        }:
             valid_next_status = []
 
         if new_status not in valid_next_status:
             raise InvalidReservationStateTransitionError(self._status, new_status)
 
         self._status = new_status
+
+    @property
+    def entity_id(self) -> ID:
+        return self.reservation_id

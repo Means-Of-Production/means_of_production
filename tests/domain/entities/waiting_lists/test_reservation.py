@@ -28,14 +28,13 @@ def sample_item():
         description="A book about Python best practices.",
         owner_id=ID.generate(),
         storage_location=Location(name="Main Branch", latitude=0.0, longitude=0.0),
-        purchase_cost=Money(amount=30, currency_name="USD"), # type: ignore
+        purchase_cost=Money(amount=30, currency_name="USD"),  # type: ignore
         image_urls=[],
     )
 
 
 @pytest.fixture
 def new_reservation(sample_borrower, sample_item):
-    # Create a fresh reservation with default ASSIGNED status
     return Reservation(
         reservation_id=ID.generate(),
         holder=sample_borrower,
@@ -53,59 +52,58 @@ def test_reservation_initial_state(new_reservation, sample_borrower, sample_item
 
 def test_full_lifecycle_success(new_reservation):
     # ASSIGNED -> BORROWER_NOTIFIED
-    new_reservation.transition_to(ReservationStatus.BORROWER_NOTIFIED)
+    new_reservation.status = ReservationStatus.BORROWER_NOTIFIED
     assert new_reservation.status == ReservationStatus.BORROWER_NOTIFIED
 
     # BORROWER_NOTIFIED -> BORROWED
-    new_reservation.transition_to(ReservationStatus.BORROWED)
+    new_reservation.status = ReservationStatus.BORROWED
     assert new_reservation.status == ReservationStatus.BORROWED
 
-    # Once borrowed, can't notify again or cancel - expect errors
+    # Invalid transitions from BORROWED
     with pytest.raises(InvalidReservationStateTransitionError):
-        new_reservation.transition_to(ReservationStatus.BORROWER_NOTIFIED)
+        new_reservation.status = ReservationStatus.BORROWER_NOTIFIED
     with pytest.raises(InvalidReservationStateTransitionError):
-        new_reservation.transition_to(ReservationStatus.CANCELLED)
+        new_reservation.status = ReservationStatus.CANCELLED
 
 
 def test_expire_and_cancel_flows(new_reservation):
-    # ASSIGNED -> CANCELLED directly allowed
-    new_reservation.transition_to(ReservationStatus.CANCELLED)
+    # ASSIGNED -> CANCELLED
+    new_reservation.status = ReservationStatus.CANCELLED
     assert new_reservation.status == ReservationStatus.CANCELLED
 
     # Reset for next test
     new_reservation._status = ReservationStatus.ASSIGNED
 
-    # ASSIGNED -> BORROWER_NOTIFIED -> CANCELLED allowed
-    new_reservation.transition_to(ReservationStatus.BORROWER_NOTIFIED)
-    new_reservation.transition_to(ReservationStatus.CANCELLED)
+    # ASSIGNED -> BORROWER_NOTIFIED -> CANCELLED
+    new_reservation.status = ReservationStatus.BORROWER_NOTIFIED
+    new_reservation.status = ReservationStatus.CANCELLED
     assert new_reservation.status == ReservationStatus.CANCELLED
 
     # Reset for expiry test
     new_reservation._status = ReservationStatus.BORROWER_NOTIFIED
 
-    # BORROWER_NOTIFIED -> EXPIRED allowed
-    new_reservation.transition_to(ReservationStatus.EXPIRED)
+    # BORROWER_NOTIFIED -> EXPIRED
+    new_reservation.status = ReservationStatus.EXPIRED
     assert new_reservation.status == ReservationStatus.EXPIRED
 
 
 def test_invalid_status_transitions(new_reservation):
-    # Try invalid transition ASSIGNED -> BORROWED directly (skip notification)
+    # Invalid: ASSIGNED -> BORROWED (skip BORROWER_NOTIFIED)
     with pytest.raises(InvalidReservationStateTransitionError):
-        new_reservation.transition_to(ReservationStatus.BORROWED)
+        new_reservation.status = ReservationStatus.BORROWED
 
-    # Move to BORROWED
-    new_reservation.transition_to(ReservationStatus.BORROWER_NOTIFIED)
-    new_reservation.transition_to(ReservationStatus.BORROWED)
+    # Valid: ASSIGNED -> BORROWER_NOTIFIED -> BORROWED
+    new_reservation.status = ReservationStatus.BORROWER_NOTIFIED
+    new_reservation.status = ReservationStatus.BORROWED
 
-    # Try invalid transition BORROWED -> ASSIGNED
+    # Invalid: BORROWED -> ASSIGNED
     with pytest.raises(InvalidReservationStateTransitionError):
-        new_reservation.transition_to(ReservationStatus.ASSIGNED)
+        new_reservation.status = ReservationStatus.ASSIGNED
 
-    # Try invalid transition BORROWED -> CANCELLED
+    # Invalid: BORROWED -> CANCELLED
     with pytest.raises(InvalidReservationStateTransitionError):
-        new_reservation.transition_to(ReservationStatus.CANCELLED)
+        new_reservation.status = ReservationStatus.CANCELLED
 
 
 def test_good_until_date_in_future(new_reservation):
-    # Ensure good_until is always in the future at creation
     assert new_reservation.good_until > datetime.utcnow()
