@@ -75,6 +75,11 @@ paths:
             schema:
               oneOf:
                 - $ref: "#/components/schemas/SimpleLibrary"
+      responses:
+        200:
+          description: successfully created
+        409:
+          description: library already exists (usually name)
 components:
   schemas:
     Person:
@@ -244,7 +249,6 @@ components:
           $ref: '#/components/schemas/Thing'
         current_reservation:
           $ref: '#/components/schemas/Reservation'
-          nullable: true
         expired_reservations:
           type: array
           items:
