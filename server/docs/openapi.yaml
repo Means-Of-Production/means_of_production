@@ -143,6 +143,97 @@ paths:
                 oneOf:
                   - $ref: "#/components/schemas/SimpleLibrary"
                   - $ref: "#/components/schemas/DistributedLibrary"
+  /library/{library_id}/things:
+    get:
+      description: returns a list of all items the user has access to within the specified library
+      tags:
+        - inventory
+        - library
+      parameters:
+        - name: library_id
+          in: path
+          required: true
+          description: ID of the library
+          schema:
+            type: string
+            format: uuid
+        - name: status
+          schema:
+            type: string
+            enum:
+              - READY
+              - BORROWED
+              - DAMAGED
+              - RESERVED
+              - ANY
+          in: query
+      responses:
+        200:
+          description: successful
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Thing"
+  /library/{library_id}/things/{thing_id}:
+    get:
+      description: returns specific thing in context of the library
+      tags:
+        - inventory
+        - library
+      parameters:
+        - name: library_id
+          in: path
+          required: true
+          description: ID of the library
+          schema:
+            type: string
+            format: uuid
+        - name: thing_id
+          in: path
+          required: true
+          description: ID of the thing
+          schema:
+            type: string
+            format: uuid
+        - name: status
+          schema:
+            type: string
+            enum:
+              - READY
+              - BORROWED
+              - DAMAGED
+              - RESERVED
+              - ANY
+          in: query
+      responses:
+        200:
+          description: successful
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Thing"
+    get:
+      description: returns specific thing in context of the library
+      tags:
+        - inventory
+        - library
+      parameters:
+        - name: library_id
+          in: path
+          required: true
+          description: ID of the library
+          schema:
+            type: string
+            format: uuid
+        - name: thing_id
+          in: path
+          required: true
+          description: ID of the thing
+          schema:
+            type: string
+            format: uuid
   /things:
     get:
       description: returns a list of all items the user has access to
