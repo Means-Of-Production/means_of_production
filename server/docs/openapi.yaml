@@ -214,8 +214,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Thing"
-    get:
-      description: returns specific thing in context of the library
+    put:
+      description: update the status of a thing via the library
       tags:
         - inventory
         - library
@@ -234,9 +234,23 @@ paths:
           schema:
             type: string
             format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Thing"
+      responses:
+        200:
+          description: Updated thing
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Thing"
+        405:
+          description: Attempt to change fields which cannot be changed
   /things:
     get:
-      description: returns a list of all items the user has access to
+      description: returns a list of all items the user has access to, across any libraries
       tags:
         - inventory
       parameters:
@@ -249,6 +263,12 @@ paths:
               - DAMAGED
               - RESERVED
               - ANY
+          in: query
+        - name: max_distance
+          description: max distance the item is in km
+          schema:
+            type: number
+            required: false
           in: query
       responses:
         200:
