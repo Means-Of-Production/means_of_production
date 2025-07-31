@@ -27,5 +27,5 @@ class Distance(BaseModel):
 
     @property
     def miles(self) -> float:
-        return self.kilometers * 1.60934
+        return self.kilometers / 1.60934
 
