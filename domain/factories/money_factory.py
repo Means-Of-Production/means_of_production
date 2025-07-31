@@ -19,7 +19,7 @@ class MoneyFactory(BaseModel):
     def total(self, amounts: list[Money]) -> Money:
         if not amounts:
             return self.empty()
-        total = MoneyFactory.empty(amounts[0].currency_name)
+        total = self.empty(amounts[0].currency_name)
         for amount in amounts:
             total.amount += amount.amount
         return total

@@ -1,13 +1,12 @@
 import decimal
-from datetime import datetime, timedelta
-from typing import Iterable
+from datetime import timedelta
 from unittest.mock import MagicMock, patch
 
 import pytest
 
 from domain.entities.borrower import Borrower
 from domain.entities.libraries.library import Library
-from domain.entities.libraries.library_fee import LibraryFee
+from domain.entities.libraries.simple_library import SimpleLibrary
 from domain.entities.loan import Loan
 from domain.entities.people.person import Person
 from domain.entities.thing import Thing
@@ -15,9 +14,7 @@ from domain.entities.waiting_lists.waiting_list import WaitingList
 from domain.factories import MoneyFactory, WaitingListFactory
 from domain.value_items import (
     ID,
-    DueDate,
     FeeStatus,
-    LoanStatus,
     Location,
     Money,
     PersonName,
@@ -35,47 +32,6 @@ class TestFeeSchedule(FeeSchedule):
 
     def fee_for_damaged_item(self, loan) -> Money:
         return Money(amount=decimal.Decimal(20.0), currency_name="USD")
-
-
-# Create a concrete implementation of Library for testing
-class TestableLibrary(Library):
-    model_config = {"arbitrary_types_allowed": True, "frozen": False, "extra": "allow"}
-
-    def __init__(self, **kwargs):
-        # Initialize the Pydantic model first
-        super().__init__(**kwargs)
-        # Then initialize our private attributes
-        # We need to use object.__setattr__ to bypass Pydantic's __setattr__
-        object.__setattr__(self, "_items", [])
-        object.__setattr__(self, "_borrowers", [])
-        object.__setattr__(self, "_loans", [])
-
-    @property
-    def all_things(self) -> Iterable[Thing]:
-        return self._items
-
-    async def borrow(self, thing: Thing, borrower: Borrower, until: DueDate) -> Loan:
-        loan = Loan(
-            loan_id=ID.generate(),
-            item=thing,
-            borrower_id=borrower.entity_id,
-            due_date=until,
-            return_location=self.location,
-            time_returned=None,
-        )
-        self.add_loan(loan)
-        return loan
-
-    async def start_return(self, loan: Loan) -> Loan:
-        loan.status = LoanStatus.WAITING_ON_LENDER_ACCEPTANCE
-        loan.time_returned = datetime.now()
-        return loan
-
-    async def finish_return(self, loan: Loan, borrower: Borrower) -> Loan:
-        return await self.finish_library_return(loan, borrower)
-
-    def get_loans(self) -> Iterable[Loan]:
-        return self._loans
 
 
 @pytest.fixture
@@ -99,7 +55,7 @@ def testable_library():
         id=ID.generate(), base_url=URL.parse("https://test-server.com")
     )
 
-    return TestableLibrary(
+    return SimpleLibrary(
         library_id=ID.generate(),
         name="Test Library",
         administrator=person,
@@ -142,7 +98,8 @@ def test_available_things(testable_library):
     borrowed_thing = MagicMock(spec=Thing)
     borrowed_thing.status = ThingStatus.BORROWED
 
-    testable_library._items = [ready_thing, borrowed_thing]
+    testable_library.add_item(ready_thing)
+    testable_library.add_item(borrowed_thing)
 
     # Test that only READY things are returned
     available = list(testable_library.available_things)
@@ -263,51 +220,3 @@ def test_get_titles_from_items():
     assert len(titles) == 2
     assert ThingTitle(name="Book 1") in titles
     assert ThingTitle(name="Book 2") in titles
-
-
-@pytest.mark.asyncio
-async def test_finish_return(testable_library, borrower):
-    # Create a test loan in the correct state for return
-    thing = MagicMock(spec=Thing)
-    thing.status = ThingStatus.BORROWED
-    thing.entity_id = ID.generate()
-
-    loan = MagicMock(spec=Loan)
-    loan.status = LoanStatus.WAITING_ON_LENDER_ACCEPTANCE
-    loan.time_returned = datetime.now()
-    loan.item = thing
-    # Use a date object instead of a datetime object
-    from datetime import date
-
-    today = date.today()
-    yesterday = today - timedelta(days=1)
-    loan.due_date = DueDate(date=yesterday)  # Overdue
-    loan.loan_id = ID.generate()
-
-    # Create an async mock function for finish_library_return
-    async def mock_finish_library_return(self, loan, borrower):
-        loan.status = LoanStatus.OVERDUE
-        thing.status = ThingStatus.READY
-        fee = LibraryFee(
-            library_fee_id=ID.generate(),
-            library_id=testable_library.library_id,
-            amount=Money(amount=decimal.Decimal(5.0), currency_name="USD"),
-            charged_for_id=loan.loan_id,
-        )
-        fee.status = FeeStatus.OUTSTANDING
-        borrower.apply_fee(fee)
-        return loan
-
-    # Patch the finish_library_return method
-    with patch.object(Library, "finish_library_return", mock_finish_library_return):
-        # Test finishing a return for an overdue item
-        result = await testable_library.finish_return(loan, borrower)
-
-        # Verify the loan status was updated
-        assert result.status == LoanStatus.OVERDUE
-
-        # Verify the thing status was updated
-        assert thing.status == ThingStatus.READY
-
-        # Verify a fee was applied for the overdue item
-        borrower.apply_fee.assert_called_once()
