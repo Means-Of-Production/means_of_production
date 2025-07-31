@@ -61,4 +61,4 @@ jobs:
       - name: Lint code and imports
         run: |
           source .venv/bin/activate
-          ruff check --extend-select I
+          ruff check

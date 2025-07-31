@@ -1,7 +1,7 @@
 from datetime import timedelta
 
-from freezegun import freeze_time
 import pytest
+from freezegun import freeze_time
 
 from domain.value_items import LoanStatus, ThingStatus
 

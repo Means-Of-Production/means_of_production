@@ -1,10 +1,11 @@
 from __future__ import annotations
 
-from math import radians, sin, cos, sqrt, atan2
+from math import atan2, cos, radians, sin, sqrt
+
 from pydantic import Field
 
-from domain.value_items.location.location import Location
 from domain.value_items.location.distance import Distance
+from domain.value_items.location.location import Location
 
 
 class PhysicalLocation(Location):

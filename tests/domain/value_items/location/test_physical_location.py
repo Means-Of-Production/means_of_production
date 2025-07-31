@@ -1,4 +1,5 @@
 import pytest
+
 from domain.value_items.location.physical_location import PhysicalLocation
 
 

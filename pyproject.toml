@@ -18,6 +18,10 @@ markers = [
     "ignore: marks tests to be ignored",
 ]
 
+[tool.ruff.lint]
+# Enable import sorting (I) by default
+extend-select = ["I"]
+
 [tool.ruff.lint.per-file-ignores]
 # ignore type annotation errors in test files
 "**/tests/**/*.py" = ["ANN"]
