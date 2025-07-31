@@ -34,10 +34,10 @@ from domain.value_items.fee_schedules.fee_schedule import FeeSchedule
 # Create a concrete implementation of FeeSchedule for testing
 class TestableFeeSchedule(FeeSchedule):
     def fee_for_overdue_item(self, loan) -> Money:
-        return Money(amount=decimal.Decimal(5.0), currency_name=Currency.USD)
+        return Money(amount=decimal.Decimal(5.0), currency=Currency.USD)
 
     def fee_for_damaged_item(self, loan) -> Money:
-        return Money(amount=decimal.Decimal(20.0), currency_name=Currency.USD)
+        return Money(amount=decimal.Decimal(20.0), currency=Currency.USD)
 
 
 @pytest.fixture
@@ -63,7 +63,7 @@ def simple_library(person):
         waiting_list_type=WaitingListType.FIRST_COME_FIRST_SERVE,
         waiting_lists_by_item_id={},
         max_fines_before_suspension=Money(
-            amount=decimal.Decimal(50.0), currency_name=Currency.USD
+            amount=decimal.Decimal(50.0), currency=Currency.USD
         ),
         fee_schedule=fee_schedule,
         money_factory=money_factory,

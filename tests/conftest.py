@@ -23,7 +23,7 @@ from domain.value_items.fee_schedules.per_day_fee_schedule import PerDayFeeSched
 @pytest.fixture
 def fee_schedule() -> FeeSchedule:
     return PerDayFeeSchedule(
-        daily_charge=Money(amount=decimal.Decimal(10.0), currency_name=Currency.USD),
+        daily_charge=Money(amount=decimal.Decimal(10.0), currency=Currency.USD),
     )
 
 
@@ -72,7 +72,7 @@ def item_one(simple_library, library_location) -> Thing:
         owner_id=simple_library.library_id,
         storage_location=library_location,
         image_urls=[],
-        purchase_cost=Money(amount=decimal.Decimal(10.0), currency_name=Currency.USD),
+        purchase_cost=Money(amount=decimal.Decimal(10.0), currency=Currency.USD),
     )
     item.status = ThingStatus.READY
     return item
@@ -91,7 +91,7 @@ def simple_library(
         location=library_location,
         waiting_list_type=WaitingListType.NONE,
         max_fines_before_suspension=Money(
-            amount=decimal.Decimal(100.0), currency_name=Currency.USD
+            amount=decimal.Decimal(100.0), currency=Currency.USD
         ),
         fee_schedule=fee_schedule,
         default_loan_time=timedelta(days=14),

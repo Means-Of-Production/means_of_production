@@ -71,12 +71,12 @@ def waiting_list(thing, backup_list):
 
 @pytest.fixture
 def money():
-    return Money(amount=decimal.Decimal(10.0), currency_name=Currency.EUR)
+    return Money(amount=decimal.Decimal(10.0), currency=Currency.EUR)
 
 
 @pytest.fixture
 def another_money():
-    return Money(amount=decimal.Decimal(20.0), currency_name=Currency.EUR)
+    return Money(amount=decimal.Decimal(20.0), currency=Currency.EUR)
 
 
 @pytest.fixture
@@ -307,7 +307,7 @@ def test_get_largest_amount(
     # Verify the sum of the bids is returned
     expected_amount = money.amount + another_money.amount
     assert largest_amount.amount == expected_amount
-    assert largest_amount.currency_name == money.currency_name
+    assert largest_amount.currency == money.currency
 
 
 def test_get_largest_amount_no_entity_id(waiting_list, money, borrower):
@@ -363,7 +363,7 @@ def test_cancel(waiting_list, borrower, backup_list):
 
     # Add a bid
     bid = AuctionBid(
-        amount_bid=Money(amount=decimal.Decimal(10.0), currency_name=Currency.USD),
+        amount_bid=Money(amount=decimal.Decimal(10.0), currency=Currency.USD),
         made_by=borrower,
         made_for=borrower,
     )
