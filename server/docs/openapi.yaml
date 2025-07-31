@@ -268,7 +268,7 @@ paths:
           description: max distance the item is in km
           schema:
             type: number
-            required: false
+          required: false
           in: query
       responses:
         200:
@@ -312,6 +312,10 @@ paths:
                   $ref: "#/components/schemas/Thing"
 
 components:
+  securitySchemes:
+    BasicAuth:
+      type: http
+      scheme: basic
   schemas:
     Person:
       type: object
