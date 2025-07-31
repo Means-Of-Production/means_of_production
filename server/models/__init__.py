@@ -6,7 +6,6 @@ from __future__ import annotations
 
 from .area import Area
 from .currency import Currency
-from .currency_name import CurrencyName
 from .distributed_library import DistributedLibrary
 from .fee_schedule import FeeSchedule
 from .library_get_response import LibraryGetResponse
@@ -31,29 +30,28 @@ from .waiting_list import WaitingList
 from .waiting_list_type import WaitingListType
 
 __all__ = [
-    'Area',
-    'Currency',
-    'CurrencyName',
-    'DistributedLibrary',
-    'FeeSchedule',
-    'LibraryGetResponse',
-    'LibraryLibraryIdGetResponse',
-    'LibraryLibraryIdPutResponse',
-    'LibraryLibraryIdThingsGetResponse',
-    'LibraryPostRequest',
-    'LibraryPostResponse',
-    'Money',
-    'Person',
-    'PhysicalLocation',
-    'Reservation',
-    'SimpleLibrary',
-    'Status',
-    'Status1',
-    'Symbol',
-    'Thing',
-    'ThingTitle',
-    'ThingsGetResponse',
-    'ThingsSearchSearchTermGetResponse',
-    'WaitingList',
-    'WaitingListType',
+    "Area",
+    "Currency",
+    "DistributedLibrary",
+    "FeeSchedule",
+    "LibraryGetResponse",
+    "LibraryLibraryIdGetResponse",
+    "LibraryLibraryIdPutResponse",
+    "LibraryLibraryIdThingsGetResponse",
+    "LibraryPostRequest",
+    "LibraryPostResponse",
+    "Money",
+    "Person",
+    "PhysicalLocation",
+    "Reservation",
+    "SimpleLibrary",
+    "Status",
+    "Status1",
+    "Symbol",
+    "Thing",
+    "ThingTitle",
+    "ThingsGetResponse",
+    "ThingsSearchSearchTermGetResponse",
+    "WaitingList",
+    "WaitingListType",
 ]

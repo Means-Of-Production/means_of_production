@@ -12,7 +12,7 @@ from pydantic import AnyUrl, BaseModel, EmailStr, Field
 
 
 class Person(BaseModel):
-    person_id: UUID = Field(..., description='A unique identifier for the person')
+    person_id: UUID = Field(..., description="A unique identifier for the person")
     salutation: Optional[str] = None
     first_name: str
     middle_name: Optional[str] = None
@@ -22,35 +22,35 @@ class Person(BaseModel):
 
 
 class PhysicalLocation(BaseModel):
-    latitude: Optional[float] = Field(None, description='Latitude coordinate')
-    longitude: Optional[float] = Field(None, description='Longitude coordinate')
-    street_address: str = Field(..., description='Street address')
-    city: str = Field(..., description='City')
-    state: str = Field(..., description='State or province')
-    zip_code: str = Field(..., description='Postal or ZIP code')
-    country: str = Field(..., description='Country')
+    latitude: Optional[float] = Field(None, description="Latitude coordinate")
+    longitude: Optional[float] = Field(None, description="Longitude coordinate")
+    street_address: str = Field(..., description="Street address")
+    city: str = Field(..., description="City")
+    state: str = Field(..., description="State or province")
+    zip_code: str = Field(..., description="Postal or ZIP code")
+    country: str = Field(..., description="Country")
 
 
 class WaitingListType(Enum):
-    NONE = 'NONE'
-    QUADRATIC_WAITING_LIST = 'QUADRATIC_WAITING_LIST'
-    FIRST_COME_FIRST_SERVE = 'FIRST_COME_FIRST_SERVE'
+    NONE = "NONE"
+    QUADRATIC_WAITING_LIST = "QUADRATIC_WAITING_LIST"
+    FIRST_COME_FIRST_SERVE = "FIRST_COME_FIRST_SERVE"
 
 
 class CurrencyName(Enum):
-    Euro = 'Euro'
-    US_Dollar = 'US Dollar'
-    Labor_Token = 'Labor Token'
+    Euro = "Euro"
+    US_Dollar = "US Dollar"
+    Labor_Token = "Labor Token"
 
 
 class Symbol(Enum):
-    EUR = 'EUR'
-    USD = 'USD'
-    LABOR = 'LABOR'
+    EUR = "EUR"
+    USD = "USD"
+    LABOR = "LABOR"
 
 
 class Money(BaseModel):
-    amount: float = Field(..., description='Decimal amount of money')
+    amount: float = Field(..., description="Decimal amount of money")
     currency_name: CurrencyName
     symbol: Optional[Symbol] = None
 
@@ -60,14 +60,14 @@ class FeeSchedule(BaseModel):
 
 
 class Currency(Enum):
-    EUR = 'EUR'
-    USD = 'USD'
-    LABOR_TOKEN = 'LABOR_TOKEN'
+    EUR = "EUR"
+    USD = "USD"
+    LABOR_TOKEN = "LABOR_TOKEN"
 
 
 class SimpleLibrary(BaseModel):
     library_id: Optional[UUID] = Field(
-        None, description='A unique identifier for the library'
+        None, description="A unique identifier for the library"
     )
     name: str
     administrator: Person
@@ -79,23 +79,23 @@ class SimpleLibrary(BaseModel):
         ...,
         description="Duration of the default loan period (ISO 8601 duration format, e.g., 'P14D' for 14 days)",
     )
-    mop_server_address: AnyUrl = Field(..., description='URL address of the MOP server')
+    mop_server_address: AnyUrl = Field(..., description="URL address of the MOP server")
     public_url: Optional[AnyUrl] = None
 
 
 class Area(BaseModel):
     center: PhysicalLocation
-    radius: float = Field(..., description='Radius of the area in kilometers')
+    radius: float = Field(..., description="Radius of the area in kilometers")
 
 
 class DistributedLibrary(BaseModel):
     library_id: Optional[UUID] = Field(
-        None, description='A unique identifier for the library'
+        None, description="A unique identifier for the library"
     )
     name: str
     administrator: Person
     area: Area = Field(
-        ..., description='The physical area covered by this distributed library'
+        ..., description="The physical area covered by this distributed library"
     )
     waiting_list_type: WaitingListType
     max_fines_before_suspension: Money
@@ -104,43 +104,43 @@ class DistributedLibrary(BaseModel):
         ...,
         description="Duration of the default loan period (ISO 8601 duration format, e.g., 'P14D' for 14 days)",
     )
-    mop_server_address: AnyUrl = Field(..., description='URL address of the MOP server')
+    mop_server_address: AnyUrl = Field(..., description="URL address of the MOP server")
     public_url: Optional[AnyUrl] = None
 
 
 class ThingTitle(BaseModel):
-    name: str = Field(..., description='The name of the thing')
+    name: str = Field(..., description="The name of the thing")
     upc: Optional[str] = Field(
-        None, description='Universal Product Code (if applicable)'
+        None, description="Universal Product Code (if applicable)"
     )
     isbn: Optional[str] = Field(
-        None, description='International Standard Book Number (if applicable)'
+        None, description="International Standard Book Number (if applicable)"
     )
     description: Optional[str] = Field(
-        None, description='A brief description of the thing'
+        None, description="A brief description of the thing"
     )
 
 
 class Status(Enum):
-    READY = 'READY'
-    BORROWED = 'BORROWED'
-    DAMAGED = 'DAMAGED'
-    RESERVED = 'RESERVED'
+    READY = "READY"
+    BORROWED = "BORROWED"
+    DAMAGED = "DAMAGED"
+    RESERVED = "RESERVED"
 
 
 class Thing(BaseModel):
-    thing_id: UUID = Field(..., description='A unique identifier for the thing')
+    thing_id: UUID = Field(..., description="A unique identifier for the thing")
     title: ThingTitle
     description: Optional[str] = Field(
-        None, description='A detailed description of the thing'
+        None, description="A detailed description of the thing"
     )
-    owner_id: UUID = Field(..., description='The ID of the owner of the thing')
+    owner_id: UUID = Field(..., description="The ID of the owner of the thing")
     storage_location: PhysicalLocation
     image_urls: Optional[List[AnyUrl]] = Field(
-        None, description='URLs of images of the thing'
+        None, description="URLs of images of the thing"
     )
     purchase_cost: Optional[Money] = None
-    status: Status = Field(..., description='The status of a thing')
+    status: Status = Field(..., description="The status of a thing")
 
 
 class Reservation(BaseModel):
@@ -149,7 +149,7 @@ class Reservation(BaseModel):
 
 class WaitingList(BaseModel):
     waiting_list_id: UUID = Field(
-        ..., description='A unique identifier for the waiting list'
+        ..., description="A unique identifier for the waiting list"
     )
     item: Thing
     current_reservation: Optional[Reservation] = None
@@ -177,11 +177,11 @@ class LibraryLibraryIdPutResponse(BaseModel):
 
 
 class Status1(Enum):
-    READY = 'READY'
-    BORROWED = 'BORROWED'
-    DAMAGED = 'DAMAGED'
-    RESERVED = 'RESERVED'
-    ANY = 'ANY'
+    READY = "READY"
+    BORROWED = "BORROWED"
+    DAMAGED = "DAMAGED"
+    RESERVED = "RESERVED"
+    ANY = "ANY"
 
 
 class LibraryLibraryIdThingsGetResponse(BaseModel):

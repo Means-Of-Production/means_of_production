@@ -4,13 +4,14 @@
 
 from __future__ import annotations
 
-from typing import Optional, Union
+from typing import Annotated, Optional, Union
 from uuid import UUID
 
 from fastapi import FastAPI
 from pydantic import conint
 
-from .models import (
+from server.models import (
+    DistributedLibrary,
     LibraryGetResponse,
     LibraryLibraryIdGetResponse,
     LibraryLibraryIdPutResponse,
@@ -24,42 +25,42 @@ from .models import (
 )
 
 app = FastAPI(
-    title='MeansOfProduction API',
-    description='This server allows clients to use the MeansOfProduction protocol and servers.  MeansOfProduction\npowers libraries, both traditional and virtual/distributed, as well as allowing cross functionality\nbetween other supported platforms.\n\nSome useful links:\n- [Project Site](https://meansofpo.org)',
-    termsOfService='https://swagger.io/terms/',
-    contact={'email': 'admin@meansofp.org'},
-    license={'name': 'MIT'},
-    version='0.0.1',
-    servers=[{'url': 'https://meansofp.org/api/v1'}],
+    title="MeansOfProduction API",
+    description="This server allows clients to use the MeansOfProduction protocol and servers.  MeansOfProduction\npowers libraries, both traditional and virtual/distributed, as well as allowing cross functionality\nbetween other supported platforms.\n\nSome useful links:\n- [Project Site](https://meansofpo.org)",
+    termsOfService="https://swagger.io/terms/",
+    contact={"email": "admin@meansofp.org"},
+    license={"name": "MIT"},
+    version="0.0.1",
+    servers=[{"url": "https://meansofp.org/api/v1"}],
 )
 
 
 @app.get(
-    '/library',
+    "/library",
     response_model=None,
-    responses={'200': {'model': LibraryGetResponse}},
-    tags=['library'],
+    responses={"200": {"model": LibraryGetResponse}},
+    tags=["library"],
 )
 def get_library(
     active: Optional[bool] = True,
-    max_items: Optional[conint(ge=1, le=100)] = 20,
-    skip: Optional[conint(ge=0)] = 0,
+    max_items: Optional[Annotated[int, conint(ge=1, le=100)]] = 20,
+    skip: Optional[Annotated[int, conint(ge=0)]] = 0,
 ) -> Optional[LibraryGetResponse]:
     pass
 
 
 @app.post(
-    '/library',
+    "/library",
     response_model=None,
     responses={
-        '200': {'model': LibraryPostResponse},
-        '409': {'model': LibraryPostResponse1},
+        "200": {"model": LibraryPostResponse},
+        "409": {"model": LibraryPostResponse},
     },
-    tags=['library'],
+    tags=["library"],
 )
 def post_library(
     body: Union[SimpleLibrary, DistributedLibrary],
-) -> Optional[Union[LibraryPostResponse, LibraryPostResponse1]]:
+) -> Optional[Union[LibraryPostResponse, LibraryPostResponse]]:
     """
     creates a new simple library
     """
@@ -67,80 +68,80 @@ def post_library(
 
 
 @app.get(
-    '/library/{library_id}',
+    "/library/{library_id}",
     response_model=None,
-    responses={'200': {'model': LibraryLibraryIdGetResponse}},
-    tags=['library'],
+    responses={"200": {"model": LibraryLibraryIdGetResponse}},
+    tags=["library"],
 )
 def get_library_library_id(library_id: UUID) -> Optional[LibraryLibraryIdGetResponse]:
     pass
 
 
 @app.put(
-    '/library/{library_id}',
+    "/library/{library_id}",
     response_model=None,
-    responses={'200': {'model': LibraryLibraryIdPutResponse}},
-    tags=['library'],
+    responses={"200": {"model": LibraryLibraryIdPutResponse}},
+    tags=["library"],
 )
 def put_library_library_id(library_id: UUID) -> Optional[LibraryLibraryIdPutResponse]:
     pass
 
 
 @app.get(
-    '/library/{library_id}/things',
+    "/library/{library_id}/things",
     response_model=None,
-    responses={'200': {'model': LibraryLibraryIdThingsGetResponse}},
-    tags=['inventory', 'library'],
+    responses={"200": {"model": LibraryLibraryIdThingsGetResponse}},
+    tags=["inventory", "library"],
 )
 def get_library_library_id_things(
-    library_id: UUID, status: Optional[Status1] = None
+    library_id: UUID, status: Status1 | None = None
 ) -> Optional[LibraryLibraryIdThingsGetResponse]:
     pass
 
 
 @app.get(
-    '/library/{library_id}/things/{thing_id}',
+    "/library/{library_id}/things/{thing_id}",
     response_model=None,
-    responses={'200': {'model': Thing}},
-    tags=['inventory', 'library'],
+    responses={"200": {"model": Thing}},
+    tags=["inventory", "library"],
 )
 def get_library_library_id_things_thing_id(
-    library_id: UUID, thing_id: UUID = ..., status: Optional[Status1] = None
+    library_id: UUID, thing_id: UUID, status: Status1 | None = None
 ) -> Optional[Thing]:
     pass
 
 
 @app.put(
-    '/library/{library_id}/things/{thing_id}',
+    "/library/{library_id}/things/{thing_id}",
     response_model=None,
-    responses={'200': {'model': Thing}},
-    tags=['inventory', 'library'],
+    responses={"200": {"model": Thing}},
+    tags=["inventory", "library"],
 )
 def put_library_library_id_things_thing_id(
-    library_id: UUID, thing_id: UUID = ..., body: Thing = None
-) -> Optional[Thing]:
+    library_id: UUID, thing_id: UUID, body: Thing | None = None
+) -> Thing | None:
     pass
 
 
 @app.get(
-    '/things',
+    "/things",
     response_model=None,
-    responses={'200': {'model': ThingsGetResponse}},
-    tags=['inventory'],
+    responses={"200": {"model": ThingsGetResponse}},
+    tags=["inventory"],
 )
 def get_things(
-    status: Optional[Status1] = None, max_distance: Optional[float] = None
+    status: Status1 | None = None, max_distance: Optional[float] = None
 ) -> Optional[ThingsGetResponse]:
     pass
 
 
 @app.get(
-    '/things/search/{search_term}',
+    "/things/search/{search_term}",
     response_model=None,
-    responses={'200': {'model': ThingsSearchSearchTermGetResponse}},
-    tags=['inventory', 'search'],
+    responses={"200": {"model": ThingsSearchSearchTermGetResponse}},
+    tags=["inventory", "search"],
 )
 def get_things_search_search_term(
-    search_term: str, status: Optional[Status1] = None
+    search_term: str, status: Status1 | None = None
 ) -> Optional[ThingsSearchSearchTermGetResponse]:
     pass

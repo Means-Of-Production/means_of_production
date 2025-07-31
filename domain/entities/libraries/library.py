@@ -21,7 +21,6 @@ from domain.value_items import (
     FeeSchedule,
     FeeStatus,
     LoanStatus,
-    Location,
     Money,
     ThingStatus,
     ThingTitle,

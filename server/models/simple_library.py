@@ -12,7 +12,7 @@ from .waiting_list_type import WaitingListType
 
 class SimpleLibrary(BaseModel):
     library_id: Optional[UUID] = Field(
-        None, description='A unique identifier for the library'
+        None, description="A unique identifier for the library"
     )
     name: str
     administrator: Person
@@ -24,5 +24,5 @@ class SimpleLibrary(BaseModel):
         ...,
         description="Duration of the default loan period (ISO 8601 duration format, e.g., 'P14D' for 14 days)",
     )
-    mop_server_address: AnyUrl = Field(..., description='URL address of the MOP server')
+    mop_server_address: AnyUrl = Field(..., description="URL address of the MOP server")
     public_url: Optional[AnyUrl] = None

@@ -14,7 +14,7 @@ from domain.entities.waiting_lists.first_come_first_serve_waiting_list import (
     FirstComeFirstServeWaitingList,
 )
 from domain.entities.waiting_lists.reservation import Reservation
-from domain.value_items import ID, Money, ReservationStatus, ThingTitle
+from domain.value_items import ID, Currency, Money, ReservationStatus, ThingTitle
 from domain.value_items.exceptions import EntityNotAssignedIdError
 
 
@@ -71,12 +71,12 @@ def waiting_list(thing, backup_list):
 
 @pytest.fixture
 def money():
-    return Money(amount=decimal.Decimal(10.0), currency_name="EUR")
+    return Money(amount=decimal.Decimal(10.0), currency_name=Currency.EUR)
 
 
 @pytest.fixture
 def another_money():
-    return Money(amount=decimal.Decimal(20.0), currency_name="EUR")
+    return Money(amount=decimal.Decimal(20.0), currency_name=Currency.EUR)
 
 
 @pytest.fixture
@@ -363,7 +363,7 @@ def test_cancel(waiting_list, borrower, backup_list):
 
     # Add a bid
     bid = AuctionBid(
-        amount_bid=Money(amount=decimal.Decimal(10.0), currency_name="USD"),
+        amount_bid=Money(amount=decimal.Decimal(10.0), currency_name=Currency.USD),
         made_by=borrower,
         made_for=borrower,
     )

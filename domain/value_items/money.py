@@ -7,20 +7,22 @@ from pydantic import BaseModel
 
 from domain.value_items.exceptions import CurrencyMismatchException
 
-class CurrencyName(Enum):
-    Euro = 'Euro'
-    US_Dollar = 'US Dollar'
-    Labor_Token = 'Labor Token'
+
+class Currency(Enum):
+    EUR = "Euro"
+    USD = "US Dollar"
+    HOUR = "Labor Token"
+
 
 class Money(BaseModel):
     model_config = {"frozen": True}
     amount: decimal.Decimal
-    currency_name: CurrencyName
+    currency_name: Currency
     symbol: str | None = None
 
     @property
     def dollars(self) -> decimal.Decimal:
-        if self.currency_name != "USD":
+        if self.currency_name != Currency.USD:
             raise CurrencyMismatchException(
                 "Can only convert to dollars if currency is USD"
             )

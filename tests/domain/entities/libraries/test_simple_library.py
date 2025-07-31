@@ -15,9 +15,9 @@ from domain.factories import MoneyFactory
 from domain.value_items import (
     ID,
     URL,
+    Currency,
     DueDate,
     LoanStatus,
-    Location,
     Money,
     PersonName,
     ThingStatus,
@@ -31,53 +31,13 @@ from domain.value_items.exceptions import (
 from domain.value_items.fee_schedules.fee_schedule import FeeSchedule
 
 
-# Create a test version of SimpleLibrary that allows modification of attributes
-class TestableSimpleLibrary(SimpleLibrary):
-    model_config = {"arbitrary_types_allowed": True, "frozen": False, "extra": "allow"}
-
-    async def borrow(
-        self, thing: Thing, borrower: Borrower, until: DueDate | None = None
-    ) -> Loan:
-        # Check if available
-        if thing.status != ThingStatus.READY:
-            raise InvalidThingStatusToBorrowError(thing.status)
-
-        # Check if borrower in good standing
-        if not self.can_borrow(borrower):
-            raise BorrowerNotInGoodStandingError()
-
-        if not until:
-            # Use a date object instead of a datetime object
-            from datetime import date
-
-            today = date.today()
-            future_date = today + self.default_loan_time
-            until = DueDate(date=future_date)
-
-        # Make loan
-        loan = Loan(
-            loan_id=ID.generate(),
-            item=thing,
-            borrower_id=borrower.entity_id,
-            due_date=until,
-            return_location=self.location,
-            time_returned=None,
-        )
-
-        loan.status = LoanStatus.BORROWED
-        thing.status = ThingStatus.BORROWED
-
-        self.add_loan(loan)
-        return loan
-
-
 # Create a concrete implementation of FeeSchedule for testing
 class TestableFeeSchedule(FeeSchedule):
     def fee_for_overdue_item(self, loan) -> Money:
-        return Money(amount=decimal.Decimal(5.0), currency_name="USD")
+        return Money(amount=decimal.Decimal(5.0), currency_name=Currency.USD)
 
     def fee_for_damaged_item(self, loan) -> Money:
-        return Money(amount=decimal.Decimal(20.0), currency_name="USD")
+        return Money(amount=decimal.Decimal(20.0), currency_name=Currency.USD)
 
 
 @pytest.fixture
@@ -95,7 +55,7 @@ def simple_library(person):
     fee_schedule = TestableFeeSchedule()
     mop_server = MOPServer(id=ID.generate(), base_url=URL.parse("https://example.com"))
 
-    return TestableSimpleLibrary(
+    return SimpleLibrary(
         library_id=ID.generate(),
         name="Test Simple Library",
         administrator=person,
@@ -103,13 +63,12 @@ def simple_library(person):
         waiting_list_type=WaitingListType.FIRST_COME_FIRST_SERVE,
         waiting_lists_by_item_id={},
         max_fines_before_suspension=Money(
-            amount=decimal.Decimal(50.0), currency_name="USD"
+            amount=decimal.Decimal(50.0), currency_name=Currency.USD
         ),
         fee_schedule=fee_schedule,
         money_factory=money_factory,
         default_loan_time=timedelta(days=14),
         mop_server=mop_server,
-        _items=[],
     )
 
 

@@ -8,7 +8,7 @@ from domain.value_items.fee_status import FeeStatus
 from domain.value_items.id import ID
 from domain.value_items.loan_status import LoanStatus
 from domain.value_items.location import Location, PhysicalArea, PhysicalLocation
-from domain.value_items.money import Money
+from domain.value_items.money import Currency, Money
 from domain.value_items.mop_server import MOPServer
 from domain.value_items.person_name import PersonName
 from domain.value_items.reservation_status import ReservationStatus

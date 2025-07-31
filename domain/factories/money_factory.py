@@ -2,13 +2,13 @@ import decimal
 
 from pydantic import BaseModel
 
-from domain.value_items import Money
+from domain.value_items import Currency, Money
 
 
 class MoneyFactory(BaseModel):
-    default_currency_name: str = "EUR"
+    default_currency_name: Currency = Currency.EUR
 
-    def empty(self, currency_name: str | None = None) -> Money:
+    def empty(self, currency_name: Currency | None = None) -> Money:
         if not currency_name:
             currency_name = self.default_currency_name
         return Money(

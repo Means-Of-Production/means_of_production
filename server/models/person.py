@@ -5,7 +5,7 @@ from pydantic import BaseModel, EmailStr, Field
 
 
 class Person(BaseModel):
-    person_id: UUID = Field(..., description='A unique identifier for the person')
+    person_id: UUID = Field(..., description="A unique identifier for the person")
     salutation: Optional[str] = None
     first_name: str
     middle_name: Optional[str] = None
