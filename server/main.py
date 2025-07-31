@@ -10,7 +10,7 @@ from uuid import UUID
 from fastapi import FastAPI
 from pydantic import conint
 
-from server.models import (
+from .models import (
     DistributedLibrary,
     LibraryGetResponse,
     LibraryLibraryIdGetResponse,
