@@ -1,6 +1,6 @@
 import decimal
 from datetime import timedelta
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch
 
 import pytest
 
@@ -124,16 +124,17 @@ def test_items(simple_library, thing):
 async def test_borrow_success(simple_library, thing, borrower):
     # Set up borrower in good standing
     borrower.library_id = simple_library.entity_id
-    simple_library.can_borrow = MagicMock(return_value=True)
 
-    # Test borrowing an item
-    # Use a date object instead of a datetime object
-    from datetime import date
+    # Use patch.object instead of direct assignment
+    with patch.object(SimpleLibrary, "can_borrow", return_value=True):
+        # Test borrowing an item
+        # Use a date object instead of a datetime object
+        from datetime import date
 
-    today = date.today()
-    future_date = today + timedelta(days=14)
-    due_date = DueDate(date=future_date)
-    loan = await simple_library.borrow(thing, borrower, due_date)
+        today = date.today()
+        future_date = today + timedelta(days=14)
+        due_date = DueDate(date=future_date)
+        loan = await simple_library.borrow(thing, borrower, due_date)
 
     # Verify the loan was created correctly
     assert loan.item == thing
@@ -153,10 +154,11 @@ async def test_borrow_success(simple_library, thing, borrower):
 async def test_borrow_with_default_due_date(simple_library, thing, borrower):
     # Set up borrower in good standing
     borrower.library_id = simple_library.entity_id
-    simple_library.can_borrow = MagicMock(return_value=True)
 
-    # Test borrowing an item without specifying a due date
-    loan = await simple_library.borrow(thing, borrower)
+    # Use patch.object instead of direct assignment
+    with patch.object(SimpleLibrary, "can_borrow", return_value=True):
+        # Test borrowing an item without specifying a due date
+        loan = await simple_library.borrow(thing, borrower)
 
     # Verify a default due date was set
     assert loan.due_date is not None
@@ -183,11 +185,12 @@ async def test_borrow_unavailable_thing(simple_library, borrower):
 @pytest.mark.asyncio
 async def test_borrow_borrower_not_in_good_standing(simple_library, thing, borrower):
     # Set up borrower not in good standing
-    simple_library.can_borrow = MagicMock(return_value=False)
 
-    # Test borrowing when borrower is not in good standing
-    with pytest.raises(BorrowerNotInGoodStandingError):
-        await simple_library.borrow(thing, borrower)
+    # Use patch.object instead of direct assignment
+    with patch.object(SimpleLibrary, "can_borrow", return_value=False):
+        # Test borrowing when borrower is not in good standing
+        with pytest.raises(BorrowerNotInGoodStandingError):
+            await simple_library.borrow(thing, borrower)
 
 
 @pytest.mark.asyncio

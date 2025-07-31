@@ -72,7 +72,7 @@ def item_one(simple_library, library_location) -> Thing:
         owner_id=simple_library.library_id,
         storage_location=library_location,
         image_urls=[],
-        purchase_cost=Money(amount=decimal.Decimal(10.0), currency=Currency.USD),
+        purchase_cost=Money(amount=decimal.Decimal(10.0), currency=Currency.EUR),
     )
     item.status = ThingStatus.READY
     return item
@@ -91,7 +91,7 @@ def simple_library(
         location=library_location,
         waiting_list_type=WaitingListType.NONE,
         max_fines_before_suspension=Money(
-            amount=decimal.Decimal(100.0), currency=Currency.USD
+            amount=decimal.Decimal(100.0), currency=Currency.EUR
         ),
         fee_schedule=fee_schedule,
         default_loan_time=timedelta(days=14),

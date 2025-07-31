@@ -29,7 +29,7 @@ from domain.value_items import (
 
 
 class Library(Entity, ABC):
-    model_config = {"arbitrary_types_allowed": True, "frozen": True}
+    model_config = {"arbitrary_types_allowed": True, "frozen": False}
 
     library_id: ID
     name: str

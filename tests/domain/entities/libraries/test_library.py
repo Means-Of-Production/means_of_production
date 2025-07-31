@@ -16,7 +16,6 @@ from domain.value_items import (
     ID,
     Currency,
     FeeStatus,
-    Location,
     Money,
     PersonName,
     ThingStatus,
@@ -24,6 +23,7 @@ from domain.value_items import (
     WaitingListType,
 )
 from domain.value_items.fee_schedules.fee_schedule import FeeSchedule
+from domain.value_items.location.physical_location import PhysicalLocation
 
 
 # Create a concrete implementation of FeeSchedule for testing
@@ -36,7 +36,20 @@ class TestFeeSchedule(FeeSchedule):
 
 
 @pytest.fixture
-def testable_library():
+def physical_location() -> PhysicalLocation:
+    return PhysicalLocation(
+        latitude=37.7749,
+        longitude=-122.4194,
+        street_address="123 Test Street",
+        city="Test City",
+        state="Test State",
+        zip_code="12345",
+        country="Test Country",
+    )
+
+
+@pytest.fixture
+def testable_library(physical_location):
     person = Person(
         person_id=ID.generate(),
         name=PersonName(first_name="Admin", last_name="User"),
@@ -60,7 +73,7 @@ def testable_library():
         library_id=ID.generate(),
         name="Test Library",
         administrator=person,
-        location=MagicMock(spec=Location),
+        location=physical_location,
         waiting_list_type=WaitingListType.FIRST_COME_FIRST_SERVE,
         waiting_lists_by_item_id={},
         max_fines_before_suspension=Money(
