@@ -12,3 +12,53 @@ concurrency:
 env:
   ENABLE_FAST_DEPLOYS: 'false'
   PYTHON_VERSION: '3.13'
+
+jobs:
+  unit_test:
+    name: Automated Tests and Code Quality
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  # Ensure full commit history is available
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.13'  # Specify your Python version (e.g., 3.9)
+
+      - name: Install uv
+        run: |
+          curl -LsSf https://astral.sh/uv/install.sh | sh
+          echo "$HOME/.cargo/bin" >> $GITHUB_PATH
+
+      - name: Display uv version
+        run: uv --version
+
+      - name: Create virtual environment
+        run: uv venv
+
+      - name: Install dependencies
+        run: uv sync --all-groups
+
+      - name: Run Pytest
+        run: |
+          source .venv/bin/activate
+          pytest
+
+      - name: Run Pyright Type Checking
+        run: |
+          source .venv/bin/activate
+          pyright -p pyproject.toml
+
+      - name: Check formatting
+        uses: psf/black@stable
+        with:
+          options: "--verbose --check"
+          version: "<25.0.0,>=24.2.0"
+
+      - name: Lint code and imports
+        run: |
+          source .venv/bin/activate
+          ruff check

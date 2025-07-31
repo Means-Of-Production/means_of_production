@@ -1,23 +1,34 @@
-from pydantic import BaseModel, Field
+from __future__ import annotations
 
-MILES_CONVERSION = 0.6214
+from pydantic import BaseModel, Field
 
 
 class Distance(BaseModel):
-    kilometers: float = Field(...)
-
     model_config = {"frozen": True}
+    kilometers: float = Field(ge=0.0)
+
+    def __eq__(self, other) -> bool:
+        return self.kilometers == other.kilometers
+
+    def __lt__(self, other) -> bool:
+        return self.kilometers < other.kilometers
+
+    def __gt__(self, other) -> bool:
+        return self.kilometers > other.kilometers
+
+    def __le__(self, other) -> bool:
+        return self.kilometers <= other.kilometers
+
+    def __ge__(self, other) -> bool:
+        return self.kilometers >= other.kilometers
+
+    def __add__(self, other: Distance) -> Distance:
+        return Distance(kilometers=self.kilometers + other.kilometers)
+
+    @classmethod
+    def from_miles(cls, miles: float) -> Distance:
+        return cls(kilometers=(miles / 1.60934))
 
     @property
     def miles(self) -> float:
-        return self.kilometers * MILES_CONVERSION
-
-    def __eq__(self, other):
-        return self.kilometers == other.kilometers
-
-    def __lt__(self, other):
-        return self.kilometers < other.kilometers
-
-    @classmethod
-    def from_miles(cls, miles: float):
-        return cls(kilometers=(miles / MILES_CONVERSION))
+        return self.kilometers / 1.60934
