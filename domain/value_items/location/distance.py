@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from pydantic import BaseModel, Field
 
+
 class Distance(BaseModel):
     model_config = {"frozen": True}
     kilometers: float = Field(ge=0.0)
@@ -21,6 +22,9 @@ class Distance(BaseModel):
     def __ge__(self, other) -> bool:
         return self.kilometers >= other.kilometers
 
+    def __add__(self, other: Distance) -> Distance:
+        return Distance(kilometers=self.kilometers + other.kilometers)
+
     @classmethod
     def from_miles(cls, miles: float) -> Distance:
         return cls(kilometers=(miles / 1.60934))
@@ -28,4 +32,3 @@ class Distance(BaseModel):
     @property
     def miles(self) -> float:
         return self.kilometers / 1.60934
-
