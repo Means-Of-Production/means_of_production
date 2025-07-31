@@ -45,6 +45,11 @@ jobs:
           source .venv/bin/activate
           pytest
 
+      - name: Run Ty Type Checking
+        run: |
+          source .venv/bin/activate
+          uv run ty check
+
       - name: Run Pyright Type Checking
         run: |
           source .venv/bin/activate
