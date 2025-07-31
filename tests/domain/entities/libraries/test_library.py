@@ -1,6 +1,5 @@
 import decimal
 from datetime import datetime, timedelta
-from typing import Iterable
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -8,6 +7,7 @@ import pytest
 from domain.entities.borrower import Borrower
 from domain.entities.libraries.library import Library
 from domain.entities.libraries.library_fee import LibraryFee
+from domain.entities.libraries.simple_library import SimpleLibrary
 from domain.entities.loan import Loan
 from domain.entities.people.person import Person
 from domain.entities.thing import Thing
@@ -37,47 +37,6 @@ class TestFeeSchedule(FeeSchedule):
         return Money(amount=decimal.Decimal(20.0), currency_name="USD")
 
 
-# Create a concrete implementation of Library for testing
-class TestableLibrary(Library):
-    model_config = {"arbitrary_types_allowed": True, "frozen": False, "extra": "allow"}
-
-    def __init__(self, **kwargs):
-        # Initialize the Pydantic model first
-        super().__init__(**kwargs)
-        # Then initialize our private attributes
-        # We need to use object.__setattr__ to bypass Pydantic's __setattr__
-        object.__setattr__(self, "_items", [])
-        object.__setattr__(self, "_borrowers", [])
-        object.__setattr__(self, "_loans", [])
-
-    @property
-    def all_things(self) -> Iterable[Thing]:
-        return self._items
-
-    async def borrow(self, thing: Thing, borrower: Borrower, until: DueDate) -> Loan:
-        loan = Loan(
-            loan_id=ID.generate(),
-            item=thing,
-            borrower_id=borrower.entity_id,
-            due_date=until,
-            return_location=self.location,
-            time_returned=None,
-        )
-        self.add_loan(loan)
-        return loan
-
-    async def start_return(self, loan: Loan) -> Loan:
-        loan.status = LoanStatus.WAITING_ON_LENDER_ACCEPTANCE
-        loan.time_returned = datetime.now()
-        return loan
-
-    async def finish_return(self, loan: Loan, borrower: Borrower) -> Loan:
-        return await self.finish_library_return(loan, borrower)
-
-    def get_loans(self) -> Iterable[Loan]:
-        return self._loans
-
-
 @pytest.fixture
 def testable_library():
     person = Person(
@@ -99,7 +58,7 @@ def testable_library():
         id=ID.generate(), base_url=URL.parse("https://test-server.com")
     )
 
-    return TestableLibrary(
+    return SimpleLibrary(
         library_id=ID.generate(),
         name="Test Library",
         administrator=person,
@@ -142,7 +101,8 @@ def test_available_things(testable_library):
     borrowed_thing = MagicMock(spec=Thing)
     borrowed_thing.status = ThingStatus.BORROWED
 
-    testable_library._items = [ready_thing, borrowed_thing]
+    testable_library.add_item(ready_thing)
+    testable_library.add_item(borrowed_thing)
 
     # Test that only READY things are returned
     available = list(testable_library.available_things)
