@@ -1,0 +1,7 @@
+from enum import Enum
+
+
+class WaitingListType(Enum):
+    NONE = 'NONE'
+    QUADRATIC_WAITING_LIST = 'QUADRATIC_WAITING_LIST'
+    FIRST_COME_FIRST_SERVE = 'FIRST_COME_FIRST_SERVE'

@@ -1,16 +1,21 @@
 from __future__ import annotations
 
 import decimal
+from enum import Enum
 
 from pydantic import BaseModel
 
 from domain.value_items.exceptions import CurrencyMismatchException
 
+class CurrencyName(Enum):
+    Euro = 'Euro'
+    US_Dollar = 'US Dollar'
+    Labor_Token = 'Labor Token'
 
 class Money(BaseModel):
     model_config = {"frozen": True}
     amount: decimal.Decimal
-    currency_name: str
+    currency_name: CurrencyName
     symbol: str | None = None
 
     @property
