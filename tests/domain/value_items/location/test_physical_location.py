@@ -29,10 +29,8 @@ def test_distance_calculation():
     distance = location1.distance(location2)
 
     # The distance between New York and Los Angeles is approximately 3935 km
-    assert round(distance.kilometers, 2) == 3935.75
-    assert (
-        round(distance.miles, 2) == 2445.57
-    )  # Correct miles conversion (km / 1.60934)
+    assert distance.kilometers == pytest.approx(3935.75, abs=1e-2)
+    assert distance.miles == pytest.approx(2445.57, abs=1e-2)
 
 
 def test_distance_with_other_location_missing_coordinates():

@@ -1,12 +1,11 @@
 import decimal
-from datetime import datetime, timedelta
+from datetime import timedelta
 from unittest.mock import MagicMock, patch
 
 import pytest
 
 from domain.entities.borrower import Borrower
 from domain.entities.libraries.library import Library
-from domain.entities.libraries.library_fee import LibraryFee
 from domain.entities.libraries.simple_library import SimpleLibrary
 from domain.entities.loan import Loan
 from domain.entities.people.person import Person
@@ -15,9 +14,7 @@ from domain.entities.waiting_lists.waiting_list import WaitingList
 from domain.factories import MoneyFactory, WaitingListFactory
 from domain.value_items import (
     ID,
-    DueDate,
     FeeStatus,
-    LoanStatus,
     Location,
     Money,
     PersonName,
