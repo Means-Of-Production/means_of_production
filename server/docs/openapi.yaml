@@ -1,0 +1,609 @@
+openapi: 3.0.4
+info:
+  title: MeansOfProduction API
+  description: |-
+    This server allows clients to use the MeansOfProduction protocol and servers.  MeansOfProduction
+    powers libraries, both traditional and virtual/distributed, as well as allowing cross functionality
+    between other supported platforms.
+    
+    Some useful links:
+    - [Project Site](https://meansofpo.org)
+  termsOfService: https://swagger.io/terms/
+  contact:
+    email: admin@meansofp.org
+  license:
+    name: MIT
+  version: 0.0.1
+externalDocs:
+  description: Find out more about Swagger
+  url: https://swagger.io
+servers:
+  - url: https://meansofp.org/api/v1
+tags:
+  - name: library
+    description: Basic library methods
+  - name: inventory
+    description: items and inventory of items
+  - name: search
+    description: allows search capability
+paths:
+  /library:
+    get:
+      tags:
+        - library
+      description: retrieves a list of current libraries
+      parameters:
+        - name: active
+          description: whether to return only libraries that are currently active
+          in: query
+          required: false
+          schema:
+            type: boolean
+            default: true
+        - name: max_items
+          description: number of libraries to return
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 20
+            maximum: 100
+            minimum: 1
+        - name: skip
+          description: Number of items to skip in results, used for paging
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 0
+            minimum: 0
+      responses:
+        200:
+          description: successful
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  oneOf:
+                    - $ref: "#/components/schemas/SimpleLibrary"
+                    - $ref: "#/components/schemas/DistributedLibrary"
+    post:
+      tags:
+        - library
+      summary: creates a new simple library
+      requestBody:
+        description: The Library object we want to create
+        required: true
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - $ref: "#/components/schemas/SimpleLibrary"
+                - $ref: "#/components/schemas/DistributedLibrary"
+      responses:
+        200:
+          description: successful
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/SimpleLibrary"
+                  - $ref: "#/components/schemas/DistributedLibrary"
+        409:
+          description: library already exists
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/SimpleLibrary"
+                  - $ref: "#/components/schemas/DistributedLibrary"
+  /library/{library_id}:
+    get:
+      tags:
+        - library
+      description: retrieves a list of current libraries
+      parameters:
+        - name: library_id
+          in: path
+          required: true
+          description: ID of the library to return
+          schema:
+            type: string
+            format: uuid
+      responses:
+        200:
+          description: successful
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/SimpleLibrary"
+                  - $ref: "#/components/schemas/DistributedLibrary"
+        404:
+          description: not found
+    put:
+      tags:
+        - library
+      description: updates a library
+      parameters:
+        - name: library_id
+          in: path
+          required: true
+          description: ID of the library
+          schema:
+            type: string
+            format: uuid
+      responses:
+        200:
+          description: successful update
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/SimpleLibrary"
+                  - $ref: "#/components/schemas/DistributedLibrary"
+  /library/{library_id}/things:
+    get:
+      description: returns a list of all items the user has access to within the specified library
+      tags:
+        - inventory
+        - library
+      parameters:
+        - name: library_id
+          in: path
+          required: true
+          description: ID of the library
+          schema:
+            type: string
+            format: uuid
+        - name: status
+          schema:
+            type: string
+            enum:
+              - READY
+              - BORROWED
+              - DAMAGED
+              - RESERVED
+              - ANY
+          in: query
+      responses:
+        200:
+          description: successful
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Thing"
+  /library/{library_id}/things/{thing_id}:
+    get:
+      description: returns specific thing in context of the library
+      tags:
+        - inventory
+        - library
+      parameters:
+        - name: library_id
+          in: path
+          required: true
+          description: ID of the library
+          schema:
+            type: string
+            format: uuid
+        - name: thing_id
+          in: path
+          required: true
+          description: ID of the thing
+          schema:
+            type: string
+            format: uuid
+        - name: status
+          schema:
+            type: string
+            enum:
+              - READY
+              - BORROWED
+              - DAMAGED
+              - RESERVED
+              - ANY
+          in: query
+      responses:
+        200:
+          description: successful
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Thing"
+    put:
+      description: update the status of a thing via the library
+      tags:
+        - inventory
+        - library
+      parameters:
+        - name: library_id
+          in: path
+          required: true
+          description: ID of the library
+          schema:
+            type: string
+            format: uuid
+        - name: thing_id
+          in: path
+          required: true
+          description: ID of the thing
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Thing"
+      responses:
+        200:
+          description: Updated thing
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Thing"
+        405:
+          description: Attempt to change fields which cannot be changed
+  /things:
+    get:
+      description: returns a list of all items the user has access to, across any libraries
+      tags:
+        - inventory
+      parameters:
+        - name: status
+          schema:
+            type: string
+            enum:
+              - READY
+              - BORROWED
+              - DAMAGED
+              - RESERVED
+              - ANY
+          in: query
+        - name: max_distance
+          description: max distance the item is in km
+          schema:
+            type: number
+          required: false
+          in: query
+      responses:
+        200:
+          description: successful
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Thing"
+  /things/search/{search_term}:
+    get:
+      description: search for items by title, etc
+      tags:
+        - inventory
+        - search
+      parameters:
+        - name: search_term
+          in: path
+          schema:
+            type: string
+          required: true
+        - name: status
+          schema:
+            type: string
+            enum:
+              - READY
+              - BORROWED
+              - DAMAGED
+              - RESERVED
+              - ANY
+          in: query
+      responses:
+        200:
+          description: successful
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Thing"
+
+components:
+  securitySchemes:
+    BasicAuth:
+      type: http
+      scheme: basic
+  schemas:
+    Person:
+      type: object
+      properties:
+        person_id:
+          type: string
+          format: uuid
+          description: A unique identifier for the person
+        salutation:
+          type: string
+          nullable: true
+        first_name:
+          type: string
+        middle_name:
+          type: string
+          nullable: true
+        last_name:
+          type: string
+        suffix:
+          type: string
+          nullable: true
+        emails:
+          type: array
+          items:
+            type: string
+            format: email
+      required:
+        - person_id
+        - first_name
+        - last_name
+    PhysicalLocation:
+      type: object
+      description: A physical location with address information
+      allOf:
+        - type: object
+          properties:
+            latitude:
+              type: number
+              format: float
+              nullable: true
+              description: Latitude coordinate
+            longitude:
+              type: number
+              format: float
+              nullable: true
+              description: Longitude coordinate
+            street_address:
+              type: string
+              description: Street address
+            city:
+              type: string
+              description: City
+            state:
+              type: string
+              description: State or province
+            zip_code:
+              type: string
+              description: Postal or ZIP code
+            country:
+              type: string
+              description: Country
+          required:
+            - street_address
+            - city
+            - state
+            - zip_code
+            - country
+    
+    WaitingListType:
+      type: string
+      enum:
+        - NONE
+        - QUADRATIC_WAITING_LIST
+        - FIRST_COME_FIRST_SERVE
+    
+    Money:
+      type: object
+      properties:
+        amount:
+          type: number
+          description: Decimal amount of money
+        currency_name:
+          type: string
+          enum:
+            - Euro
+            - US Dollar
+            - Labor Token
+        symbol:
+          type: string
+          nullable: true
+          enum:
+            - EUR
+            - USD
+            - LABOR
+      required:
+        - amount
+        - currency_name
+    
+    FeeSchedule:
+      type: object
+      description: Abstract base class for fee schedules
+    
+    SimpleLibrary:
+      type: object
+      properties:
+        library_id:
+          type: string
+          format: uuid
+          description: A unique identifier for the library
+        name:
+          type: string
+        administrator:
+          $ref: '#/components/schemas/Person'
+        location:
+          $ref: '#/components/schemas/PhysicalLocation'
+        waiting_list_type:
+          $ref: '#/components/schemas/WaitingListType'
+        max_fines_before_suspension:
+          $ref: '#/components/schemas/Money'
+        currency:
+          type: string
+          enum:
+            - EUR
+            - USD
+            - LABOR_TOKEN
+        default_loan_time:
+          type: string
+          description: Duration of the default loan period (ISO 8601 duration format, e.g., 'P14D' for 14 days)
+        mop_server_address:
+          type: string
+          format: uri
+          description: URL address of the MOP server
+        public_url:
+          type: string
+          format: uri
+          nullable: true
+      required:
+        - name
+        - administrator
+        - currency
+        - location
+        - waiting_list_type
+        - max_fines_before_suspension
+        - default_loan_time
+        - mop_server_address
+
+        
+    DistributedLibrary:
+      type: object
+      description: A distributed library that coordinates lending across multiple lenders
+      properties:
+        library_id:
+          type: string
+          format: uuid
+          description: A unique identifier for the library
+        name:
+          type: string
+        administrator:
+          $ref: '#/components/schemas/Person'
+        area:
+          type: object
+          description: The physical area covered by this distributed library
+          properties:
+            center:
+              $ref: '#/components/schemas/PhysicalLocation'
+            radius:
+              type: number
+              format: float
+              description: Radius of the area in kilometers
+          required:
+            - center
+            - radius
+        waiting_list_type:
+          $ref: '#/components/schemas/WaitingListType'
+        max_fines_before_suspension:
+          $ref: '#/components/schemas/Money'
+        currency:
+          type: string
+          enum:
+            - EUR
+            - USD
+            - LABOR_TOKEN
+        default_loan_time:
+          type: string
+          description: Duration of the default loan period (ISO 8601 duration format, e.g., 'P14D' for 14 days)
+        mop_server_address:
+          type: string
+          format: uri
+          description: URL address of the MOP server
+        public_url:
+          type: string
+          format: uri
+          nullable: true
+      required:
+        - name
+        - administrator
+        - area
+        - currency
+        - waiting_list_type
+        - max_fines_before_suspension
+        - default_loan_time
+        - mop_server_address
+
+    ThingTitle:
+      type: object
+      description: The title and identifiers of a thing
+      properties:
+        name:
+          type: string
+          description: The name of the thing
+        upc:
+          type: string
+          nullable: true
+          description: Universal Product Code (if applicable)
+        isbn:
+          type: string
+          nullable: true
+          description: International Standard Book Number (if applicable)
+        description:
+          type: string
+          nullable: true
+          description: A brief description of the thing
+      required:
+        - name
+
+    Thing:
+      type: object
+      description: An item that can be borrowed
+      properties:
+        thing_id:
+          type: string
+          format: uuid
+          description: A unique identifier for the thing
+        title:
+          $ref: '#/components/schemas/ThingTitle'
+        description:
+          type: string
+          nullable: true
+          description: A detailed description of the thing
+        owner_id:
+          type: string
+          format: uuid
+          description: The ID of the owner of the thing
+        storage_location:
+          $ref: '#/components/schemas/PhysicalLocation'
+        image_urls:
+          type: array
+          items:
+            type: string
+            format: uri
+          description: URLs of images of the thing
+        purchase_cost:
+          $ref: '#/components/schemas/Money'
+          nullable: true
+        status:
+          type: string
+          description: The status of a thing
+          enum:
+            - READY
+            - BORROWED
+            - DAMAGED
+            - RESERVED
+      required:
+        - thing_id
+        - title
+        - owner_id
+        - storage_location
+        - status
+
+    Reservation:
+      type: object
+      description: A reservation for a thing
+
+    WaitingList:
+      type: object
+      properties:
+        waiting_list_id:
+          type: string
+          format: uuid
+          description: A unique identifier for the waiting list
+        item:
+          $ref: '#/components/schemas/Thing'
+        current_reservation:
+          $ref: '#/components/schemas/Reservation'
+        expired_reservations:
+          type: array
+          items:
+            $ref: '#/components/schemas/Reservation'
+      required:
+        - waiting_list_id
+        - item

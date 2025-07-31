@@ -21,7 +21,6 @@ from domain.value_items import (
     FeeSchedule,
     FeeStatus,
     LoanStatus,
-    Location,
     Money,
     ThingStatus,
     ThingTitle,
@@ -30,12 +29,11 @@ from domain.value_items import (
 
 
 class Library(Entity, ABC):
-    model_config = {"arbitrary_types_allowed": True, "frozen": True}
+    model_config = {"arbitrary_types_allowed": True, "frozen": False}
 
     library_id: ID
     name: str
     administrator: Person
-    location: Location
     waiting_list_type: WaitingListType
     waiting_lists_by_item_id: dict[ID, WaitingList] = Field(default_factory=dict)
     max_fines_before_suspension: Money

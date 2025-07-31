@@ -14,8 +14,8 @@ from domain.entities.waiting_lists.waiting_list import WaitingList
 from domain.factories import MoneyFactory, WaitingListFactory
 from domain.value_items import (
     ID,
+    Currency,
     FeeStatus,
-    Location,
     Money,
     PersonName,
     ThingStatus,
@@ -23,19 +23,33 @@ from domain.value_items import (
     WaitingListType,
 )
 from domain.value_items.fee_schedules.fee_schedule import FeeSchedule
+from domain.value_items.location.physical_location import PhysicalLocation
 
 
 # Create a concrete implementation of FeeSchedule for testing
 class TestFeeSchedule(FeeSchedule):
     def fee_for_overdue_item(self, loan) -> Money:
-        return Money(amount=decimal.Decimal(5.0), currency_name="USD")
+        return Money(amount=decimal.Decimal(5.0), currency=Currency.USD)
 
     def fee_for_damaged_item(self, loan) -> Money:
-        return Money(amount=decimal.Decimal(20.0), currency_name="USD")
+        return Money(amount=decimal.Decimal(20.0), currency=Currency.USD)
 
 
 @pytest.fixture
-def testable_library():
+def physical_location() -> PhysicalLocation:
+    return PhysicalLocation(
+        latitude=37.7749,
+        longitude=-122.4194,
+        street_address="123 Test Street",
+        city="Test City",
+        state="Test State",
+        zip_code="12345",
+        country="Test Country",
+    )
+
+
+@pytest.fixture
+def testable_library(physical_location):
     person = Person(
         person_id=ID.generate(),
         name=PersonName(first_name="Admin", last_name="User"),
@@ -59,11 +73,11 @@ def testable_library():
         library_id=ID.generate(),
         name="Test Library",
         administrator=person,
-        location=MagicMock(spec=Location),
+        location=physical_location,
         waiting_list_type=WaitingListType.FIRST_COME_FIRST_SERVE,
         waiting_lists_by_item_id={},
         max_fines_before_suspension=Money(
-            amount=decimal.Decimal(50.0), currency_name="USD"
+            amount=decimal.Decimal(50.0), currency=Currency.USD
         ),
         fee_schedule=fee_schedule,
         money_factory=money_factory,
@@ -133,21 +147,21 @@ def test_can_borrow_with_fees(testable_library, borrower):
     with patch.object(
         MoneyFactory,
         "total",
-        return_value=Money(amount=decimal.Decimal(0.0), currency_name="USD"),
+        return_value=Money(amount=decimal.Decimal(0.0), currency=Currency.USD),
     ):
         assert testable_library.can_borrow(borrower)
 
     # Case 2: Borrower has fees but under the limit
     fee = MagicMock()
     fee.status = FeeStatus.OUTSTANDING
-    fee.amount = Money(amount=decimal.Decimal(10.0), currency_name="USD")
+    fee.amount = Money(amount=decimal.Decimal(10.0), currency=Currency.USD)
     borrower.fees = [fee]
 
     # Mock the money_factory.total method to return a value less than max_fines
     with patch.object(
         MoneyFactory,
         "total",
-        return_value=Money(amount=decimal.Decimal(10.0), currency_name="USD"),
+        return_value=Money(amount=decimal.Decimal(10.0), currency=Currency.USD),
     ):
         assert testable_library.can_borrow(borrower)
 
@@ -155,7 +169,7 @@ def test_can_borrow_with_fees(testable_library, borrower):
     with patch.object(
         MoneyFactory,
         "total",
-        return_value=Money(amount=decimal.Decimal(60.0), currency_name="USD"),
+        return_value=Money(amount=decimal.Decimal(60.0), currency=Currency.USD),
     ):
         assert not testable_library.can_borrow(borrower)
 
