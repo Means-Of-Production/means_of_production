@@ -7,16 +7,11 @@ from __future__ import annotations
 from typing import Annotated, Optional, Union
 from uuid import UUID
 
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from pydantic import conint
 
 from server.models import (
     DistributedLibrary,
-    LibraryGetResponse,
-    LibraryLibraryIdGetResponse,
-    LibraryLibraryIdPutResponse,
-    LibraryLibraryIdThingsGetResponse,
-    LibraryPostResponse,
     SimpleLibrary,
     Status1,
     Thing,
@@ -38,65 +33,65 @@ app = FastAPI(
 @app.get(
     "/library",
     response_model=None,
-    responses={"200": {"model": LibraryGetResponse}},
+    responses={"200": {"model": list[SimpleLibrary | DistributedLibrary]}},
     tags=["library"],
 )
 def get_library(
-    active: Optional[bool] = True,
-    max_items: Optional[Annotated[int, conint(ge=1, le=100)]] = 20,
-    skip: Optional[Annotated[int, conint(ge=0)]] = 0,
-) -> Optional[LibraryGetResponse]:
-    pass
+    active: bool = True,
+    max_items: Annotated[int, conint(ge=1, le=100)] = 20,
+    skip: Annotated[int, conint(ge=0)] = 0,
+) -> list[SimpleLibrary | DistributedLibrary]:
+    raise NotImplementedError()
 
 
 @app.post(
     "/library",
     response_model=None,
     responses={
-        "200": {"model": LibraryPostResponse},
-        "409": {"model": LibraryPostResponse},
+        "200": {"model": SimpleLibrary | DistributedLibrary},
+        "409": {"model": None},
     },
     tags=["library"],
 )
 def post_library(
-    body: Union[SimpleLibrary, DistributedLibrary],
-) -> Optional[Union[LibraryPostResponse, LibraryPostResponse]]:
+    body: SimpleLibrary | DistributedLibrary,
+) -> SimpleLibrary | DistributedLibrary:
     """
     creates a new simple library
     """
-    pass
+    raise NotImplementedError()
 
 
 @app.get(
     "/library/{library_id}",
     response_model=None,
-    responses={"200": {"model": LibraryLibraryIdGetResponse}},
+    responses={"200": {"model": SimpleLibrary | DistributedLibrary}},
     tags=["library"],
 )
-def get_library_library_id(library_id: UUID) -> Optional[LibraryLibraryIdGetResponse]:
-    pass
+def get_library_library_id(library_id: UUID) -> SimpleLibrary | DistributedLibrary:
+    raise NotImplementedError()
 
 
 @app.put(
     "/library/{library_id}",
     response_model=None,
-    responses={"200": {"model": LibraryLibraryIdPutResponse}},
+    responses={"200": {"model": SimpleLibrary | DistributedLibrary}},
     tags=["library"],
 )
-def put_library_library_id(library_id: UUID) -> Optional[LibraryLibraryIdPutResponse]:
-    pass
+def put_library_library_id(library_id: UUID) -> SimpleLibrary | DistributedLibrary:
+    raise NotImplementedError()
 
 
 @app.get(
     "/library/{library_id}/things",
     response_model=None,
-    responses={"200": {"model": LibraryLibraryIdThingsGetResponse}},
+    responses={"200": {"model": list[Thing]}},
     tags=["inventory", "library"],
 )
 def get_library_library_id_things(
     library_id: UUID, status: Status1 | None = None
-) -> Optional[LibraryLibraryIdThingsGetResponse]:
-    pass
+) -> list[Thing]:
+    raise NotImplementedError()
 
 
 @app.get(
@@ -107,8 +102,8 @@ def get_library_library_id_things(
 )
 def get_library_library_id_things_thing_id(
     library_id: UUID, thing_id: UUID, status: Status1 | None = None
-) -> Optional[Thing]:
-    pass
+) -> Thing:
+    raise NotImplementedError()
 
 
 @app.put(
