@@ -248,6 +248,126 @@ paths:
                 $ref: "#/components/schemas/Thing"
         405:
           description: Attempt to change fields which cannot be changed
+  /library/{library_id}/things/{thing_id}/start_borrow:
+    put:
+      parameters:
+        - name: library_id
+          in: path
+          required: true
+          description: ID of the library
+          schema:
+            type: string
+            format: uuid
+        - name: thing_id
+          in: path
+          required: true
+          description: ID of the thing
+          schema:
+            type: string
+            format: uuid
+        - name: borrower_id
+          required: true
+          in: query
+          schema:
+            type: string
+            format: uuid
+      responses:
+        200:
+          description: Updated thing
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Thing"
+  /library/{library_id}/things/{thing_id}/complete_borrow:
+    put:
+      parameters:
+        - name: library_id
+          in: path
+          required: true
+          description: ID of the library
+          schema:
+            type: string
+            format: uuid
+        - name: thing_id
+          in: path
+          required: true
+          description: ID of the thing
+          schema:
+            type: string
+            format: uuid
+        - name: lender_id
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        200:
+          description: Updated thing
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Thing"
+  /library/{library_id}/things/{thing_id}/start_return:
+    put:
+      parameters:
+        - name: library_id
+          in: path
+          required: true
+          description: ID of the library
+          schema:
+            type: string
+            format: uuid
+        - name: thing_id
+          in: path
+          required: true
+          description: ID of the thing
+          schema:
+            type: string
+            format: uuid
+        - name: borrower_id
+          required: true
+          in: query
+          schema:
+            type: string
+            format: uuid
+      responses:
+        200:
+          description: Updated thing
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Thing"
+  /library/{library_id}/things/{thing_id}/end_return:
+    put:
+      parameters:
+        - name: library_id
+          in: path
+          required: true
+          description: ID of the library
+          schema:
+            type: string
+            format: uuid
+        - name: thing_id
+          in: path
+          required: true
+          description: ID of the thing
+          schema:
+            type: string
+            format: uuid
+        - name: lender_id
+          in: query
+          required: true
+          schema: 
+            type: string
+            format: uuid
+      responses:
+        200:
+          description: Updated thing
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Thing"
   /things:
     get:
       description: returns a list of all items the user has access to, across any libraries
