@@ -10,7 +10,7 @@ from uuid import UUID
 from fastapi import FastAPI
 from pydantic import conint
 
-from server.models import (
+from .models import (
     DistributedLibrary,
     LibraryGetResponse,
     LibraryLibraryIdGetResponse,
@@ -20,7 +20,6 @@ from server.models import (
     SimpleLibrary,
     Status1,
     Thing,
-    ThingsGetResponse,
     ThingsSearchSearchTermGetResponse,
 )
 
@@ -126,12 +125,12 @@ def put_library_library_id_things_thing_id(
 @app.get(
     "/things",
     response_model=None,
-    responses={"200": {"model": ThingsGetResponse}},
+    responses={"200": {"model": list[Thing]}},
     tags=["inventory"],
 )
 def get_things(
     status: Status1 | None = None, max_distance: Optional[float] = None
-) -> Optional[ThingsGetResponse]:
+) -> list[Thing] | None:
     pass
 
 
