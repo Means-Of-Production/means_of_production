@@ -11,6 +11,7 @@ from domain.repositories import LibraryRepository, LoanRepository
 from domain.value_items import (
     ID,
     BorrowerVerificationFlags,
+    Currency,
     Location,
     Money,
     PersonName,

@@ -8,6 +8,8 @@ authors = [
 dependencies = [
     "pydantic>=2.10.4",
     "email-validator>=2.1.1",
+    "fastapi>=0.116.1",
+    "uvicorn>=0.35.0",
 ]
 requires-python = "==3.13.*"
 readme = "README.md"
@@ -37,4 +39,6 @@ dev = [
     "pyright>=1.1.391",
     "pytest-asyncio>=1.0.0",
     "freezegun>=1.5.2",
+    "fastapi-code-generator>=0.5.4",
+    "ty>=0.0.1a16",
 ]
