@@ -5,7 +5,6 @@
 from __future__ import annotations
 
 from .area import Area
-from .currency import Currency
 from .distributed_library import DistributedLibrary
 from .fee_schedule import FeeSchedule
 from .library_get_response import LibraryGetResponse
@@ -31,7 +30,6 @@ from .waiting_list_type import WaitingListType
 
 __all__ = [
     "Area",
-    "Currency",
     "DistributedLibrary",
     "FeeSchedule",
     "LibraryGetResponse",
