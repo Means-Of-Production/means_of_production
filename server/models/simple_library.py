@@ -4,6 +4,7 @@ from uuid import UUID
 from pydantic import AnyUrl, BaseModel, Field
 
 from domain import Currency
+
 from .money import Money
 from .person import Person
 from .physical_location import PhysicalLocation

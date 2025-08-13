@@ -2,6 +2,7 @@ from typing import Optional
 from uuid import UUID
 
 from pydantic import AnyUrl, BaseModel, Field
+
 from domain import Currency
 
 from .area import Area
