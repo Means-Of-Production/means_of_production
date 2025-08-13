@@ -2,9 +2,9 @@ from typing import Optional
 from uuid import UUID
 
 from pydantic import AnyUrl, BaseModel, Field
+from domain import Currency
 
 from .area import Area
-from .currency import Currency
 from .money import Money
 from .person import Person
 from .waiting_list_type import WaitingListType
