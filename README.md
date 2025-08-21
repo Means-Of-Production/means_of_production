@@ -20,3 +20,10 @@ We currently have both `ty` and `pyright`, while deprecating the latter
 To test types, run
 `uv run ty check`
 
+# run
+## Server
+To run the server locally
+`uvicorn server.main:app --reload`
+
+
+
