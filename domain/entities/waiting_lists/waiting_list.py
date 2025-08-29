@@ -71,7 +71,7 @@ class WaitingList(Entity, ABC):
             holder=next_borrower,
             item=self.item,
             good_until=good_until,
-            _status=ReservationStatus.ASSIGNED,
+            _status=ReservationStatus.ASSIGNED, # type: ignore
         )
 
         self.cancel(next_borrower)
