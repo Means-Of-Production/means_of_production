@@ -248,68 +248,44 @@ paths:
                 $ref: "#/components/schemas/Thing"
         405:
           description: Attempt to change fields which cannot be changed
-  /library/{library_id}/things/{thing_id}/start_borrow:
-    put:
+  /library/{library_id}/loans:
+    get:
+      tags:
+        - library
+      description: returns a list of loans for the specified library
       parameters:
         - name: library_id
           in: path
           required: true
           description: ID of the library
-          schema:
-            type: string
-            format: uuid
-        - name: thing_id
-          in: path
-          required: true
-          description: ID of the thing
           schema:
             type: string
             format: uuid
         - name: borrower_id
-          required: true
+          description: Limits loans to the specified borrower
           in: query
-          schema:
-            type: string
-            format: uuid
-      responses:
-        200:
-          description: Updated thing
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Thing"
-  /library/{library_id}/things/{thing_id}/complete_borrow:
-    put:
-      parameters:
-        - name: library_id
-          in: path
-          required: true
-          description: ID of the library
-          schema:
-            type: string
-            format: uuid
-        - name: thing_id
-          in: path
-          required: true
-          description: ID of the thing
+          required: false
           schema:
             type: string
             format: uuid
         - name: lender_id
+          description: Limits loans to the specified lender
           in: query
-          required: true
+          required: false
           schema:
             type: string
             format: uuid
       responses:
         200:
-          description: Updated thing
+          description: successful
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Thing"
-  /library/{library_id}/things/{thing_id}/start_return:
-    put:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Loan"
+  /library/{library_id}/loans/{loan_id}:
+    get:
       parameters:
         - name: library_id
           in: path
@@ -318,56 +294,54 @@ paths:
           schema:
             type: string
             format: uuid
-        - name: thing_id
+        - name: loan_id
           in: path
           required: true
-          description: ID of the thing
+          description: ID of the loan
           schema:
-            type: string
-            format: uuid
-        - name: borrower_id
-          required: true
-          in: query
-          schema:
-            type: string
-            format: uuid
+             type: string
+             format: uuid
       responses:
         200:
-          description: Updated thing
+          description: successful
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Thing"
-  /library/{library_id}/things/{thing_id}/end_return:
+                $ref: "#/components/schemas/Loan"
     put:
+      description: Update loan.  Used to update status with lending, borrowing, etc.
       parameters:
         - name: library_id
           in: path
           required: true
           description: ID of the library
-          schema:
-            type: string
-            format: uuid
-        - name: thing_id
+        - name: loan_id
           in: path
           required: true
-          description: ID of the thing
+          description: ID of
           schema:
             type: string
             format: uuid
-        - name: lender_id
-          in: query
-          required: true
-          schema: 
-            type: string
-            format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Loan"
       responses:
         200:
-          description: Updated thing
+          description: successfully updates
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Thing"
+                $ref: "#/components/schemas/Loan"
+        422:
+          description: invalid request due to loan state
+          content:
+            application/json:
+              schema:
+                type: string
+                description: error message
+  
   /things:
     get:
       description: returns a list of all items the user has access to, across any libraries
@@ -727,3 +701,65 @@ components:
       required:
         - waiting_list_id
         - item
+
+    DueDate:
+      type: object
+      description: Due date of a loan; null indicates a permanent loan when date is null
+      properties:
+        date:
+          type: string
+          format: date-time
+          nullable: true
+          description: UTC due date-time; null means permanent loan
+      required:
+        - date
+
+    Loan:
+      type: object
+      description: A loan of a thing to a borrower
+      properties:
+        loan_id:
+          type: string
+          format: uuid
+          description: Unique identifier for the loan
+        item:
+          $ref: '#/components/schemas/Thing'
+        due_date:
+          $ref: '#/components/schemas/DueDate'
+        borrower_id:
+          type: string
+          format: uuid
+          description: The ID of the borrower
+        location:
+          $ref: '#/components/schemas/PhysicalLocation'
+          nullable: true
+          description: Current location of the item while on loan
+        return_location:
+          $ref: '#/components/schemas/PhysicalLocation'
+          description: Where the item should be returned
+        time_returned:
+          type: string
+          format: date-time
+          nullable: true
+          description: UTC date-time when the item was returned
+        status:
+          type: string
+          description: Current status of the loan
+          enum:
+            - BORROWED
+            - OVERDUE
+            - RETURN_STARTED
+            - WAITING_ON_LENDER_ACCEPTANCE
+            - RETURNED_DAMAGED
+            - RETURNED
+          readOnly: true
+        active:
+          type: boolean
+          description: True if the loan is currently active (status BORROWED)
+          readOnly: true
+      required:
+        - loan_id
+        - item
+        - due_date
+        - borrower_id
+        - return_location
