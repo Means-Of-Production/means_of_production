@@ -1,0 +1,26 @@
+{
+  "name": "@means-of-production/domain",
+  "version": "0.0.1",
+  "description": "Means of Production domain model (TypeScript)",
+  "license": "MIT",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p .",
+    "clean": "rm -rf dist",
+    "typecheck": "tsc -p . --noEmit"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "devDependencies": {
+    "typescript": "^5.5.4"
+  },
+  "dependencies": {
+    "decimal.js": "^10.4.3",
+    "uuid": "^9.0.1"
+  }
+}
