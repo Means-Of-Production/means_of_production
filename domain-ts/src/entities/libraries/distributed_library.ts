@@ -73,7 +73,9 @@ export class DistributedLibrary extends Library {
     const updated = await owner.start_return(loan);
 
     loan.time_returned = new Date();
-    loan.status = LoanStatus.WAITING_ON_LENDER_ACCEPTANCE;
+    if (updated.status !== LoanStatus.WAITING_ON_LENDER_ACCEPTANCE) {
+      updated.status = LoanStatus.WAITING_ON_LENDER_ACCEPTANCE;
+    }
     return updated;
   }
 
