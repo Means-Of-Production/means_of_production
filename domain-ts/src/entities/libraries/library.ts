@@ -138,10 +138,13 @@ export abstract class Library extends Entity {
 
     let fee_amount: Money | null = null;
     if (loan.item.status === ThingStatus.DAMAGED) {
-      fee_amount = this.fee_schedule.fee_for_damaged_item(loan);
+      // prefer camelCase per FeeSchedule interface; fall back if implementation uses snake_case
+      const calculator = (this.fee_schedule as any).feeForDamagedItem ?? (this.fee_schedule as any).fee_for_damaged_item;
+      if (calculator) fee_amount = calculator.call(this.fee_schedule, loan);
     }
     if (loan.status === LoanStatus.OVERDUE) {
-      fee_amount = this.fee_schedule.fee_for_overdue_item(loan);
+      const calculator = (this.fee_schedule as any).feeForOverdueItem ?? (this.fee_schedule as any).fee_for_overdue_item;
+      if (calculator) fee_amount = calculator.call(this.fee_schedule, loan);
     }
 
     if (fee_amount) {

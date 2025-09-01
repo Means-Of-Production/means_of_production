@@ -11,13 +11,18 @@
   "scripts": {
     "build": "tsc -p .",
     "clean": "rm -rf dist",
-    "typecheck": "tsc -p . --noEmit"
+    "typecheck": "tsc -p . --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage"
   },
   "engines": {
     "node": ">=20"
   },
   "devDependencies": {
-    "typescript": "^5.5.4"
+    "typescript": "^5.5.4",
+    "vitest": "^1.6.0",
+    "@types/node": "^22.5.1"
   },
   "dependencies": {
     "decimal.js": "^10.4.3",
